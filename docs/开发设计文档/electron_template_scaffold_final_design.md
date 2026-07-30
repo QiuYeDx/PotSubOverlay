@@ -268,8 +268,8 @@ type UpdateCheckResult =
 
 约定版本：
 
-- Node.js：`>=18.18.0 <23`
-- 推荐 Node.js：`20.x`
+- Node.js：`^22.12.0 || ^24.0.0`
+- 推荐 Node.js：`24.x`，不使用非 LTS 的 Node.js 23
 - pnpm：`8.7.0`
 
 `package.json` 必须包含：
@@ -284,6 +284,7 @@ type UpdateCheckResult =
 - `build`：类型检查、Vite 构建、electron-builder 当前平台构建。
 - `build:renderer`：只构建前端与 Electron bundle。
 - `typecheck`：TypeScript 检查。
+- `electron:check`：验证 Electron、Chromium 与平滑圆角 CSS 运行时能力。
 - `release:dir`：当前平台目录包，便于调试。
 - `release:mac`：macOS dmg + zip。
 - `release:win`：Windows nsis。
@@ -341,4 +342,3 @@ type UpdateCheckResult =
 - `corepack pnpm build:renderer`
 - `corepack pnpm i18n:check`
 - 如启动 dev server 进行视觉验证，结束前必须停止对应进程。
-

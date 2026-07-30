@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { SmoothCorners } from "@/components/qiuye-ui/smooth-corners";
 import { APP_NAME } from "@/constants/app";
 import AppLogo from "@/assets/app-logo.svg";
 import {
@@ -23,38 +24,43 @@ function Home() {
   return (
     <div className="mx-auto max-w-5xl px-4 pb-[92px] pt-6 sm:px-8">
       <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
-        <section className="rounded-xl border bg-card p-6 shadow-sm">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-            <img
-              src={AppLogo}
-              alt={APP_NAME}
-              className="h-20 w-20 shrink-0 rounded-2xl shadow-sm"
-            />
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="m-0 text-2xl font-semibold tracking-tight">
-                  {t("home:hero.title")}
-                </h1>
-                <Badge variant="outline" className="font-mono text-[11px]">
-                  v{import.meta.env.VITE_APP_VERSION}
-                </Badge>
-              </div>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-                {t("home:hero.description")}
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2">
-                <Button size="sm" className="gap-1.5">
-                  <Rocket className="h-3.5 w-3.5" />
-                  {t("home:actions.start")}
-                </Button>
-                <Button size="sm" variant="outline" className="gap-1.5">
-                  <FolderCode className="h-3.5 w-3.5" />
-                  {t("home:actions.customize")}
-                </Button>
+        <SmoothCorners asChild radius={12} smoothing={0.7}>
+          <section
+            className="border bg-card p-6 shadow-sm"
+            data-smooth-corners="home-hero"
+          >
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+              <img
+                src={AppLogo}
+                alt={APP_NAME}
+                className="h-20 w-20 shrink-0 rounded-2xl shadow-sm"
+              />
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="m-0 text-2xl font-semibold tracking-tight">
+                    {t("home:hero.title")}
+                  </h1>
+                  <Badge variant="outline" className="font-mono text-[11px]">
+                    v{import.meta.env.VITE_APP_VERSION}
+                  </Badge>
+                </div>
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+                  {t("home:hero.description")}
+                </p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <Button size="sm" className="gap-1.5">
+                    <Rocket className="h-3.5 w-3.5" />
+                    {t("home:actions.start")}
+                  </Button>
+                  <Button size="sm" variant="outline" className="gap-1.5">
+                    <FolderCode className="h-3.5 w-3.5" />
+                    {t("home:actions.customize")}
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </SmoothCorners>
 
         <Card>
           <CardHeader>
@@ -104,4 +110,3 @@ function Home() {
 }
 
 export default Home;
-

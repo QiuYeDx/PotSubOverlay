@@ -6,7 +6,7 @@
 
 ## 运行与包管理
 
-- 使用 Node.js `>=18.18.0 <23`，推荐 Node.js `20.x`。
+- 使用 Node.js `^22.12.0 || ^24.0.0`，推荐 Node.js `24.x`；不使用非 LTS 的 Node.js 23。
 - 项目固定 `packageManager: pnpm@8.7.0`。
 - 执行 pnpm 命令时使用 `corepack pnpm ...`。
 - 不要用全局新版 pnpm 直接安装或更新依赖，避免重写旧版 lockfile。
@@ -43,4 +43,3 @@ corepack pnpm i18n:check
 ```bash
 corepack pnpm build:renderer
 ```
-

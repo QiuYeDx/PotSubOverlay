@@ -4,7 +4,7 @@
 
 ## 环境
 
-- Node.js: `>=18.18.0 <23`，推荐 `20.x`
+- Node.js: `^22.12.0 || ^24.0.0`，推荐 `24.x`（不使用非 LTS 的 Node.js 23）
 - pnpm: `8.7.0`
 
 建议统一使用：
@@ -22,6 +22,7 @@ corepack pnpm dev
 corepack pnpm typecheck
 corepack pnpm i18n:check
 corepack pnpm build:renderer
+corepack pnpm electron:check
 corepack pnpm release:dir
 corepack pnpm release:mac
 corepack pnpm release:win
@@ -94,5 +95,9 @@ corepack pnpm i18n:check
 - `docs/开发设计文档/electron_template_scaffold_final_design.md`
 - `docs/开发设计文档/electron_template_scaffold_execution_plan.md`
 
-后续中大型改动继续沿用该目录下的设计、执行计划和实施记录流程。
+新版 Electron 长期分支的版本选择、兼容边界和实施进度见：
 
+- `docs/开发设计文档/electron_modern_runtime_final_design.md`
+- `docs/开发设计文档/electron_modern_runtime_execution_plan.md`
+
+后续中大型改动继续沿用该目录下的设计、执行计划和实施记录流程。
