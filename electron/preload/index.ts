@@ -106,14 +106,14 @@ function useLoading() {
   const styleContent = `
 /* ---------- Preload Loading Screen ---------- */
 
-@keyframes fk-loader-enter {
+@keyframes fk-loader-content-enter {
   from {
     opacity: 0;
-    transform: scale(0.985);
+    transform: translateY(3px) scale(0.985);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -140,7 +140,7 @@ function useLoading() {
   -webkit-app-region: drag;
   user-select: none;
   isolation: isolate;
-  animation: fk-loader-enter 0.28s ease-out both;
+  opacity: 1;
 }
 
 .app-loading-wrap[data-fk-color-mode='light'] {
@@ -209,6 +209,18 @@ function useLoading() {
   will-change: opacity, transform;
 }
 
+.fk-progress-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: inherit;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  will-change: opacity, transform;
+  animation: fk-loader-content-enter 0.28s ease-out both;
+}
+
 .fk-percent {
   margin-top: 10px;
   font-family:
@@ -253,7 +265,7 @@ function useLoading() {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .app-loading-wrap { animation: none; }
+  .fk-progress-content { animation: none; }
 }
 
 @media (max-width: 420px), (max-height: 360px) {
@@ -328,8 +340,10 @@ function useLoading() {
     <div class="fk-reveal-circle" aria-hidden="true"></div>
     <div class="fk-exit-mask" aria-hidden="true"></div>
     <div class="fk-progress-stack" aria-hidden="true">
-      <div class="fk-wordmark">QiuYe Electron Template</div>
-      <div class="fk-percent">0%</div>
+      <div class="fk-progress-content">
+        <div class="fk-wordmark">QiuYe Electron Template</div>
+        <div class="fk-percent">0%</div>
+      </div>
     </div>
     <span class="fk-sr-only">QiuYe Electron Template is starting</span>
   `
