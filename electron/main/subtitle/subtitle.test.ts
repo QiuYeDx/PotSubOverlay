@@ -46,7 +46,7 @@ describe("finder", () => {
     ]);
   });
 
-  it("handles media names with dots and asmr.one style names", () => {
+  it("handles media names with dots and full-media-name subtitles", () => {
     const found = matchSubtitleFiles("D:/a/3. Dialogue Vol.20「poco」.wav", [
       "3. Dialogue Vol.20「poco」.lrc",
       "3. Dialogue Vol.20「poco」.wav.vtt",

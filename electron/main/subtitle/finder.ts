@@ -14,7 +14,7 @@ export interface SubtitleCandidate {
 
 /**
  * Pick the subtitle files that belong to a media file from a directory listing.
- * Matches `name.ext`, `name.<tag>.ext` and `name.mp3.ext` (asmr.one style).
+ * Matches `name.ext`, `name.<tag>.ext` and `name.mp3.ext` (full media name + extension).
  */
 export function matchSubtitleFiles(mediaPath: string, entries: string[]): SubtitleCandidate[] {
   const dir = path.dirname(mediaPath);
