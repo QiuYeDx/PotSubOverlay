@@ -2,6 +2,13 @@
 
 本项目的所有重要更改都将记录在此文件中。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [Unreleased]
+
+### 测试与文档
+
+- 更新 README 截图：主界面（中日双语）、外观设置、调整位置、简洁模式（中英双语），并新增托盘菜单截图
+- 开发用模拟播放器 `POTSUB_FAKE_PLAYER` 新增时长与 `hold` 参数，可把进度固定在某一句字幕上，方便截取文档配图
+
 ## [1.1.0] - 2026-10-08
 
 ### 新增

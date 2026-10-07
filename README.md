@@ -39,9 +39,11 @@
 
 - 简体中文 / 繁體中文 / English / 日本語 界面，浅色 / 深色主题，托盘常驻（菜单与应用同一套设计），开机启动。
 
-| 外观设置 | 调整位置 | 简洁模式 |
-|---|---|---|
-| ![外观](docs/images/appearance-dark.png) | ![调整位置](docs/images/edit-position.png) | ![简洁模式](docs/images/compact.png) |
+| 外观设置（深色） | 调整字幕位置 |
+|---|---|
+| ![外观设置：主语言与第二语言分别设置样式](docs/images/appearance-dark.png) | ![调整字幕位置：拖动移动、拖动两侧调整宽度](docs/images/edit-position.png) |
+| **简洁模式（中英双语）** | **托盘菜单** |
+| ![简洁模式：中英双语字幕](docs/images/compact.png) | ![托盘菜单](docs/images/tray-menu.png) |
 
 ## 使用
 
@@ -97,7 +99,7 @@ corepack pnpm icons:build
 
 发布或合入用户可见的改动时请更新 [CHANGELOG.md](CHANGELOG.md)（格式见 [docs/CHANGELOG_TEMPLATE.md](docs/CHANGELOG_TEMPLATE.md)），`check` 会检查当前版本是否有对应条目。
 
-开发调试时可以设置环境变量 `POTSUB_FAKE_PLAYER="<媒体路径>|<起始毫秒>"`，用模拟播放器代替 PotPlayer；`POTSUB_QA_SCRIPT` 可以驱动窗口截图做视觉验收（见 `electron/main/qa.ts`）。
+开发调试时可以设置环境变量 `POTSUB_FAKE_PLAYER="<媒体路径>|<起始毫秒>|<时长毫秒>|hold"`（后两项可省略；`hold` 让进度停在起始位置，便于截图），用模拟播放器代替 PotPlayer；`POTSUB_QA_SCRIPT` 可以驱动窗口截图做视觉验收（见 `electron/main/qa.ts`）。
 
 技术栈：Electron 41 · React 19 · TypeScript · Vite · Tailwind CSS 4 · shadcn/ui · [qiuye-ui](https://ui.qiuyedx.com/) · Motion · Zustand · i18next · koffi，基于 [qiuye-electron-template](https://github.com/QiuYeDx/qiuye-electron-template)（`electron-modern`）。
 
