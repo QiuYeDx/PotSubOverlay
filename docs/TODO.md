@@ -43,7 +43,7 @@
 - 真实番剧片段（从媒体库剪出前 4 分钟视频流，HEVC 10bit 1080p，关键帧间隔 1–10.4 秒，平均约 4.5 秒）
 - 静音 WAV
 
-**消息接口**（`WM_USER` = 0x400，`wParam` 为命令，`lParam` 为参数；定义见 PotPlayer SDK 头文件，例如 [ld3l/PotPlayerControl `InternalSimpleCmd.h`](https://github.com/ld3l/PotPlayerControl/blob/master/InternalSimpleCmd.h)）：
+**消息接口**（`WM_USER` = 0x400，`wParam` 为命令，`lParam` 为参数；定义见 PotPlayer SDK 头文件，例如 [ld3l/PotPlayerControl `InternalSimpleCmd.h`](https://github.com/ld3l/PotPlayerControl/blob/main/InternalSimpleCmd.h)）：
 
 | 命令 | 值 | 用途 | 实测 |
 |---|---|---|---|
