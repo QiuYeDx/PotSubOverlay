@@ -1,9 +1,11 @@
+import { EventEmitter } from "node:events";
 import { app, globalShortcut } from "electron";
 import { HOTKEY_ACTIONS } from "@/shared/defaults";
 import type {
   AppSnapshot,
   HotkeyAction,
   LangMode,
+  LangRoles,
   OverlayPlacement,
   PlayState,
   Settings,
@@ -18,9 +20,9 @@ import type { ControlWindow } from "./windows/control";
 import type { OverlayWindow } from "./windows/overlay";
 
 const SNAPSHOT_INTERVAL_MS = 120;
-const LANG_MODE_CYCLE: LangMode[] = ["both", "zh", "ja"];
+const LANG_MODE_CYCLE: LangMode[] = ["both", "primary", "secondary"];
 
-export class Controller {
+export class Controller extends EventEmitter<{ roles: [] }> {
   readonly monitor: PlayerMonitor;
   readonly session: SubtitleSession;
   private readonly bridge: PlayerBridge;
@@ -29,13 +31,14 @@ export class Controller {
   private snapshotTimer: NodeJS.Timeout | null = null;
   private snapshotDirty = false;
   private hotkeyFailures: HotkeyAction[] = [];
-  private listeners = new Set<(snapshot: AppSnapshot) => void>();
+  private snapshotListeners = new Set<(snapshot: AppSnapshot) => void>();
 
   constructor(
     private readonly settings: SettingsStore,
     private readonly overlay: OverlayWindow,
     private readonly control: ControlWindow
   ) {
+    super();
     const fake = process.env.POTSUB_FAKE_PLAYER;
     const bridge: PlayerBridge = fake
       ? FakePlayerBridge.fromEnv(fake)
@@ -63,6 +66,7 @@ export class Controller {
     this.session.on("change", () => {
       this.refreshDisplay();
       this.markDirty(true);
+      this.emit("roles");
     });
 
     settings.on("change", (next, previous) => this.handleSettingsChange(next, previous));
@@ -90,8 +94,8 @@ export class Controller {
   }
 
   onSnapshot(listener: (snapshot: AppSnapshot) => void): () => void {
-    this.listeners.add(listener);
-    return () => this.listeners.delete(listener);
+    this.snapshotListeners.add(listener);
+    return () => this.snapshotListeners.delete(listener);
   }
 
   snapshot(): AppSnapshot {
@@ -108,6 +112,7 @@ export class Controller {
       status: this.session.getStatus(),
       tracks: this.session.trackInfos(),
       availableLangs: this.session.availableLangs(),
+      roles: this.session.roles(settings.primaryLang),
       offsetMs: mediaPath ? (this.settings.getMedia(mediaPath)?.offsetMs ?? 0) : 0,
       display: this.display,
       overlayVisible: settings.overlayVisible,
@@ -196,13 +201,22 @@ export class Controller {
     if (next.launchAtLogin !== previous.launchAtLogin) {
       app.setLoginItemSettings({ openAtLogin: next.launchAtLogin, args: ["--hidden"] });
     }
-    if (next.filterSigns !== previous.filterSigns || next.preferVariant !== previous.preferVariant) {
+    if (
+      next.filterSigns !== previous.filterSigns ||
+      next.preferVariant !== previous.preferVariant ||
+      next.primaryLang !== previous.primaryLang
+    ) {
       void this.session.reload();
     }
     this.refreshDisplay();
     this.refreshVisibility();
     this.markDirty(true);
     this.control.send("settings:changed", next);
+  }
+
+  /** Languages of the current subtitle, used by the tray and the overlay sample. */
+  get roles(): LangRoles {
+    return this.session.roles(this.settings.get().primaryLang);
   }
 
   private refreshDisplay(): void {
@@ -213,7 +227,7 @@ export class Controller {
     const time = this.position.positionMs - offset;
     const hasMedia = Boolean(this.monitor.active()?.mediaPath);
     this.display = hasMedia
-      ? this.session.compose(time, settings.langMode, settings.langOrder)
+      ? this.session.compose(time, settings.langMode, settings.langOrder, settings.primaryLang)
       : EMPTY_DISPLAY;
     this.overlay.setDisplay(this.display);
   }
@@ -269,9 +283,9 @@ export class Controller {
         this.snapshotTimer = null;
         if (!this.snapshotDirty) return;
         this.snapshotDirty = false;
-        if (this.listeners.size === 0) return;
+        if (this.snapshotListeners.size === 0) return;
         const snapshot = this.snapshot();
-        for (const listener of this.listeners) listener(snapshot);
+        for (const listener of this.snapshotListeners) listener(snapshot);
       },
       urgent ? 0 : SNAPSHOT_INTERVAL_MS
     );

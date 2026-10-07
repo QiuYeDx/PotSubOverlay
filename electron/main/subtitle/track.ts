@@ -1,4 +1,4 @@
-import type { SubtitleLang } from "@/shared/types";
+import type { SubtitleLang } from "@/shared/languages";
 import { decodeSubtitle } from "./decode";
 import type { SubtitleCandidate } from "./finder";
 import { parseLangHint } from "./finder";
@@ -105,22 +105,33 @@ function score(track: SubtitleTrack, preferVariant: "sc" | "tc"): number {
   return value + Math.min(track.cues.length, 2000) / 1e6;
 }
 
-/** Choose which tracks to enable when the user has not chosen any. */
+/**
+ * Choose which tracks to enable when the user has not chosen any:
+ * 1. a bilingual file, preferring one that contains the primary language;
+ * 2. otherwise the best primary-language file plus the best file in another language;
+ * 3. otherwise the best file.
+ */
 export function selectDefaultTracks(
   tracks: SubtitleTrack[],
-  preferVariant: "sc" | "tc"
+  preferVariant: "sc" | "tc",
+  primaryLang: SubtitleLang
 ): SubtitleTrack[] {
   const usable = tracks.filter((track) => track.cues.length > 0);
   const best = (list: SubtitleTrack[]) =>
     [...list].sort((a, b) => score(b, preferVariant) - score(a, preferVariant))[0];
 
   const bilingual = usable.filter((track) => track.bilingual);
-  if (bilingual.length > 0) return [best(bilingual)];
+  if (bilingual.length > 0) {
+    const withPrimary = bilingual.filter((track) => track.langs.includes(primaryLang));
+    return [best(withPrimary.length > 0 ? withPrimary : bilingual)];
+  }
 
-  const zh = usable.filter((track) => track.langs.includes("zh"));
-  const ja = usable.filter((track) => track.langs.includes("ja"));
-  if (zh.length > 0 && ja.length > 0) return [best(zh), best(ja)];
-
-  const any = best(usable);
-  return any ? [any] : [];
+  const primary = best(usable.filter((track) => track.langs.includes(primaryLang)));
+  const anchor = primary ?? best(usable);
+  if (!anchor) return [];
+  const anchorLang = primary ? primaryLang : anchor.langs[0];
+  const other = best(
+    usable.filter((track) => track !== anchor && !track.langs.includes(anchorLang) && track.langs[0] !== "other")
+  );
+  return other ? [anchor, other] : [anchor];
 }

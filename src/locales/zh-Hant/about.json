@@ -1,7 +1,7 @@
 {
   "title": "關於",
   "description": "版本、專案連結與授權資訊。",
-  "tagline": "把 PotPlayer 正在播放的字幕，放到遊戲畫面上。為邊玩遊戲邊聽日語動畫、ASMR 與音聲作品而做。",
+  "tagline": "把 PotPlayer 正在播放的字幕，放到遊戲畫面上。為邊玩遊戲邊聽外語動畫、影集、ASMR 與音聲作品而做。",
   "buttons": {
     "repo": "儲存庫",
     "releases": "發布紀錄"

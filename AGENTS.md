@@ -16,6 +16,10 @@ PotSubOverlay：读取 PotPlayer 正在播放的文件与进度，把同名外�
 - PotPlayer 取路径必须用 `PostMessage` + `WM_COPYDATA`（`hookWindowMessage`），不要改成 `SendMessage`：回复会在 FFI 调用期间重入主线程。
 - 字幕窗口（`overlay.html` / `src/overlay/`）是独立的轻量页面：不引入 i18next、路由和模板 loading；文案在 `src/overlay/strings.ts`。
 - `src/shared/` 是主进程与渲染进程共享的类型和默认值，不得引入 Node 或 DOM API。
+- 双语按“主语言 / 第二语言”角色工作，语言表（名称、字体栈、示例文本）集中在 `src/shared/languages.ts`；业务逻辑与文案里不要写死具体语言组合。
+- 字幕窗口创建后始终保持显示，“隐藏字幕”是页面内淡出（`overlay:visible`）；不要改回 `win.hide()/show()`，系统窗口动画会造成闪烁。
+- 托盘菜单是自绘的透明窗口（`windows/tray-menu.ts` + `tray-menu.html`），因为 Windows 原生菜单无法主题化；新增菜单项在 `tray.ts` 的 `menuState()` 与 `src/tray-menu/TrayMenu.tsx` 同步修改。
+- 绝对定位的装饰层（如预览舞台里的字幕和占位文字）必须 `pointer-events-none`，避免挡住其上的按钮。
 - 主进程只把原生模块（koffi）设为 external，其余依赖打包进 bundle；electron-builder 只携带 koffi 与 `@koromix/koffi-win32-x64`。新增原生依赖时要同步 `vite.config.ts` 的 `mainExternal` 和 `electron-builder.json` 的 `files` / `asarUnpack`。
 - 模板文件在 Windows 上以 CRLF 检出（`core.autocrlf=true`），脚本化的多行替换要考虑行尾。
 

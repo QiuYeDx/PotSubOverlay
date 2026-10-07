@@ -6,13 +6,12 @@ import { SettingsGroup } from "@/components/app/SettingsGroup";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import type { SubtitleTrackInfo } from "@/shared/types";
+import useLanguageName from "@/hooks/useLanguageName";
 import useAppStore from "@/store/useAppStore";
 
 function LangBadges({ track }: { track: SubtitleTrackInfo }) {
-  const { t } = useTranslation();
-  const labels = track.bilingual
-    ? [t("player:tracks.bilingual")]
-    : track.langs.map((lang) => t(`player:tracks.lang_${lang}`));
+  const nameOf = useLanguageName();
+  const labels = track.langs.filter((lang) => lang !== "other" || track.langs.length === 1).map(nameOf);
   return (
     <>
       {labels.map((label) => (

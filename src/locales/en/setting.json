@@ -49,6 +49,8 @@
     "hide_paused": "Hide When Paused",
     "hide_paused_hint": "Don't show subtitles while PotPlayer is paused",
     "subtitle_title": "Subtitle Files",
+    "primary_lang": "Primary Language",
+    "primary_lang_hint": "Shown as the primary line of bilingual subtitles",
     "filter_signs": "Filter Sign Subtitles",
     "filter_signs_hint": "Ignore positioned on-screen text and signs in ASS files",
     "variant": "Chinese Variant",
@@ -77,7 +79,7 @@
     "actions": {
       "toggleOverlay": "Show / Hide Subtitles",
       "toggleEdit": "Adjust Subtitle Position",
-      "cycleLangMode": "Cycle Both / Chinese / Japanese",
+      "cycleLangMode": "Cycle Both / Primary / Second Language",
       "offsetBackward": "Subtitles {{step}} Earlier",
       "offsetForward": "Subtitles {{step}} Later"
     }

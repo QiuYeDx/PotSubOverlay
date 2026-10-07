@@ -1,8 +1,4 @@
 {
-  "sample": {
-    "zh": "接下来将为您展现的是",
-    "ja": "これから ご覧に入れますのは"
-  },
   "preview": {
     "source": "Preview",
     "sample": "Sample",
@@ -11,10 +7,10 @@
   },
   "text": {
     "title": "Text",
-    "description": "Chinese and Japanese are styled separately",
-    "language": "Language",
-    "zh": "Chinese",
-    "ja": "Japanese",
+    "description": "Primary: {{primary}} · Second: {{secondary}}",
+    "role": "Language",
+    "primary": "Primary",
+    "secondary": "Second",
     "font": "Font",
     "size": "Size",
     "weight": "Weight",
@@ -33,16 +29,13 @@
     "all": "All Fonts",
     "loading": "Loading system fonts…",
     "empty": "No matching fonts",
-    "sample_zh": "字幕示例 永",
-    "sample_ja": "字幕サンプル 永"
+    "auto": "Auto (a font for {{lang}})"
   },
   "layout": {
     "title": "Layout",
     "order": "Order",
-    "zh_first": "Chinese on Top",
-    "ja_first": "Japanese on Top",
-    "secondary_scale": "Second Language Size",
-    "secondary_scale_hint": "Relative to the first language",
+    "primary_first": "Primary on Top",
+    "secondary_first": "Second on Top",
     "block_gap": "Language Spacing",
     "line_gap": "Line Spacing",
     "letter_spacing": "Letter Spacing"

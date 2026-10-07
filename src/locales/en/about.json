@@ -1,7 +1,7 @@
 {
   "title": "About",
   "description": "Version, project links and license.",
-  "tagline": "Puts the subtitles PotPlayer is playing on top of your game. Made for listening to Japanese anime, ASMR and voice works while you play.",
+  "tagline": "Puts the subtitles PotPlayer is playing on top of your game. Made for listening to foreign-language anime, shows, ASMR and voice works while you play.",
   "buttons": {
     "repo": "Repository",
     "releases": "Releases"

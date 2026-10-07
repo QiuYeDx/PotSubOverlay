@@ -1,0 +1,12 @@
+/* The menu window is transparent; only the menu surface paints. */
+html,
+body,
+#root {
+  height: auto;
+  background: transparent !important;
+  overflow: hidden;
+}
+
+body {
+  user-select: none;
+}

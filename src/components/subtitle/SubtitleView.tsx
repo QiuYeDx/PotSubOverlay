@@ -1,15 +1,8 @@
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { CSSProperties } from "react";
-import type { DisplayPayload, OverlayStyle, SubtitleLang, TextStyle } from "@/shared/types";
+import { FONT_STACK, HTML_LANG } from "@/shared/languages";
+import type { DisplayPayload, LangRole, OverlayStyle, SubtitleLang } from "@/shared/types";
 import { cn } from "@/lib/utils";
-
-const FALLBACK_FONTS: Record<SubtitleLang, string> = {
-  zh: '"Microsoft YaHei UI", "PingFang SC", "Noto Sans SC", sans-serif',
-  ja: '"Yu Gothic UI", "Meiryo", "Noto Sans JP", sans-serif',
-  other: '"Segoe UI", system-ui, sans-serif',
-};
-
-const HTML_LANG: Record<SubtitleLang, string> = { zh: "zh-CN", ja: "ja", other: "en" };
 
 function hexToRgba(hex: string, alpha: number): string {
   const value = hex.replace("#", "");
@@ -19,22 +12,22 @@ function hexToRgba(hex: string, alpha: number): string {
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
 }
 
-function textStyleFor(lang: SubtitleLang, style: OverlayStyle): TextStyle {
-  // "other" (e.g. romaji or English lyrics) follows the Japanese style.
-  return lang === "zh" ? style.zh : style.ja;
+/** A style's font, falling back to (or, when empty, entirely using) a stack suited to the language. */
+export function fontFamilyFor(family: string, lang: SubtitleLang): string {
+  return family ? `"${family}", ${FONT_STACK[lang]}` : FONT_STACK[lang];
 }
 
 export function lineCss(
   lang: SubtitleLang,
+  role: LangRole,
   style: OverlayStyle,
-  secondary: boolean,
   scale = 1
 ): CSSProperties {
-  const text = textStyleFor(lang, style);
-  const size = text.fontSize * (secondary ? style.secondaryScale : 1) * scale;
+  const text = style[role];
+  const size = text.fontSize * scale;
   const outline = style.outlineWidth * scale;
   return {
-    fontFamily: `"${text.fontFamily}", ${FALLBACK_FONTS[lang]}`,
+    fontFamily: fontFamilyFor(text.fontFamily, lang),
     fontSize: `${size}px`,
     fontWeight: text.fontWeight,
     color: text.color,
@@ -60,8 +53,8 @@ export interface SubtitleViewProps {
 }
 
 /**
- * Renders subtitle blocks exactly like the overlay does. The first block is
- * the primary language; following blocks use the secondary scale.
+ * Renders subtitle blocks exactly like the overlay does; each block is styled
+ * by its role (primary / secondary language).
  */
 export function SubtitleView({ display, style, scale = 1, animate, className }: SubtitleViewProps) {
   const reduceMotion = useReducedMotion();
@@ -89,6 +82,7 @@ export function SubtitleView({ display, style, scale = 1, animate, className }: 
               <div
                 key={`${block.lang}-${index}`}
                 lang={HTML_LANG[block.lang]}
+                dir="auto"
                 className="flex w-full flex-col items-center"
                 style={{ gap: style.lineGap * scale }}
               >
@@ -97,7 +91,7 @@ export function SubtitleView({ display, style, scale = 1, animate, className }: 
                     key={lineIndex}
                     className="max-w-full whitespace-pre-wrap break-words"
                     style={{
-                      ...lineCss(block.lang, style, index > 0, scale),
+                      ...lineCss(block.lang, block.role, style, scale),
                       ...(boxed
                         ? {
                             background: hexToRgba(style.backgroundColor, style.backgroundOpacity),

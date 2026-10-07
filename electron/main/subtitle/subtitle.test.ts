@@ -1,6 +1,7 @@
 import iconv from "iconv-lite";
 import { describe, expect, it } from "vitest";
-import { composeDisplay } from "./compose";
+import { composeDisplay, resolveRoles } from "./compose";
+import { migrateSettings } from "../settings-migrate";
 import { decodeSubtitle } from "./decode";
 import { matchSubtitleFiles, parseLangHint } from "./finder";
 import { classifyLine } from "./lang";
@@ -59,6 +60,11 @@ describe("finder", () => {
     expect(parseLangHint("JA")).toEqual({ langs: ["ja"], variant: null });
     expect(parseLangHint("chs&jpn")).toEqual({ langs: ["zh", "ja"], variant: "sc" });
     expect(parseLangHint("mp3")).toEqual({ langs: [], variant: null });
+    expect(parseLangHint("chseng")).toEqual({ langs: ["zh", "en"], variant: "sc" });
+    expect(parseLangHint("zh-en")).toEqual({ langs: ["zh", "en"], variant: null });
+    expect(parseLangHint("简英双语")).toEqual({ langs: ["zh", "en"], variant: "sc" });
+    expect(parseLangHint("kor")).toEqual({ langs: ["ko"], variant: null });
+    expect(parseLangHint("edited")).toEqual({ langs: [], variant: null });
   });
 });
 
@@ -217,6 +223,9 @@ describe("language", () => {
     expect(classifyLine("我们走吧")).toBe("zh");
     expect(classifyLine("大丈夫")).toBe("han");
     expect(classifyLine("you bleed")).toBe("latin");
+    expect(classifyLine("안녕하세요")).toBe("ko");
+    expect(classifyLine("Привет, как дела?")).toBe("ru");
+    expect(classifyLine("Xin chào các bạn")).toBe("vi");
     expect(classifyLine("……")).toBe("none");
   });
 
@@ -250,34 +259,40 @@ describe("selection and composition", () => {
   it("prefers a bilingual track, else zh + ja", () => {
     const sc = track("ep.scjp.ass", "[Events]\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,你好\\Nこんにちは\nDialogue: 0,0:00:03.00,0:00:04.00,Default,,0,0,0,,再见吧\\Nさようなら\nDialogue: 0,0:00:05.00,0:00:06.00,Default,,0,0,0,,我们走\\N行きましょう\n");
     const tc = track("ep.tcjp.ass", "[Events]\nDialogue: 0,0:00:01.00,0:00:02.00,Default,,0,0,0,,你好\\Nこんにちは\nDialogue: 0,0:00:03.00,0:00:04.00,Default,,0,0,0,,再見吧\\Nさようなら\nDialogue: 0,0:00:05.00,0:00:06.00,Default,,0,0,0,,我們走\\N行きましょう\n");
-    expect(selectDefaultTracks([zh(), tc, sc], "sc").map((t) => t.fileName)).toEqual([
+    expect(selectDefaultTracks([zh(), tc, sc], "sc", "zh").map((t) => t.fileName)).toEqual([
       "ep.scjp.ass",
     ]);
-    expect(selectDefaultTracks([zh(), ja()], "sc").map((t) => t.fileName)).toEqual([
+    expect(selectDefaultTracks([zh(), ja()], "sc", "zh").map((t) => t.fileName)).toEqual([
       "ep.zh.srt",
       "ep.ja.srt",
     ]);
+    // English preferred but only zh + ja files: both languages still show.
+    expect(selectDefaultTracks([zh(), ja()], "sc", "en")).toHaveLength(2);
   });
 
   it("merges two files and honours mode and order", () => {
     const tracks = [zh(), ja()];
-    expect(composeDisplay(tracks, 2000, "both", "zh-first").blocks).toEqual([
-      { lang: "zh", lines: ["早上好"] },
-      { lang: "ja", lines: ["おはよう"] },
+    expect(composeDisplay(tracks, 2000, "both", "primary-first", "zh").blocks).toEqual([
+      { lang: "zh", role: "primary", lines: ["早上好"] },
+      { lang: "ja", role: "secondary", lines: ["おはよう"] },
     ]);
-    expect(composeDisplay(tracks, 2000, "both", "ja-first").blocks[0].lang).toBe("ja");
-    expect(composeDisplay(tracks, 2000, "ja", "zh-first").blocks).toEqual([
-      { lang: "ja", lines: ["おはよう"] },
+    expect(composeDisplay(tracks, 2000, "both", "secondary-first", "zh").blocks[0].lang).toBe("ja");
+    expect(composeDisplay(tracks, 2000, "secondary", "primary-first", "zh").blocks).toEqual([
+      { lang: "ja", role: "secondary", lines: ["おはよう"] },
     ]);
-    expect(composeDisplay(tracks, 4200, "both", "zh-first").blocks).toEqual([
-      { lang: "zh", lines: ["再见"] },
+    expect(composeDisplay(tracks, 4200, "both", "primary-first", "zh").blocks).toEqual([
+      { lang: "zh", role: "primary", lines: ["再见"] },
     ]);
-    expect(composeDisplay(tracks, 9000, "both", "zh-first").key).toBe("");
+    expect(composeDisplay(tracks, 9000, "both", "primary-first", "zh").key).toBe("");
+    // Japanese as the preferred language swaps the roles.
+    expect(
+      composeDisplay(tracks, 2000, "both", "primary-first", "ja").blocks.map((b) => b.lang)
+    ).toEqual(["ja", "zh"]);
   });
 
   it("ignores the mode for single-language subtitles", () => {
-    expect(composeDisplay([zh()], 2000, "ja", "zh-first").blocks).toEqual([
-      { lang: "zh", lines: ["早上好"] },
+    expect(composeDisplay([zh()], 2000, "secondary", "primary-first", "zh").blocks).toEqual([
+      { lang: "zh", role: "primary", lines: ["早上好"] },
     ]);
   });
 
@@ -288,5 +303,111 @@ describe("selection and composition", () => {
     );
     expect(activeCues(t, 2500).map((c) => c.lines[0].text)).toEqual(["长句子", "短句"]);
     expect(activeCues(t, 5000).map((c) => c.lines[0].text)).toEqual(["长句子"]);
+  });
+});
+
+describe("other languages", () => {
+  const srt = (pairs: [string, string][]) =>
+    pairs
+      .map(([a, b], i) => `${i + 1}\n00:00:0${i * 2 + 1},000 --> 00:00:0${i * 2 + 2},000\n${a}\n${b}\n`)
+      .join("\n");
+
+  it("detects Chinese + English bilingual subtitles", () => {
+    const t = track(
+      "movie.srt",
+      srt([
+        ["我们走吧", "Let's go, we are late."],
+        ["你在说什么", "What are you talking about?"],
+        ["大丈夫", "It's fine, don't worry."],
+        ["这是我的", "This is my house."],
+      ])
+    );
+    expect(t.bilingual).toBe(true);
+    expect(t.langs).toEqual(["zh", "en"]);
+    expect(t.cues[2].lines.map((l) => l.lang)).toEqual(["zh", "en"]);
+  });
+
+  it("detects Korean + English and resolves roles", () => {
+    const t = track(
+      "drama.srt",
+      srt([
+        ["안녕하세요", "Hello there, how are you?"],
+        ["괜찮아요", "I'm fine, thank you."],
+        ["가자", "Let's go to the station."],
+      ])
+    );
+    expect(t.langs).toEqual(["ko", "en"]);
+    expect(resolveRoles(t.langs, "zh")).toEqual({ primary: "ko", secondary: "en" });
+    expect(resolveRoles(t.langs, "en")).toEqual({ primary: "en", secondary: "ko" });
+    expect(
+      composeDisplay([t], 1500, "both", "primary-first", "en").blocks.map((b) => b.lang)
+    ).toEqual(["en", "ko"]);
+  });
+
+  it("tells French from English by function words", () => {
+    const fr = track(
+      "film.srt",
+      "1\n00:00:01,000 --> 00:00:02,000\nJe ne sais pas ce que tu veux\n\n2\n00:00:03,000 --> 00:00:04,000\nC'est la vie, mais il est tard\n\n3\n00:00:05,000 --> 00:00:06,000\nOn va avec elle pour le dîner\n"
+    );
+    expect(fr.langs).toEqual(["fr"]);
+  });
+
+  it("also upgrades untouched defaults in unreleased v2 files", () => {
+    const migrated = migrateSettings({
+      version: 2,
+      style: {
+        primary: { fontFamily: "", fontSize: 34, fontWeight: 600, color: "#FFFFFF" },
+        secondary: { fontFamily: "", fontSize: 28, fontWeight: 600, color: "#FFFFFF" },
+        outlineWidth: 2,
+      },
+    }) as Record<string, any>;
+    expect(migrated.version).toBe(3);
+    expect(migrated.style.primary.fontSize).toBe(30);
+    expect(migrated.style.secondary.fontSize).toBe(28);
+    expect(migrated.style.outlineWidth).toBe(2);
+  });
+
+  it("moves untouched 1.0 defaults to the 1.1 defaults", () => {
+    const migrated = migrateSettings({
+      version: 1,
+      style: {
+        zh: { fontFamily: "Microsoft YaHei UI", fontSize: 34, fontWeight: 600, color: "#FFFFFF" },
+        ja: { fontFamily: "Yu Gothic UI", fontSize: 34, fontWeight: 600, color: "#FFFFFF" },
+        secondaryScale: 0.74,
+        outlineWidth: 3,
+      },
+    }) as Record<string, any>;
+    expect(migrated.style.primary.fontSize).toBe(30);
+    expect(migrated.style.secondary.fontSize).toBe(24);
+    expect(migrated.style.outlineWidth).toBe(1.5);
+    expect(migrated.style.secondary.fontFamily).toBe("");
+  });
+
+  it("migrates 1.0 settings", () => {
+    const migrated = migrateSettings({
+      version: 1,
+      langMode: "ja",
+      langOrder: "ja-first",
+      style: {
+        zh: { fontFamily: "Microsoft YaHei UI", fontSize: 36, fontWeight: 700, color: "#FFFFFF" },
+        ja: { fontFamily: "Meiryo UI", fontSize: 40, fontWeight: 600, color: "#FFEEAA" },
+        secondaryScale: 0.5,
+      },
+    }) as Record<string, any>;
+    expect(migrated.version).toBe(3);
+    expect(migrated.langMode).toBe("secondary");
+    expect(migrated.langOrder).toBe("secondary-first");
+    expect(migrated.style.primary).toEqual({
+      fontFamily: "",
+      fontSize: 36,
+      fontWeight: 700,
+      color: "#FFFFFF",
+    });
+    expect(migrated.style.secondary).toEqual({
+      fontFamily: "Meiryo UI",
+      fontSize: 20,
+      fontWeight: 600,
+      color: "#FFEEAA",
+    });
   });
 });

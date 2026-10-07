@@ -49,9 +49,11 @@
     "hide_paused": "暂停时隐藏",
     "hide_paused_hint": "PotPlayer 暂停时不显示字幕",
     "subtitle_title": "字幕文件",
+    "primary_lang": "主语言",
+    "primary_lang_hint": "双语字幕里优先作为主语言显示的语言",
     "filter_signs": "过滤特效字幕",
     "filter_signs_hint": "忽略 ASS 中带定位的屏幕字、招牌等特效",
-    "variant": "简繁偏好",
+    "variant": "中文简繁偏好",
     "variant_hint": "同时有简体与繁体字幕时默认选用",
     "variant_sc": "简体",
     "variant_tc": "繁體",
@@ -77,7 +79,7 @@
     "actions": {
       "toggleOverlay": "显示 / 隐藏字幕",
       "toggleEdit": "调整字幕位置",
-      "cycleLangMode": "切换双语 / 中文 / 日文",
+      "cycleLangMode": "切换 双语 / 主语言 / 第二语言",
       "offsetBackward": "字幕提前 {{step}}",
       "offsetForward": "字幕延后 {{step}}"
     }

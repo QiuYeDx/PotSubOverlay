@@ -34,8 +34,8 @@
   },
   "lang": {
     "both": "雙語",
-    "zh": "中文",
-    "ja": "日文",
+    "primary": "主語言",
+    "secondary": "第二語言",
     "single_hint": "目前字幕只有一種語言"
   },
   "offset": {
@@ -56,14 +56,10 @@
   },
   "tracks": {
     "title": "字幕檔",
-    "multi_hint": "可同時啟用多個檔案，例如分開的中文與日文字幕",
+    "multi_hint": "可同時啟用多個檔案，例如兩種語言分開的字幕",
     "rescan": "重新掃描",
     "pick": "選擇字幕檔…",
     "reveal": "在資料夾中顯示",
-    "bilingual": "雙語",
-    "lang_zh": "中文",
-    "lang_ja": "日文",
-    "lang_other": "其他",
     "cues": "{{count}} 條",
     "read_failed": "讀取失敗",
     "idle_title": "等待播放",

@@ -10,8 +10,6 @@ const STRINGS = {
     done: "完成",
     display: "显示器",
     primary: "主显示器",
-    sampleZh: "这是一行示例字幕，用来确认位置与大小",
-    sampleJa: "これはサンプル字幕です",
     width: "宽度",
   },
   "zh-Hant": {
@@ -21,8 +19,6 @@ const STRINGS = {
     done: "完成",
     display: "顯示器",
     primary: "主顯示器",
-    sampleZh: "這是一行示例字幕，用來確認位置與大小",
-    sampleJa: "これはサンプル字幕です",
     width: "寬度",
   },
   en: {
@@ -32,8 +28,6 @@ const STRINGS = {
     done: "Done",
     display: "Display",
     primary: "Primary",
-    sampleZh: "这是一行示例字幕，用来确认位置与大小",
-    sampleJa: "これはサンプル字幕です",
     width: "Width",
   },
   ja: {
@@ -43,8 +37,6 @@ const STRINGS = {
     done: "完了",
     display: "ディスプレイ",
     primary: "メイン",
-    sampleZh: "这是一行示例字幕，用来确认位置与大小",
-    sampleJa: "これはサンプル字幕です",
     width: "幅",
   },
 } as const;

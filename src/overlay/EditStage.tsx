@@ -2,6 +2,7 @@ import { motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { SubtitleView } from "@/components/subtitle/SubtitleView";
 import { DEFAULT_PLACEMENT } from "@/shared/defaults";
+import { SAMPLE_TEXT } from "@/shared/languages";
 import type {
   DisplayPayload,
   OverlayModeMessage,
@@ -63,11 +64,11 @@ function EditStage({
         : {
             key: "sample",
             blocks: [
-              { lang: "zh", lines: [t.sampleZh] },
-              { lang: "ja", lines: [t.sampleJa] },
+              { lang: mode.sampleLangs[0], role: "primary", lines: [SAMPLE_TEXT[mode.sampleLangs[0]]] },
+              { lang: mode.sampleLangs[1], role: "secondary", lines: [SAMPLE_TEXT[mode.sampleLangs[1]]] },
             ],
           },
-    [display, t]
+    [display, mode.sampleLangs]
   );
 
   const commit = useCallback((next: OverlayPlacement) => {

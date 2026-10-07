@@ -34,8 +34,8 @@
   },
   "lang": {
     "both": "Both",
-    "zh": "Chinese",
-    "ja": "Japanese",
+    "primary": "Primary",
+    "secondary": "Second",
     "single_hint": "This subtitle has only one language"
   },
   "offset": {
@@ -56,14 +56,10 @@
   },
   "tracks": {
     "title": "Subtitle Files",
-    "multi_hint": "Several files can be on at once, e.g. separate Chinese and Japanese files",
+    "multi_hint": "Several files can be on at once, e.g. one file per language",
     "rescan": "Rescan",
     "pick": "Choose Subtitle File…",
     "reveal": "Show in Folder",
-    "bilingual": "Bilingual",
-    "lang_zh": "Chinese",
-    "lang_ja": "Japanese",
-    "lang_other": "Other",
     "cues": "{{count}} lines",
     "read_failed": "Couldn't read",
     "idle_title": "Waiting for Playback",

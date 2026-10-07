@@ -112,3 +112,26 @@ interface Track { id; path; format; tagLangs; cues; langProfile: { langs: Lang[]
 | 游戏自身也置顶 | 定时重申置顶；文档说明使用无边框窗口 |
 | 网络盘 `fs.watch` 不可靠 | 捕获异常，提供“重新扫描”按钮，媒体切换时总会重新扫描 |
 | 纯汉字日文行误判为中文 | slot 多数投票 + 文件名标记 + 手动指定轨道语言 |
+
+## v1.1：通用双语（主语言 + 第二语言）
+
+v1.0 把双语写死为“中文 + 日文”。v1.1 改为按“角色”工作，不假设具体语言组合。
+
+### 支持的语言
+
+`zh` `ja` `ko` `en` `fr` `de` `es` `pt` `it` `ru` `th` `vi` `ar`，其余记为 `other`。语言表（显示名、HTML lang、默认字体栈、示例文本）集中在 `src/shared/languages.ts`，主进程与渲染进程共用。
+
+### 识别
+
+- 按文字系统分类：假名 → `ja`，谚文 → `ko`，西里尔 → `ru`，泰文 → `th`，阿拉伯 → `ar`，越南语特有字母 → `vi`，汉字（含中文专用字）→ `zh` / 待定，拉丁字母 → 待定。
+- 拉丁字母行按 slot 汇总后用高频功能词打分区分 `en/fr/de/es/pt/it`，没有把握时默认 `en`。
+- 仍按 slot（ASS 样式 / 行序）投票回填待定行；≥2 个有效 slot 语言不同即为双语。
+- 文件名标记扩展到全部语言，并能拆分连写组合：`scjp`、`chseng`、`zhen`、`简英`、`中日双语` 等。
+
+### 角色
+
+- 设置 `primaryLang`（默认 `zh`）。当前字幕包含主语言时它就是“主语言”，否则取出现的第一种语言；“第二语言”为另一种语言。
+- `langMode`：`both` / `primary` / `secondary`；`langOrder`：`primary-first`（默认）/ `secondary-first`。
+- 外观按角色设置：`style.primary` / `style.secondary` 各自的字体（空 = 按语言自动）、字号、字重、颜色；取消 `secondaryScale`。
+- 默认轨道选择：优先包含主语言的双语文件；否则“主语言最佳文件 + 另一语言最佳文件”；再否则任意最佳文件。
+- 设置文件升级到 `version: 3`：自动迁移 v1 的 `zh/ja` 样式与模式；仍是 1.0 默认值（34px / 25px / 3px 描边）的项改为新默认值（30px / 24px / 1.5px），用户改过的值保持不变。

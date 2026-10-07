@@ -1,5 +1,6 @@
-import { Menu, Tray, nativeImage } from "electron";
-import type { LangMode, Settings } from "@/shared/types";
+import { Tray, nativeImage } from "electron";
+import { languageName } from "@/shared/languages";
+import type { LangMode, LangRoles, Settings, TrayMenuState } from "@/shared/types";
 
 type Locale = "zh" | "zh-Hant" | "en" | "ja";
 
@@ -10,8 +11,9 @@ const STRINGS: Record<Locale, Record<string, string>> = {
     editPosition: "调整字幕位置",
     language: "字幕语言",
     both: "双语",
-    zh: "仅中文",
-    ja: "仅日文",
+    only: "仅{lang}",
+    primary: "仅主语言",
+    secondary: "仅第二语言",
     quit: "退出",
     hintTitle: "PotSubOverlay 仍在运行",
     hintBody: "字幕会继续显示。点击托盘图标可重新打开控制面板。",
@@ -22,8 +24,9 @@ const STRINGS: Record<Locale, Record<string, string>> = {
     editPosition: "調整字幕位置",
     language: "字幕語言",
     both: "雙語",
-    zh: "僅中文",
-    ja: "僅日文",
+    only: "僅{lang}",
+    primary: "僅主語言",
+    secondary: "僅第二語言",
     quit: "結束",
     hintTitle: "PotSubOverlay 仍在執行",
     hintBody: "字幕會繼續顯示。點擊系統匣圖示可重新開啟控制面板。",
@@ -34,8 +37,9 @@ const STRINGS: Record<Locale, Record<string, string>> = {
     editPosition: "Adjust Subtitle Position",
     language: "Subtitle Language",
     both: "Bilingual",
-    zh: "Chinese Only",
-    ja: "Japanese Only",
+    only: "{lang} Only",
+    primary: "Primary Language Only",
+    secondary: "Second Language Only",
     quit: "Quit",
     hintTitle: "PotSubOverlay is still running",
     hintBody: "Subtitles keep working. Click the tray icon to reopen the control panel.",
@@ -46,69 +50,62 @@ const STRINGS: Record<Locale, Record<string, string>> = {
     editPosition: "字幕の位置を調整",
     language: "字幕の言語",
     both: "二か国語",
-    zh: "中国語のみ",
-    ja: "日本語のみ",
+    only: "{lang}のみ",
+    primary: "第一言語のみ",
+    secondary: "第二言語のみ",
     quit: "終了",
     hintTitle: "PotSubOverlay は実行中です",
     hintBody: "字幕は引き続き表示されます。トレイアイコンをクリックするとコントロールパネルを再度開けます。",
   },
 };
 
-export interface TrayActions {
-  open: () => void;
-  toggleOverlay: () => void;
-  edit: () => void;
-  setLangMode: (mode: LangMode) => void;
-  quit: () => void;
-}
-
 export class AppTray {
   private tray: Tray;
   private locale: Locale = "zh";
 
+  /**
+   * @param openMenu Shows the styled tray menu (Windows does not let native
+   *   context menus be themed, so the app draws its own).
+   */
   constructor(
     iconPath: string,
-    private readonly actions: TrayActions,
-    private getSettings: () => Settings
+    private readonly onOpen: () => void,
+    private readonly openMenu: (state: TrayMenuState) => void,
+    private readonly getSettings: () => Settings,
+    private readonly getRoles: () => LangRoles
   ) {
     this.tray = new Tray(nativeImage.createFromPath(iconPath));
     this.tray.setToolTip("PotSubOverlay");
-    this.tray.on("click", () => actions.open());
-    this.refresh();
+    this.tray.on("click", () => this.onOpen());
+    this.tray.on("right-click", () => this.openMenu(this.menuState()));
   }
 
   setLocale(locale: string): void {
-    const next = (locale in STRINGS ? locale : "zh") as Locale;
-    if (next === this.locale) return;
-    this.locale = next;
-    this.refresh();
+    this.locale = (locale in STRINGS ? locale : "zh") as Locale;
   }
 
-  refresh(): void {
+  menuState(): TrayMenuState {
     const t = STRINGS[this.locale];
     const settings = this.getSettings();
-    const mode = (value: LangMode) => ({
-      label: t[value],
-      type: "radio" as const,
-      checked: settings.langMode === value,
-      click: () => this.actions.setLangMode(value),
-    });
-    this.tray.setContextMenu(
-      Menu.buildFromTemplate([
-        { label: t.open, click: () => this.actions.open() },
-        { type: "separator" },
-        {
-          label: t.showSubtitle,
-          type: "checkbox",
-          checked: settings.overlayVisible,
-          click: () => this.actions.toggleOverlay(),
-        },
-        { label: t.editPosition, click: () => this.actions.edit() },
-        { label: t.language, submenu: [mode("both"), mode("zh"), mode("ja")] },
-        { type: "separator" },
-        { label: t.quit, click: () => this.actions.quit() },
-      ])
-    );
+    const roles = this.getRoles();
+    const label = (value: LangMode) => {
+      if (value === "both") return t.both;
+      const lang = roles[value];
+      return lang ? t.only.replace("{lang}", languageName(lang, this.locale)) : t[value];
+    };
+    return {
+      labels: {
+        open: t.open,
+        showSubtitle: t.showSubtitle,
+        editPosition: t.editPosition,
+        language: t.language,
+        quit: t.quit,
+      },
+      modes: (["both", "primary", "secondary"] as const).map((value) => ({ value, label: label(value) })),
+      modesEnabled: roles.primary !== null && roles.secondary !== null,
+      langMode: settings.langMode,
+      overlayVisible: settings.overlayVisible,
+    };
   }
 
   /** One-time native balloon explaining that closing the window keeps the app alive. */

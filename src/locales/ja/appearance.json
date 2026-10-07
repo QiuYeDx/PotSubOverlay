@@ -1,8 +1,4 @@
 {
-  "sample": {
-    "zh": "接下来将为您展现的是",
-    "ja": "これから ご覧に入れますのは"
-  },
   "preview": {
     "source": "プレビュー",
     "sample": "サンプル",
@@ -11,10 +7,10 @@
   },
   "text": {
     "title": "テキスト",
-    "description": "中国語と日本語を個別に設定できます",
-    "language": "言語",
-    "zh": "中国語",
-    "ja": "日本語",
+    "description": "第一言語：{{primary}} · 第二言語：{{secondary}}",
+    "role": "言語",
+    "primary": "第一言語",
+    "secondary": "第二言語",
     "font": "フォント",
     "size": "サイズ",
     "weight": "太さ",
@@ -33,16 +29,13 @@
     "all": "すべてのフォント",
     "loading": "システムフォントを読み込み中…",
     "empty": "一致するフォントがありません",
-    "sample_zh": "字幕示例 永",
-    "sample_ja": "字幕サンプル 永"
+    "auto": "自動（{{lang}}向けのフォント）"
   },
   "layout": {
     "title": "レイアウト",
     "order": "並び順",
-    "zh_first": "中国語が上",
-    "ja_first": "日本語が上",
-    "secondary_scale": "第二言語のサイズ",
-    "secondary_scale_hint": "第一言語に対する比率",
+    "primary_first": "第一言語が上",
+    "secondary_first": "第二言語が上",
     "block_gap": "言語間の間隔",
     "line_gap": "行間",
     "letter_spacing": "字間"

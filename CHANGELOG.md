@@ -2,6 +2,26 @@
 
 All notable changes to PotSubOverlay are documented in this file.
 
+## [1.1.0] - 2026-10-08
+
+### Added
+
+- Bilingual subtitles in any language pair: Chinese, Japanese, Korean, English, French, German, Spanish, Portuguese, Italian, Russian, Thai, Vietnamese and Arabic are recognised, and file tags such as `chseng`, `zh-en` or `中英双语` are understood.
+- Primary language setting (default Chinese); the two lines are styled as primary / second language, with an automatic font per language.
+- Tray menu drawn in the app's own style, following the app theme, with keyboard navigation.
+
+### Changed
+
+- Defaults: 30px primary text, 24px second-language text, 1.5px outline (untouched 1.0 values are migrated).
+- Language mode reads Both / <primary> / <second> with real language names, also in the tray menu.
+
+### Fixed
+
+- Compact mode: expand and close buttons could not be clicked while no subtitle was showing.
+- Showing or hiding subtitles could stutter; the overlay now fades in the page instead of hiding the window.
+- The font list no longer runs past the bottom of the window; it shrinks or opens above the field.
+- Even corner insets for the compact-mode button and the theme toggle.
+
 ## [1.0.0] - 2026-10-08
 
 ### Added

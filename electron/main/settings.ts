@@ -3,6 +3,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { app } from "electron";
 import { DEFAULT_SETTINGS } from "@/shared/defaults";
+import { isSubtitleLang } from "@/shared/languages";
+import { isPlainObject, migrateSettings, SETTINGS_VERSION } from "./settings-migrate";
 import type { MediaPrefs, Settings } from "@/shared/types";
 
 const MAX_MEDIA_ENTRIES = 400;
@@ -10,10 +12,6 @@ const SAVE_DEBOUNCE_MS = 300;
 
 type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K] };
 export type SettingsPatch = DeepPartial<Omit<Settings, "media" | "version">>;
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 /** Merge `patch` into `base`, keeping only keys that exist in `base` and matching types. */
 function mergeKnown<T>(base: T, patch: unknown): T {
@@ -34,6 +32,22 @@ function mergeKnown<T>(base: T, patch: unknown): T {
   return result as T;
 }
 
+/** Drop values a hand-edited or older file could carry that the app cannot use. */
+function sanitize(settings: Settings): Settings {
+  const valid = <T extends string>(value: T, allowed: readonly string[], fallback: T): T =>
+    allowed.includes(value) ? value : fallback;
+  return {
+    ...settings,
+    version: SETTINGS_VERSION,
+    primaryLang:
+      isSubtitleLang(settings.primaryLang) && (settings.primaryLang as string) !== "other"
+        ? settings.primaryLang
+        : DEFAULT_SETTINGS.primaryLang,
+    langMode: valid(settings.langMode, ["both", "primary", "secondary"], "both"),
+    langOrder: valid(settings.langOrder, ["primary-first", "secondary-first"], "primary-first"),
+  };
+}
+
 export class SettingsStore extends EventEmitter<{ change: [Settings, Settings] }> {
   private settings: Settings;
   private saveTimer: NodeJS.Timeout | null = null;
@@ -51,7 +65,7 @@ export class SettingsStore extends EventEmitter<{ change: [Settings, Settings] }
   update(patch: SettingsPatch): Settings {
     const previous = this.settings;
     const next = mergeKnown(previous, patch);
-    this.settings = { ...next, media: previous.media };
+    this.settings = sanitize({ ...next, media: previous.media });
     this.scheduleSave();
     this.emit("change", this.settings, previous);
     return this.settings;
@@ -93,10 +107,10 @@ export class SettingsStore extends EventEmitter<{ change: [Settings, Settings] }
 
   private load(): Settings {
     try {
-      const raw = JSON.parse(fs.readFileSync(this.filePath, "utf8")) as Partial<Settings>;
+      const raw = migrateSettings(JSON.parse(fs.readFileSync(this.filePath, "utf8"))) as Partial<Settings>;
       const merged = mergeKnown(DEFAULT_SETTINGS, raw);
       const media = isPlainObject(raw.media) ? (raw.media as Settings["media"]) : {};
-      return { ...merged, media };
+      return sanitize({ ...merged, media });
     } catch {
       return structuredClone(DEFAULT_SETTINGS);
     }

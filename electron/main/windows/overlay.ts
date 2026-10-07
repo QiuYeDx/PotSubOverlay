@@ -1,10 +1,11 @@
-import { BrowserWindow, screen, type Display, type Rectangle } from "electron";
+import { BrowserWindow, ipcMain, screen, type Display, type Rectangle } from "electron";
 import type {
   DisplayPayload,
   OverlayModeMessage,
   OverlayPlacement,
   OverlayStyle,
 } from "@/shared/types";
+import { disableWindowTransitions } from "../win32/dwmapi";
 import { handleFromBuffer, WM_COPYDATA } from "../win32/user32";
 
 const TOPMOST_REASSERT_MS = 3000;
@@ -23,8 +24,8 @@ export function resolveDisplay(displayId: number | null): Display {
 
 /** Height that fits two primary and two secondary lines plus effects. */
 export function overlayHeight(style: OverlayStyle): number {
-  const primary = Math.max(style.zh.fontSize, style.ja.fontSize);
-  const secondary = primary * style.secondaryScale;
+  const primary = style.primary.fontSize;
+  const secondary = style.secondary.fontSize;
   const pad = style.background === "box" ? 24 : 0;
   return Math.ceil(
     primary * 1.45 * 2 +
@@ -52,6 +53,10 @@ export function normalBounds(placement: OverlayPlacement, style: OverlayStyle): 
 /**
  * The transparent, click-through subtitle window. In edit mode it grows to
  * cover its display and becomes interactive so the subtitle can be dragged.
+ *
+ * The window stays shown for the app's lifetime; "hiding" the subtitles is a
+ * fade inside the page. Real hide/show goes through the shell's window
+ * animation and Chromium's stale first frame, which made toggling stutter.
  */
 export class OverlayWindow {
   readonly win: BrowserWindow;
@@ -62,6 +67,7 @@ export class OverlayWindow {
   private topmostTimer: NodeJS.Timeout;
   private lastDisplay: DisplayPayload = { key: "", blocks: [] };
   private locale = "zh";
+  private sampleLangs: OverlayModeMessage["sampleLangs"] = ["zh", "en"];
 
   constructor(options: OverlayWindowOptions, placement: OverlayPlacement, style: OverlayStyle) {
     this.placement = placement;
@@ -92,12 +98,25 @@ export class OverlayWindow {
     });
     this.win.setAlwaysOnTop(true, "screen-saver");
     this.win.setIgnoreMouseEvents(true);
+    disableWindowTransitions(this.hwnd);
     this.win.hookWindowMessage(WM_COPYDATA, (_wParam, lParam) => options.onCopyData(lParam));
     this.win.webContents.on("did-finish-load", () => this.pushAll());
+    // The page asks for everything once its listeners exist; pushes sent
+    // before React mounted (e.g. on did-finish-load) can be missed.
+    ipcMain.handle("overlay:state", (event) =>
+      event.sender === this.win.webContents
+        ? {
+            visible: this.visible,
+            style: this.style,
+            mode: this.modeMessage(),
+            display: this.lastDisplay,
+          }
+        : null
+    );
     void options.load(this.win);
 
     this.topmostTimer = setInterval(() => {
-      if (this.visible && !this.win.isDestroyed()) this.win.setAlwaysOnTop(true, "screen-saver");
+      if (!this.win.isDestroyed()) this.win.setAlwaysOnTop(true, "screen-saver");
     }, TOPMOST_REASSERT_MS);
 
     screen.on("display-metrics-changed", this.handleDisplayChange);
@@ -114,20 +133,27 @@ export class OverlayWindow {
   }
 
   setVisible(visible: boolean): void {
-    if (this.win.isDestroyed() || visible === this.visible) return;
-    this.visible = visible;
-    if (visible) {
+    if (this.win.isDestroyed()) return;
+    if (!this.win.isVisible()) {
       this.win.showInactive();
       this.win.setAlwaysOnTop(true, "screen-saver");
-    } else {
-      this.win.hide();
     }
+    if (visible === this.visible) return;
+    this.visible = visible;
+    this.send("overlay:visible", visible);
   }
 
   setDisplay(payload: DisplayPayload): void {
     if (payload.key === this.lastDisplay.key) return;
     this.lastDisplay = payload;
     this.send("overlay:display", payload);
+  }
+
+  /** Languages for the edit-mode sample when nothing is playing. */
+  setSampleLangs(langs: OverlayModeMessage["sampleLangs"]): void {
+    if (langs[0] === this.sampleLangs[0] && langs[1] === this.sampleLangs[1]) return;
+    this.sampleLangs = langs;
+    if (this.editing) this.send("overlay:mode", this.modeMessage());
   }
 
   setLocale(locale: string): void {
@@ -155,6 +181,7 @@ export class OverlayWindow {
   }
 
   destroy(): void {
+    ipcMain.removeHandler("overlay:state");
     clearInterval(this.topmostTimer);
     screen.off("display-metrics-changed", this.handleDisplayChange);
     screen.off("display-removed", this.handleDisplayChange);
@@ -180,7 +207,6 @@ export class OverlayWindow {
       this.win.setIgnoreMouseEvents(true);
       this.win.setFocusable(false);
       this.applyBounds();
-      if (!this.visible) this.win.hide();
     }
     this.win.setAlwaysOnTop(true, "screen-saver");
     this.send("overlay:mode", this.modeMessage());
@@ -205,10 +231,12 @@ export class OverlayWindow {
         primary: display.id === primaryId,
       })),
       locale: this.locale,
+      sampleLangs: this.sampleLangs,
     };
   }
 
   private pushAll(): void {
+    this.send("overlay:visible", this.visible);
     this.send("overlay:style", this.style);
     this.send("overlay:mode", this.modeMessage());
     this.send("overlay:display", this.lastDisplay);

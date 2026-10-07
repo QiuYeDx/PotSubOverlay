@@ -3,13 +3,27 @@
  * Keep this file free of Node/DOM imports.
  */
 
-export type SubtitleLang = "zh" | "ja" | "other";
+import type { KnownLang, SubtitleLang } from "./languages";
+
+export type { KnownLang, SubtitleLang } from "./languages";
+
+/**
+ * Bilingual subtitles are handled by role: the "primary" language is the one
+ * the user prefers (settings.primaryLang) when present, the "secondary" one is
+ * the other language in the subtitle.
+ */
+export type LangRole = "primary" | "secondary";
 
 /** Which languages the overlay shows when the subtitle is bilingual. */
-export type LangMode = "both" | "zh" | "ja";
+export type LangMode = "both" | LangRole;
 
 /** Vertical order of the two languages in bilingual mode. */
-export type LangOrder = "zh-first" | "ja-first";
+export type LangOrder = "primary-first" | "secondary-first";
+
+export interface LangRoles {
+  primary: SubtitleLang | null;
+  secondary: SubtitleLang | null;
+}
 
 export type PlayState = "playing" | "paused" | "stopped";
 
@@ -49,6 +63,7 @@ export type SubtitleStatus =
 
 export interface DisplayBlock {
   lang: SubtitleLang;
+  role: LangRole;
   lines: string[];
 }
 
@@ -66,6 +81,8 @@ export interface AppSnapshot {
   tracks: SubtitleTrackInfo[];
   /** Languages present across the enabled tracks. */
   availableLangs: SubtitleLang[];
+  /** Which of those languages is shown as primary / secondary. */
+  roles: LangRoles;
   offsetMs: number;
   display: DisplayPayload;
   overlayVisible: boolean;
@@ -75,6 +92,7 @@ export interface AppSnapshot {
 }
 
 export interface TextStyle {
+  /** Empty string = pick a font that suits the language automatically. */
   fontFamily: string;
   fontSize: number;
   fontWeight: number;
@@ -82,10 +100,8 @@ export interface TextStyle {
 }
 
 export interface OverlayStyle {
-  zh: TextStyle;
-  ja: TextStyle;
-  /** Style used for the language shown second in bilingual mode is scaled by this. */
-  secondaryScale: number;
+  primary: TextStyle;
+  secondary: TextStyle;
   outlineWidth: number;
   outlineColor: string;
   shadowBlur: number;
@@ -118,7 +134,9 @@ export type HotkeyAction =
   | "offsetForward";
 
 export interface Settings {
-  version: 1;
+  version: 3;
+  /** Preferred first language of bilingual subtitles. */
+  primaryLang: KnownLang;
   langMode: LangMode;
   langOrder: LangOrder;
   overlayVisible: boolean;
@@ -162,4 +180,29 @@ export interface OverlayModeMessage {
   placement: OverlayPlacement;
   displays: DisplayInfo[];
   locale: string;
+  /** Languages used for the sample text when nothing is playing. */
+  sampleLangs: [SubtitleLang, SubtitleLang];
 }
+
+/** What the custom tray menu renders. Labels are localized by the main process. */
+export interface TrayMenuState {
+  labels: {
+    open: string;
+    showSubtitle: string;
+    editPosition: string;
+    language: string;
+    quit: string;
+  };
+  modes: { value: LangMode; label: string }[];
+  /** False when the subtitle has a single language, so modes do not apply. */
+  modesEnabled: boolean;
+  langMode: LangMode;
+  overlayVisible: boolean;
+}
+
+export type TrayMenuAction =
+  | { type: "open" }
+  | { type: "toggleOverlay" }
+  | { type: "edit" }
+  | { type: "langMode"; value: LangMode }
+  | { type: "quit" };

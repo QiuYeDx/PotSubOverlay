@@ -4,6 +4,8 @@ import { app, type BrowserWindow } from "electron";
 import type { Controller } from "./controller";
 import type { ControlWindow } from "./windows/control";
 import type { OverlayWindow } from "./windows/overlay";
+import type { TrayMenuWindow } from "./windows/tray-menu";
+import type { AppTray } from "./tray";
 
 /**
  * Development-only visual QA driver. Set POTSUB_QA_SCRIPT to a JSON file with
@@ -12,12 +14,14 @@ import type { OverlayWindow } from "./windows/overlay";
  */
 type Step =
   | { wait: number }
-  | { capture: "overlay" | "control"; file: string }
+  | { capture: "overlay" | "control" | "menu"; file: string }
   | { snapshot: string }
   | { edit: boolean }
   | { compact: boolean }
   | { js: string }
+  | { eval: string; file: string }
   | { size: [number, number] }
+  | { trayMenu: true }
   | { quit: true };
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -32,6 +36,8 @@ export async function runQaScript(deps: {
   controller: Controller;
   overlay: OverlayWindow;
   control: ControlWindow;
+  tray: AppTray;
+  trayMenu: TrayMenuWindow;
 }): Promise<void> {
   const scriptPath = process.env.POTSUB_QA_SCRIPT;
   if (!scriptPath) return;
@@ -44,7 +50,12 @@ export async function runQaScript(deps: {
       log(JSON.stringify(step));
       if ("wait" in step) await delay(step.wait);
       else if ("capture" in step) {
-        const win = step.capture === "overlay" ? deps.overlay.win : deps.control.win;
+        const win =
+          step.capture === "overlay"
+            ? deps.overlay.win
+            : step.capture === "menu"
+              ? deps.trayMenu.win
+              : deps.control.win;
         await capture(win, path.join(outDir, step.file));
       } else if ("snapshot" in step) {
         fs.writeFileSync(
@@ -53,8 +64,12 @@ export async function runQaScript(deps: {
         );
       } else if ("edit" in step) await deps.controller.setEditing(step.edit);
       else if ("compact" in step) await deps.control.setCompact(step.compact);
-      else if ("js" in step) await deps.control.win?.webContents.executeJavaScript(step.js);
+      else if ("eval" in step) {
+        const result = await deps.control.win?.webContents.executeJavaScript(step.eval);
+        fs.writeFileSync(path.join(outDir, step.file), JSON.stringify(result, null, 2));
+      } else if ("js" in step) await deps.control.win?.webContents.executeJavaScript(step.js);
       else if ("size" in step) deps.control.win?.setSize(step.size[0], step.size[1]);
+      else if ("trayMenu" in step) deps.trayMenu.open(deps.tray.menuState());
       else if ("quit" in step) app.quit();
     } catch (error) {
       log(`error: ${String(error)}`);

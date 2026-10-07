@@ -1,20 +1,19 @@
 import type { HotkeyAction, OverlayPlacement, OverlayStyle, Settings } from "./types";
 
 export const DEFAULT_STYLE: OverlayStyle = {
-  zh: {
-    fontFamily: "Microsoft YaHei UI",
-    fontSize: 34,
+  primary: {
+    fontFamily: "",
+    fontSize: 30,
     fontWeight: 600,
     color: "#FFFFFF",
   },
-  ja: {
-    fontFamily: "Yu Gothic UI",
-    fontSize: 34,
+  secondary: {
+    fontFamily: "",
+    fontSize: 24,
     fontWeight: 600,
     color: "#FFFFFF",
   },
-  secondaryScale: 0.74,
-  outlineWidth: 3,
+  outlineWidth: 1.5,
   outlineColor: "#000000",
   shadowBlur: 10,
   shadowOpacity: 0.55,
@@ -51,9 +50,10 @@ export const HOTKEY_ACTIONS: HotkeyAction[] = [
 ];
 
 export const DEFAULT_SETTINGS: Settings = {
-  version: 1,
+  version: 3,
+  primaryLang: "zh",
   langMode: "both",
-  langOrder: "zh-first",
+  langOrder: "primary-first",
   overlayVisible: true,
   hideWhenPlayerForeground: true,
   hideWhenPaused: false,
@@ -70,26 +70,3 @@ export const DEFAULT_SETTINGS: Settings = {
   media: {},
 };
 
-/** Fonts offered first in the font picker, in order of preference. */
-export const RECOMMENDED_FONTS = {
-  zh: [
-    "Microsoft YaHei UI",
-    "HarmonyOS Sans SC",
-    "Source Han Sans SC",
-    "Noto Sans SC",
-    "MiSans",
-    "PingFang SC",
-    "LXGW WenKai",
-    "SimHei",
-  ],
-  ja: [
-    "Yu Gothic UI",
-    "Meiryo UI",
-    "Source Han Sans JP",
-    "Noto Sans JP",
-    "BIZ UDPGothic",
-    "M PLUS 1p",
-    "Yu Mincho",
-    "MS Gothic",
-  ],
-};

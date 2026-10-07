@@ -1,8 +1,4 @@
 {
-  "sample": {
-    "zh": "接下來將為您展現的是",
-    "ja": "これから ご覧に入れますのは"
-  },
   "preview": {
     "source": "預覽內容",
     "sample": "範例",
@@ -11,10 +7,10 @@
   },
   "text": {
     "title": "文字",
-    "description": "中文與日文分別設定",
-    "language": "語言",
-    "zh": "中文",
-    "ja": "日文",
+    "description": "主語言：{{primary}} · 第二語言：{{secondary}}",
+    "role": "語言",
+    "primary": "主語言",
+    "secondary": "第二語言",
     "font": "字型",
     "size": "字級",
     "weight": "字重",
@@ -33,16 +29,13 @@
     "all": "全部字型",
     "loading": "正在讀取系統字型…",
     "empty": "沒有符合的字型",
-    "sample_zh": "字幕範例 永",
-    "sample_ja": "字幕サンプル 永"
+    "auto": "自動（適合{{lang}}的字型）"
   },
   "layout": {
     "title": "排版",
     "order": "上下順序",
-    "zh_first": "中文在上",
-    "ja_first": "日文在上",
-    "secondary_scale": "第二語言大小",
-    "secondary_scale_hint": "相對於第一語言的字級",
+    "primary_first": "主語言在上",
+    "secondary_first": "第二語言在上",
     "block_gap": "語言間距",
     "line_gap": "行距",
     "letter_spacing": "字距"

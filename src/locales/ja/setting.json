@@ -49,9 +49,11 @@
     "hide_paused": "一時停止中は隠す",
     "hide_paused_hint": "PotPlayer の一時停止中は字幕を表示しません",
     "subtitle_title": "字幕ファイル",
+    "primary_lang": "第一言語",
+    "primary_lang_hint": "二か国語字幕で第一言語として表示する言語",
     "filter_signs": "エフェクト字幕を除外",
     "filter_signs_hint": "ASS の位置指定された画面内テキストや看板などを無視します",
-    "variant": "簡体字 / 繁体字",
+    "variant": "中国語の簡体字 / 繁体字",
     "variant_hint": "両方の字幕がある場合に優先する方",
     "variant_sc": "简体",
     "variant_tc": "繁體",
@@ -77,7 +79,7 @@
     "actions": {
       "toggleOverlay": "字幕の表示 / 非表示",
       "toggleEdit": "字幕の位置を調整",
-      "cycleLangMode": "二か国語 / 中国語 / 日本語を切り替え",
+      "cycleLangMode": "両方 / 第一言語 / 第二言語を切り替え",
       "offsetBackward": "字幕を {{step}} 早める",
       "offsetForward": "字幕を {{step}} 遅らせる"
     }

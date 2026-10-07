@@ -64,6 +64,7 @@ export default defineConfig(({ command }) => {
           input: {
             index: "electron/preload/index.ts",
             overlay: "electron/preload/overlay.ts",
+            menu: "electron/preload/menu.ts",
           },
           vite: {
             resolve: {
@@ -77,7 +78,7 @@ export default defineConfig(({ command }) => {
               outDir: "dist-electron/preload",
               rollupOptions: {
                 external: preloadExternal,
-                // Two preload entries (control panel + overlay) share no modules,
+                // The preload entries (control panel, overlay, tray menu) share no modules,
                 // so each still builds to a single self-contained file.
                 output: {
                   inlineDynamicImports: false,
@@ -103,6 +104,7 @@ export default defineConfig(({ command }) => {
         input: {
           index: path.join(__dirname, "index.html"),
           overlay: path.join(__dirname, "overlay.html"),
+          "tray-menu": path.join(__dirname, "tray-menu.html"),
         },
       },
     },

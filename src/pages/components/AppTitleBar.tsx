@@ -82,7 +82,7 @@ function AppTitleBar() {
         type="button"
         aria-label={t("common:window.compact")}
         title={t("common:window.compact")}
-        className="app-region-no-drag absolute top-1/2 right-2.5 flex h-7 -translate-y-1/2 items-center gap-1.5 rounded-full border border-border/40 bg-background/60 px-2.5 text-xs text-muted-foreground backdrop-blur-md transition-colors hover:text-foreground"
+        className="app-region-no-drag absolute top-1/2 right-1.5 flex h-7 -translate-y-1/2 items-center gap-1.5 rounded-full border border-border/40 bg-background/60 px-2.5 text-xs text-muted-foreground backdrop-blur-md transition-colors hover:text-foreground"
         onClick={() => setCompact(true)}
       >
         <Minimize2 className="size-3.5" />

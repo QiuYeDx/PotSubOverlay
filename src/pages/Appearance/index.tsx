@@ -9,8 +9,9 @@ import { ColorPicker } from "@/components/qiuye-ui/color-picker";
 import { SegmentedControl } from "@/components/qiuye-ui/segmented-control";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { RECOMMENDED_FONTS } from "@/shared/defaults";
-import type { DisplayPayload, LangOrder } from "@/shared/types";
+import useLanguageName from "@/hooks/useLanguageName";
+import { RECOMMENDED_FONTS, SAMPLE_TEXT, type SubtitleLang } from "@/shared/languages";
+import type { DisplayPayload, LangOrder, LangRole } from "@/shared/types";
 import useAppStore from "@/store/useAppStore";
 
 const WEIGHTS = [400, 500, 600, 700, 900];
@@ -19,22 +20,29 @@ function Appearance() {
   const { t } = useTranslation();
   const settings = useAppStore((s) => s.settings);
   const liveDisplay = useAppStore((s) => s.snapshot.display);
+  const roles = useAppStore((s) => s.snapshot.roles);
+  const nameOf = useLanguageName();
   const updateStyle = useAppStore((s) => s.updateStyle);
   const updateSettings = useAppStore((s) => s.updateSettings);
   const resetSettings = useAppStore((s) => s.resetSettings);
-  const [lang, setLang] = useState<"zh" | "ja">("zh");
+  const [role, setRole] = useState<LangRole>("primary");
   const [source, setSource] = useState<"sample" | "live">("sample");
   const style = settings.style;
-  const text = style[lang];
+  const text = style[role];
+
+  // Preview with the languages of what is playing, or sensible stand-ins.
+  const primaryLang: SubtitleLang = roles.primary ?? settings.primaryLang;
+  const secondaryLang: SubtitleLang = roles.secondary ?? (primaryLang === "en" ? "zh" : "en");
+  const roleLang = role === "primary" ? primaryLang : secondaryLang;
 
   const sample: DisplayPayload = useMemo(() => {
-    const zh = { lang: "zh" as const, lines: [t("appearance:sample.zh")] };
-    const ja = { lang: "ja" as const, lines: [t("appearance:sample.ja")] };
+    const primary = { lang: primaryLang, role: "primary" as const, lines: [SAMPLE_TEXT[primaryLang]] };
+    const secondary = { lang: secondaryLang, role: "secondary" as const, lines: [SAMPLE_TEXT[secondaryLang]] };
     return {
-      key: `sample-${settings.langOrder}`,
-      blocks: settings.langOrder === "zh-first" ? [zh, ja] : [ja, zh],
+      key: `sample-${settings.langOrder}-${primaryLang}-${secondaryLang}`,
+      blocks: settings.langOrder === "primary-first" ? [primary, secondary] : [secondary, primary],
     };
-  }, [settings.langOrder, t]);
+  }, [settings.langOrder, primaryLang, secondaryLang]);
 
   const hasLive = liveDisplay.blocks.length > 0;
   const display = source === "live" && hasLive ? liveDisplay : sample;
@@ -74,17 +82,20 @@ function Appearance() {
         <div className="flex flex-col gap-5">
           <SettingsGroup
             title={t("appearance:text.title")}
-            description={t("appearance:text.description")}
+            description={t("appearance:text.description", {
+              primary: nameOf(primaryLang),
+              secondary: nameOf(secondaryLang),
+            })}
             action={
               <SegmentedControl
-                aria-label={t("appearance:text.language")}
+                aria-label={t("appearance:text.role")}
                 size="sm"
                 variant="contained"
-                value={lang}
-                onValueChange={(value) => setLang(value as "zh" | "ja")}
+                value={role}
+                onValueChange={(value) => setRole(value as LangRole)}
                 items={[
-                  { value: "zh", label: t("appearance:text.zh") },
-                  { value: "ja", label: t("appearance:text.ja") },
+                  { value: "primary", label: t("appearance:text.primary") },
+                  { value: "secondary", label: t("appearance:text.secondary") },
                 ]}
               />
             }
@@ -92,9 +103,11 @@ function Appearance() {
             <SettingsRow label={t("appearance:text.font")}>
               <FontPicker
                 value={text.fontFamily}
-                recommended={RECOMMENDED_FONTS[lang]}
-                sample={lang === "zh" ? t("appearance:font.sample_zh") : t("appearance:font.sample_ja")}
-                onChange={(fontFamily) => updateStyle({ [lang]: { fontFamily } })}
+                lang={roleLang}
+                recommended={RECOMMENDED_FONTS[roleLang]}
+                sample={SAMPLE_TEXT[roleLang]}
+                autoLabel={t("appearance:font.auto", { lang: nameOf(roleLang) })}
+                onChange={(fontFamily) => updateStyle({ [role]: { fontFamily } })}
               />
             </SettingsRow>
             <SettingsRow label={t("appearance:text.size")}>
@@ -102,7 +115,7 @@ function Appearance() {
                 value={text.fontSize}
                 min={16}
                 max={80}
-                onChange={(fontSize) => updateStyle({ [lang]: { fontSize } })}
+                onChange={(fontSize) => updateStyle({ [role]: { fontSize } })}
                 format={(v) => `${v}px`}
               />
             </SettingsRow>
@@ -113,7 +126,7 @@ function Appearance() {
                 variant="contained"
                 fullWidth
                 value={String(text.fontWeight)}
-                onValueChange={(value) => updateStyle({ [lang]: { fontWeight: Number(value) } })}
+                onValueChange={(value) => updateStyle({ [role]: { fontWeight: Number(value) } })}
                 items={WEIGHTS.map((weight) => ({
                   value: String(weight),
                   label: t(`appearance:text.weights.${weight}`),
@@ -123,7 +136,7 @@ function Appearance() {
             <SettingsRow label={t("appearance:text.color")}>
               <ColorPicker
                 value={text.color}
-                onChange={(color) => updateStyle({ [lang]: { color } })}
+                onChange={(color) => updateStyle({ [role]: { color } })}
                 triggerSize="sm"
                 triggerClassName="border-foreground/20"
               />
@@ -139,21 +152,9 @@ function Appearance() {
                 value={settings.langOrder}
                 onValueChange={(value) => updateSettings({ langOrder: value as LangOrder })}
                 items={[
-                  { value: "zh-first", label: t("appearance:layout.zh_first") },
-                  { value: "ja-first", label: t("appearance:layout.ja_first") },
+                  { value: "primary-first", label: t("appearance:layout.primary_first") },
+                  { value: "secondary-first", label: t("appearance:layout.secondary_first") },
                 ]}
-              />
-            </SettingsRow>
-            <SettingsRow
-              label={t("appearance:layout.secondary_scale")}
-              description={t("appearance:layout.secondary_scale_hint")}
-            >
-              <ValueSlider
-                value={Math.round(style.secondaryScale * 100)}
-                min={50}
-                max={100}
-                onChange={(v) => updateStyle({ secondaryScale: v / 100 })}
-                format={(v) => `${v}%`}
               />
             </SettingsRow>
             <SettingsRow label={t("appearance:layout.block_gap")}>

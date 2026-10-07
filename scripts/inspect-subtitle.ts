@@ -2,13 +2,14 @@
  * Dev tool: show which subtitles PotSubOverlay would load for a media file and
  * how it understands them.
  *
- *   corepack pnpm subtitle:inspect "D:/path/to/video.mkv"
+ *   corepack pnpm subtitle:inspect "D:/path/to/video.mkv" [primary language, default zh]
  */
 import fs from "node:fs/promises";
 import path from "node:path";
 import { composeDisplay } from "../electron/main/subtitle/compose";
 import { matchSubtitleFiles } from "../electron/main/subtitle/finder";
 import { buildTrack, selectDefaultTracks } from "../electron/main/subtitle/track";
+import type { SubtitleLang } from "../src/shared/languages";
 
 const formatTime = (ms: number) =>
   `${String(Math.floor(ms / 60000)).padStart(2, "0")}:${String(Math.floor((ms % 60000) / 1000)).padStart(2, "0")}`;
@@ -34,17 +35,18 @@ async function main() {
     );
   }
 
-  const selected = selectDefaultTracks(tracks, "sc");
+  const primaryLang = (process.argv[3] as SubtitleLang | undefined) ?? "zh";
+  const selected = selectDefaultTracks(tracks, "sc", primaryLang);
   console.log(`default: ${selected.map((t) => t.fileName).join(", ") || "(none)"}`);
   const cues = selected[0]?.cues ?? [];
   const samples = [0.1, 0.3, 0.5, 0.7].map((ratio) => cues[Math.floor(cues.length * ratio)]);
   for (const cue of samples) {
     if (!cue) continue;
     const t = cue.start + 1;
-    for (const mode of ["both", "zh", "ja"] as const) {
-      const display = composeDisplay(selected, t, mode, "zh-first");
+    for (const mode of ["both", "primary", "secondary"] as const) {
+      const display = composeDisplay(selected, t, mode, "primary-first", primaryLang);
       console.log(
-        `  [${formatTime(t)}] ${mode.padEnd(4)} ${display.blocks.map((b) => `${b.lang}: ${b.lines.join(" / ")}`).join("  ‖  ")}`
+        `  [${formatTime(t)}] ${mode.padEnd(9)} ${display.blocks.map((b) => `${b.lang}: ${b.lines.join(" / ")}`).join("  ‖  ")}`
       );
     }
   }

@@ -9,6 +9,7 @@ import { AppTray } from "./tray";
 import { setupUpdateIPC } from "./update";
 import { ControlWindow } from "./windows/control";
 import { OverlayWindow } from "./windows/overlay";
+import { TrayMenuWindow } from "./windows/tray-menu";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -24,6 +25,7 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 
 const controlPreload = path.join(__dirname, "../preload/index.mjs");
 const overlayPreload = path.join(__dirname, "../preload/overlay.mjs");
+const menuPreload = path.join(__dirname, "../preload/menu.mjs");
 const startHidden = process.argv.includes("--hidden");
 
 if (process.platform === "win32") {
@@ -36,10 +38,10 @@ if (!app.requestSingleInstanceLock()) {
 }
 
 /** Load a renderer page from the dev server or the built files. */
-function pageLoader(page: "index" | "overlay") {
+function pageLoader(page: "index" | "overlay" | "tray-menu") {
   return async (win: BrowserWindow) => {
     if (VITE_DEV_SERVER_URL) {
-      await win.loadURL(page === "index" ? VITE_DEV_SERVER_URL : `${VITE_DEV_SERVER_URL}overlay.html`);
+      await win.loadURL(page === "index" ? VITE_DEV_SERVER_URL : `${VITE_DEV_SERVER_URL}${page}.html`);
       return;
     }
     await win.loadFile(path.join(RENDERER_DIST, `${page}.html`));
@@ -98,35 +100,54 @@ app.whenReady().then(() => {
     if (control.isVisible) control.send("app:snapshot", snapshot);
   });
 
+  const quit = () => {
+    quitting = true;
+    control.markQuitting();
+    app.quit();
+  };
+  const trayMenu = new TrayMenuWindow({
+    preload: menuPreload,
+    load: pageLoader("tray-menu"),
+    onAction: (action) => {
+      if (action.type === "open") control.show();
+      else if (action.type === "toggleOverlay") controller?.toggleOverlay();
+      else if (action.type === "edit") void controller?.setEditing(true);
+      else if (action.type === "langMode") controller?.updateSettings({ langMode: action.value });
+      else if (action.type === "quit") quit();
+    },
+  });
   const tray = new AppTray(
     iconPath,
-    {
-      open: () => control.show(),
-      toggleOverlay: () => controller?.toggleOverlay(),
-      edit: () => void controller?.setEditing(true),
-      setLangMode: (langMode) => controller?.updateSettings({ langMode }),
-      quit: () => {
-        quitting = true;
-        control.markQuitting();
-        app.quit();
-      },
-    },
-    () => settings.get()
+    () => control.show(),
+    (state) => trayMenu.open(state),
+    () => settings.get(),
+    () => controller?.roles ?? { primary: null, secondary: null }
   );
-  settings.on("change", () => tray.refresh());
+
+  // Keep the tray labels and the edit-mode sample in step with the subtitle's languages.
+  const syncLanguages = () => {
+    const { primary, secondary } = controller?.roles ?? { primary: null, secondary: null };
+    const preferred = settings.get().primaryLang;
+    const first = primary ?? preferred;
+    overlay.setSampleLangs([first, secondary ?? (first === "en" ? "zh" : "en")]);
+  };
+  settings.on("change", syncLanguages);
+  controller.on("roles", syncLanguages);
+  syncLanguages();
 
   registerIpc({ controller, settings, control, tray, overlay });
   setupUpdateIPC();
 
   control.create(!startHidden);
   controller.start();
-  void runQaScript({ controller, overlay, control });
+  void runQaScript({ controller, overlay, control, tray, trayMenu });
 
   app.on("before-quit", () => {
     quitting = true;
     control.markQuitting();
     controller?.stop();
     overlay.destroy();
+    trayMenu.destroy();
     tray.destroy();
   });
 

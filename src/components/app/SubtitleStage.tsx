@@ -65,15 +65,16 @@ export function SubtitleStage({
             "linear-gradient(180deg, #151a26 0%, #0b0d12 100%)",
         }}
       />
-      {children}
-      <div className="absolute inset-x-0 bottom-0 flex justify-center px-4 pb-[var(--stage-pad,18px)]">
+      {/* Text layers never take pointer events, so chrome passed as children stays clickable. */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center px-4 pb-[var(--stage-pad,18px)]">
         <SubtitleView display={display} style={style} scale={scale} />
       </div>
       {empty && placeholder ? (
-        <div className="absolute inset-0 flex items-center justify-center px-6 text-center text-[13px] text-white/45">
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-6 text-center text-[13px] text-white/45">
           {placeholder}
         </div>
       ) : null}
+      {children}
     </div>
   );
 }

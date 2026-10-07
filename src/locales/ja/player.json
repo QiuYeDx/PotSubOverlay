@@ -34,8 +34,8 @@
   },
   "lang": {
     "both": "両方",
-    "zh": "中国語",
-    "ja": "日本語",
+    "primary": "第一言語",
+    "secondary": "第二言語",
     "single_hint": "この字幕は一言語のみです"
   },
   "offset": {
@@ -56,14 +56,10 @@
   },
   "tracks": {
     "title": "字幕ファイル",
-    "multi_hint": "中国語と日本語が別ファイルの場合など、複数を同時に有効にできます",
+    "multi_hint": "言語ごとに分かれたファイルなど、複数を同時に有効にできます",
     "rescan": "再スキャン",
     "pick": "字幕ファイルを選択…",
     "reveal": "フォルダーで表示",
-    "bilingual": "二か国語",
-    "lang_zh": "中国語",
-    "lang_ja": "日本語",
-    "lang_other": "その他",
     "cues": "{{count}} 行",
     "read_failed": "読み込み失敗",
     "idle_title": "再生待ち",

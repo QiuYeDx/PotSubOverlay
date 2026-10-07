@@ -22,6 +22,8 @@ function OverlayApp() {
   const [mode, setMode] = useState<OverlayModeMessage | null>(null);
   // Hidden while the main process resizes the window between modes.
   const [preparing, setPreparing] = useState(false);
+  // Whether subtitles should be seen (off, or hidden while PotPlayer is in front).
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const api = window.overlayApi;
@@ -29,11 +31,27 @@ function OverlayApp() {
       api.on("overlay:display", (payload: DisplayPayload) => setDisplay(payload)),
       api.on("overlay:style", (next: OverlayStyle) => setStyle(next)),
       api.on("overlay:prepare", () => setPreparing(true)),
+      api.on("overlay:visible", (next: boolean) => setVisible(next)),
       api.on("overlay:mode", (next: OverlayModeMessage) => {
         setMode(next);
         setPreparing(false);
       }),
     ];
+    // Pull the current state after subscribing, so nothing pushed earlier is lost.
+    void api
+      .invoke<{
+        visible: boolean;
+        style: OverlayStyle;
+        mode: OverlayModeMessage;
+        display: DisplayPayload;
+      } | null>("overlay:state")
+      .then((state) => {
+        if (!state) return;
+        setVisible(state.visible);
+        setStyle(state.style);
+        setMode(state.mode);
+        setDisplay(state.display);
+      });
     return () => offs.forEach((off) => off());
   }, []);
 
@@ -58,9 +76,11 @@ function OverlayApp() {
             key="live"
             className="flex h-full w-full items-end justify-center px-2 pb-2"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            // Motion animates from the current opacity, so rapid toggles
+            // reverse smoothly instead of restarting.
+            animate={{ opacity: visible ? 1 : 0 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.16 }}
+            transition={{ duration: visible ? 0.22 : 0.16, ease: [0.22, 1, 0.36, 1] }}
           >
             <SubtitleView display={display} style={style} />
           </motion.div>

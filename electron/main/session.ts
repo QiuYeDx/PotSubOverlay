@@ -5,11 +5,12 @@ import type {
   DisplayPayload,
   LangMode,
   LangOrder,
+  LangRoles,
   SubtitleLang,
   SubtitleStatus,
   SubtitleTrackInfo,
 } from "@/shared/types";
-import { availableLangs, composeDisplay, EMPTY_DISPLAY } from "./subtitle/compose";
+import { availableLangs, composeDisplay, EMPTY_DISPLAY, resolveRoles } from "./subtitle/compose";
 import { matchSubtitleFiles, SUBTITLE_EXTENSIONS, type SubtitleCandidate } from "./subtitle/finder";
 import { buildTrack, selectDefaultTracks, type SubtitleTrack } from "./subtitle/track";
 import type { SubtitleFormat } from "./subtitle/types";
@@ -80,7 +81,7 @@ export class SubtitleSession extends EventEmitter<{ change: [] }> {
     this.emit("change");
 
     const prefs = this.settings.getMedia(mediaPath);
-    const { filterSigns, preferVariant } = this.settings.get();
+    const { filterSigns, preferVariant, primaryLang } = this.settings.get();
     let candidates: SubtitleCandidate[] = [];
     try {
       const entries = await fs.promises.readdir(path.dirname(mediaPath));
@@ -115,7 +116,7 @@ export class SubtitleSession extends EventEmitter<{ change: [] }> {
     const tracks = this.tracks();
     const remembered = (prefs?.tracks ?? []).filter((p) => tracks.some((t) => t.path === p));
     const chosen =
-      remembered.length > 0 ? remembered : selectDefaultTracks(tracks, preferVariant).map((t) => t.path);
+      remembered.length > 0 ? remembered : selectDefaultTracks(tracks, preferVariant, primaryLang).map((t) => t.path);
     this.enabled = new Set(chosen);
     this.status = tracks.length > 0 ? "ready" : "none-found";
     this.emit("change");
@@ -161,10 +162,14 @@ export class SubtitleSession extends EventEmitter<{ change: [] }> {
     return availableLangs(this.enabledTracks());
   }
 
-  compose(timeMs: number, mode: LangMode, order: LangOrder): DisplayPayload {
+  roles(preferred: SubtitleLang): LangRoles {
+    return resolveRoles(this.availableLangs(), preferred);
+  }
+
+  compose(timeMs: number, mode: LangMode, order: LangOrder, preferred: SubtitleLang): DisplayPayload {
     const tracks = this.enabledTracks();
     if (tracks.length === 0) return EMPTY_DISPLAY;
-    return composeDisplay(tracks, timeMs, mode, order);
+    return composeDisplay(tracks, timeMs, mode, order, preferred);
   }
 
   dispose(): void {

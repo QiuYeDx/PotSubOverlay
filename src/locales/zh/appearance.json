@@ -1,8 +1,4 @@
 {
-  "sample": {
-    "zh": "接下来将为您展现的是",
-    "ja": "これから ご覧に入れますのは"
-  },
   "preview": {
     "source": "预览内容",
     "sample": "示例",
@@ -11,10 +7,10 @@
   },
   "text": {
     "title": "文字",
-    "description": "中文与日文分别设置",
-    "language": "语言",
-    "zh": "中文",
-    "ja": "日文",
+    "description": "主语言：{{primary}} · 第二语言：{{secondary}}",
+    "role": "语言",
+    "primary": "主语言",
+    "secondary": "第二语言",
     "font": "字体",
     "size": "字号",
     "weight": "字重",
@@ -33,16 +29,13 @@
     "all": "全部字体",
     "loading": "正在读取系统字体…",
     "empty": "没有匹配的字体",
-    "sample_zh": "字幕示例 永",
-    "sample_ja": "字幕サンプル 永"
+    "auto": "自动（适合{{lang}}的字体）"
   },
   "layout": {
     "title": "排版",
     "order": "上下顺序",
-    "zh_first": "中文在上",
-    "ja_first": "日文在上",
-    "secondary_scale": "第二语言大小",
-    "secondary_scale_hint": "相对于第一语言的字号",
+    "primary_first": "主语言在上",
+    "secondary_first": "第二语言在上",
     "block_gap": "语言间距",
     "line_gap": "行间距",
     "letter_spacing": "字间距"

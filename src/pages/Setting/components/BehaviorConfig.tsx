@@ -1,7 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { SettingsGroup, SettingsRow } from "@/components/app/SettingsGroup";
 import { SegmentedControl } from "@/components/qiuye-ui/segmented-control";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import useLanguageName from "@/hooks/useLanguageName";
+import { SUBTITLE_LANGS, type KnownLang } from "@/shared/languages";
 import useAppStore from "@/store/useAppStore";
 
 const STEPS = [100, 250, 500, 1000];
@@ -10,6 +13,7 @@ function BehaviorConfig() {
   const { t } = useTranslation();
   const settings = useAppStore((s) => s.settings);
   const updateSettings = useAppStore((s) => s.updateSettings);
+  const nameOf = useLanguageName();
 
   return (
     <>
@@ -35,6 +39,26 @@ function BehaviorConfig() {
       </SettingsGroup>
 
       <SettingsGroup title={t("setting:behavior.subtitle_title")}>
+        <SettingsRow
+          label={t("setting:behavior.primary_lang")}
+          description={t("setting:behavior.primary_lang_hint")}
+        >
+          <Select
+            value={settings.primaryLang}
+            onValueChange={(value) => updateSettings({ primaryLang: value as KnownLang })}
+          >
+            <SelectTrigger size="sm" className="w-[150px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="end">
+              {SUBTITLE_LANGS.map((lang) => (
+                <SelectItem key={lang} value={lang}>
+                  {nameOf(lang)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </SettingsRow>
         <SettingsRow
           label={t("setting:behavior.filter_signs")}
           description={t("setting:behavior.filter_signs_hint")}

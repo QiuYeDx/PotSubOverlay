@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { LangMode } from "@/shared/types";
+import useLanguageName from "@/hooks/useLanguageName";
 import useAppStore from "@/store/useAppStore";
 
 export function useActiveInstance() {
@@ -88,9 +89,10 @@ export function StatusPill({ compact = false }: { compact?: boolean }) {
 export function LangModeControl({ size = "sm", fullWidth = true }: { size?: "sm" | "md"; fullWidth?: boolean }) {
   const { t } = useTranslation();
   const langMode = useAppStore((s) => s.settings.langMode);
-  const available = useAppStore((s) => s.snapshot.availableLangs);
+  const roles = useAppStore((s) => s.snapshot.roles);
   const updateSettings = useAppStore((s) => s.updateSettings);
-  const bilingual = available.includes("zh") && available.includes("ja");
+  const nameOf = useLanguageName();
+  const bilingual = roles.primary !== null && roles.secondary !== null;
 
   const control = (
     <SegmentedControl
@@ -103,8 +105,8 @@ export function LangModeControl({ size = "sm", fullWidth = true }: { size?: "sm"
       onValueChange={(value) => updateSettings({ langMode: value as LangMode })}
       items={[
         { value: "both", label: t("player:lang.both") },
-        { value: "zh", label: t("player:lang.zh") },
-        { value: "ja", label: t("player:lang.ja") },
+        { value: "primary", label: roles.primary ? nameOf(roles.primary) : t("player:lang.primary") },
+        { value: "secondary", label: roles.secondary ? nameOf(roles.secondary) : t("player:lang.secondary") },
       ]}
     />
   );

@@ -18,6 +18,7 @@ const EMPTY_SNAPSHOT: AppSnapshot = {
   status: "no-player",
   tracks: [],
   availableLangs: [],
+  roles: { primary: null, secondary: null },
   offsetMs: 0,
   display: { key: "", blocks: [] },
   overlayVisible: true,
