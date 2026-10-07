@@ -17,7 +17,7 @@ const useUpdatePreferencesStore = create<UpdatePreferencesStore>()(
       setShowChangelog: (showChangelog) => set({ showChangelog }),
     }),
     {
-      name: "qiuye-electron-template-update-preferences",
+      name: "potsuboverlay-update-preferences",
       storage: createJSONStorage(() => localStorage),
     }
   )

@@ -1,0 +1,82 @@
+{
+  "drop_hint": "松开以加载这个字幕文件",
+  "nothing_playing": "暂无播放",
+  "open_potplayer_hint": "在 PotPlayer 中播放视频或音频",
+  "state": {
+    "no_player": "未连接",
+    "playing": "正在播放",
+    "paused": "已暂停",
+    "stopped": "已停止"
+  },
+  "stage": {
+    "no_player": "打开 PotPlayer 播放视频或音频，字幕会显示在这里",
+    "waiting_path": "正在读取播放的文件…",
+    "scanning": "正在查找字幕…",
+    "none_found": "同一文件夹下没有找到同名字幕",
+    "error": "无法读取媒体所在的文件夹",
+    "silent": "此刻没有字幕",
+    "no_enabled": "没有启用任何字幕文件"
+  },
+  "notice": {
+    "hidden": "字幕已关闭",
+    "suppressed": "PotPlayer 在前台，已暂时隐藏"
+  },
+  "controls": {
+    "visibility": "字幕显示",
+    "shown": "显示中",
+    "hidden": "已关闭",
+    "suppressed": "暂时隐藏",
+    "language": "语言",
+    "offset": "时间偏移",
+    "position": "位置",
+    "edit_position": "调整位置",
+    "finish_edit": "完成调整"
+  },
+  "lang": {
+    "both": "双语",
+    "zh": "中文",
+    "ja": "日文",
+    "single_hint": "当前字幕只有一种语言"
+  },
+  "offset": {
+    "earlier": "字幕提前 {{step}}",
+    "later": "字幕延后 {{step}}",
+    "explain": "正数表示字幕延后显示",
+    "reset": "点击归零"
+  },
+  "players": {
+    "title": "播放器",
+    "count": "检测到 {{count}} 个 PotPlayer 窗口",
+    "empty_title": "未检测到 PotPlayer",
+    "empty_hint": "启动 PotPlayer 并播放任意视频或音频，这里会自动出现。",
+    "auto": "自动跟随",
+    "auto_hint": "始终跟随正在播放的窗口",
+    "untitled": "未命名",
+    "following": "当前"
+  },
+  "tracks": {
+    "title": "字幕文件",
+    "multi_hint": "可同时启用多个文件，例如分开的中文与日文字幕",
+    "rescan": "重新扫描",
+    "pick": "选择字幕文件…",
+    "reveal": "在文件夹中显示",
+    "bilingual": "双语",
+    "lang_zh": "中文",
+    "lang_ja": "日文",
+    "lang_other": "其他",
+    "cues": "{{count}} 条",
+    "read_failed": "读取失败",
+    "idle_title": "等待播放",
+    "idle_hint": "PotPlayer 开始播放后，会自动查找同一文件夹下的同名字幕。",
+    "scanning": "正在查找字幕…",
+    "error_title": "无法读取所在文件夹",
+    "error_hint": "请确认文件夹仍然可以访问，例如网络盘是否已连接。",
+    "none_title": "没有找到同名字幕",
+    "none_hint": "支持 .srt .ass .ssa .vtt .lrc，文件名需与媒体相同，如“名字.ja.srt”。也可以直接把字幕文件拖进来。"
+  },
+  "compact": {
+    "expand": "展开完整模式",
+    "hide": "隐藏字幕",
+    "show": "显示字幕"
+  }
+}

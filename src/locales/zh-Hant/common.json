@@ -1,5 +1,5 @@
 {
-  "app_name": "QiuYe Electron Template",
+  "app_name": "PotSubOverlay",
   "lang": {
     "zh": "简体中文",
     "zh-Hant": "繁體中文",
@@ -7,9 +7,10 @@
     "ja": "日本語"
   },
   "menu": {
-    "home": "主頁",
-    "about": "關於",
-    "setting": "設定"
+    "player": "播放",
+    "appearance": "外觀",
+    "setting": "設定",
+    "about": "關於"
   },
   "action": {
     "check_update": "檢查更新",
@@ -18,16 +19,17 @@
   "window": {
     "close": "關閉視窗",
     "minimize": "最小化視窗",
-    "toggle_maximize": "最大化或還原視窗"
+    "toggle_maximize": "最大化或還原視窗",
+    "compact": "切換到簡潔模式",
+    "compact_short": "簡潔"
   },
   "update": {
     "title": "應用程式更新",
     "checking": "正在檢查",
     "available_title": "發現新版本 {{version}}",
-    "up_to_date_title": "目前已是最新版本",
+    "up_to_date_title": "目前已是最新版",
     "error_title": "檢查更新失敗",
     "open_releases": "開啟 Releases",
     "changelog_title": "更新日誌"
   }
 }
-

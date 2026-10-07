@@ -1,10 +1,18 @@
 {
   "title": "设置",
-  "description": "调整模板级偏好和通用行为。",
+  "description": "调整字幕行为、快捷键与应用偏好。",
   "nav": {
     "general": {
       "label": "通用",
       "hint": "语言与主题"
+    },
+    "behavior": {
+      "label": "行为",
+      "hint": "隐藏规则与字幕"
+    },
+    "hotkeys": {
+      "label": "快捷键",
+      "hint": "游戏中快速操作"
     },
     "update": {
       "label": "更新",
@@ -12,33 +20,66 @@
     }
   },
   "subtitle": {
-    "general_config": "通用设置",
-    "update_config": "更新设置"
+    "general_config": "通用",
+    "update_config": "更新"
   },
   "fields": {
-    "language": "语言",
-    "theme": "主题",
+    "language": "界面语言",
+    "theme": "外观主题",
     "light_mode": "浅色",
     "dark_mode": "深色",
     "system_mode": "跟随系统",
-    "notification": {
-      "label": "系统通知",
-      "test_btn": "测试通知",
-      "test_title": "通知已连接",
-      "test_body": "Electron 主进程可以正常显示系统通知。"
-    },
     "update": {
       "auto_check": {
         "label": "启动时自动检查",
-        "desc": "应用启动后静默检查 GitHub Releases，发现新版本时再提示。"
+        "desc": "启动后静默检查 GitHub Releases，有新版本时再提示。"
       },
       "show_changelog": {
         "label": "显示更新日志",
-        "desc": "有新版本时尝试读取远程 CHANGELOG.md，并展示相关版本条目。"
+        "desc": "有新版本时读取 CHANGELOG.md 并展示相关条目。"
       },
-      "target_repo": "目标仓库",
-      "target_repo_desc": "复制模板后可通过 .env、package.json template.update 和常量文件配置目标仓库。"
+      "target_repo": "更新来源",
+      "target_repo_desc": "从这个 GitHub 仓库的 Releases 检查新版本，只提示，不自动下载。"
+    }
+  },
+  "behavior": {
+    "overlay_title": "字幕显示",
+    "hide_foreground": "PotPlayer 在前台时隐藏",
+    "hide_foreground_hint": "切回播放器观看时，避免与播放器自带的字幕重复",
+    "hide_paused": "暂停时隐藏",
+    "hide_paused_hint": "PotPlayer 暂停时不显示字幕",
+    "subtitle_title": "字幕文件",
+    "filter_signs": "过滤特效字幕",
+    "filter_signs_hint": "忽略 ASS 中带定位的屏幕字、招牌等特效",
+    "variant": "简繁偏好",
+    "variant_hint": "同时有简体与繁体字幕时默认选用",
+    "variant_sc": "简体",
+    "variant_tc": "繁體",
+    "offset_step": "偏移步长",
+    "offset_step_hint": "每次提前或延后调整的时间",
+    "app_title": "应用",
+    "close_to_tray": "关闭窗口时保留在托盘",
+    "close_to_tray_hint": "字幕继续工作，可从托盘图标重新打开",
+    "launch_at_login": "开机启动",
+    "launch_at_login_hint": "登录 Windows 后在托盘中静默启动",
+    "compact_on_top": "简洁模式置顶",
+    "compact_on_top_hint": "简洁模式的小窗口保持在其他窗口之上"
+  },
+  "hotkeys": {
+    "title": "全局快捷键",
+    "description": "游戏中也能使用。点击后按下新组合键，Esc 取消，Backspace 清除。",
+    "reset": "恢复默认",
+    "recording": "请按下组合键…",
+    "none": "未设置",
+    "clear": "清除快捷键",
+    "conflict": "这个组合已被其他程序占用，请换一个",
+    "conflict_short": "被占用",
+    "actions": {
+      "toggleOverlay": "显示 / 隐藏字幕",
+      "toggleEdit": "调整字幕位置",
+      "cycleLangMode": "切换双语 / 中文 / 日文",
+      "offsetBackward": "字幕提前 {{step}}",
+      "offsetForward": "字幕延后 {{step}}"
     }
   }
 }
-

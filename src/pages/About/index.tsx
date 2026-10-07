@@ -57,7 +57,7 @@ function About() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 pb-[92px] pt-6 sm:px-8">
+    <div className="mx-auto max-w-3xl px-4 pb-[92px] pt-1 sm:px-8">
       <div className="mb-5">
         <div className="text-2xl font-semibold tracking-tight">
           {t("about:title")}
@@ -128,7 +128,7 @@ function About() {
           </div>
 
           <div className="mt-6 grid grid-cols-2 gap-4 border-t pt-4 sm:grid-cols-4">
-            <Stat label={t("about:stats.platform")} value="macOS / Windows" />
+            <Stat label={t("about:stats.platform")} value="Windows 11" />
             <Stat label={t("about:stats.license")} value="MIT" />
             <Stat label={t("about:stats.build")} value={`v${appVersion}`} mono />
             <Stat label={t("about:stats.stack")} value="Electron / React" />
@@ -176,8 +176,8 @@ function About() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 gap-x-7 gap-y-1 sm:grid-cols-2">
             {[
-              [t("about:tech.framework"), "Electron 33 + React 19"],
-              [t("about:tech.language"), "TypeScript 5.4"],
+              [t("about:tech.framework"), "Electron 41 + React 19"],
+              [t("about:tech.language"), "TypeScript 5.9"],
               [t("about:tech.build_tool"), "Vite 5"],
               [t("about:tech.style"), "Tailwind CSS 4 + shadcn/ui"],
               [t("about:tech.state"), "Zustand"],

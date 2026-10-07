@@ -1,0 +1,73 @@
+{
+  "sample": {
+    "zh": "接下来将为您展现的是",
+    "ja": "これから ご覧に入れますのは"
+  },
+  "preview": {
+    "source": "プレビュー",
+    "sample": "サンプル",
+    "live": "ライブ",
+    "silent": "この時点の字幕はありません"
+  },
+  "text": {
+    "title": "テキスト",
+    "description": "中国語と日本語を個別に設定できます",
+    "language": "言語",
+    "zh": "中国語",
+    "ja": "日本語",
+    "font": "フォント",
+    "size": "サイズ",
+    "weight": "太さ",
+    "weights": {
+      "400": "標準",
+      "500": "ミディアム",
+      "600": "セミボールド",
+      "700": "ボールド",
+      "900": "ブラック"
+    },
+    "color": "色"
+  },
+  "font": {
+    "search": "フォントを検索",
+    "recommended": "おすすめ",
+    "all": "すべてのフォント",
+    "loading": "システムフォントを読み込み中…",
+    "empty": "一致するフォントがありません",
+    "sample_zh": "字幕示例 永",
+    "sample_ja": "字幕サンプル 永"
+  },
+  "layout": {
+    "title": "レイアウト",
+    "order": "並び順",
+    "zh_first": "中国語が上",
+    "ja_first": "日本語が上",
+    "secondary_scale": "第二言語のサイズ",
+    "secondary_scale_hint": "第一言語に対する比率",
+    "block_gap": "言語間の間隔",
+    "line_gap": "行間",
+    "letter_spacing": "字間"
+  },
+  "effects": {
+    "title": "縁取りと影",
+    "description": "明るい画面でも字幕を読みやすく保ちます",
+    "outline_width": "縁取りの太さ",
+    "outline_color": "縁取りの色",
+    "shadow_blur": "影のぼかし",
+    "shadow_opacity": "影の濃さ"
+  },
+  "background": {
+    "title": "背景",
+    "style": "スタイル",
+    "style_hint": "明るい・にぎやかなゲームでは背景プレートが便利です",
+    "none": "なし",
+    "box": "プレート",
+    "color": "プレートの色",
+    "opacity": "不透明度"
+  },
+  "motion": {
+    "title": "モーション",
+    "animation": "切り替えアニメーション",
+    "animation_hint": "字幕の切り替え時にふわっとフェードします"
+  },
+  "reset": "外観をデフォルトに戻す"
+}

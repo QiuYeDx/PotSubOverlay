@@ -1,26 +1,14 @@
 # Changelog
 
-All notable changes to this template are documented in this file.
+All notable changes to PotSubOverlay are documented in this file.
 
-## [Unreleased]
-
-- Template is ready for project-specific renaming and extension.
+## [1.0.0] - 2026-10-08
 
 ### Added
 
-- Added qiuye-ui smooth corners with an Electron runtime capability check.
-
-### Changed
-
-- Upgraded the `electron-modern` branch to Electron 41.10.3 while preserving unsigned macOS system notifications.
-- Updated the supported development runtimes to Node.js 22.12+ and Node.js 24, with Node.js 24 recommended.
-
-## [0.1.0] - 2026-07-02
-
-### Added
-
-- Initialized Electron + React + Vite + TypeScript template.
-- Added shadcn/ui basics, qiuye-ui helpers, i18n, theme switching, startup Loading, bottom navigation, About page, and Settings page.
-- Added configurable GitHub Releases update checks with optional CHANGELOG display.
-- Added macOS/Windows hidden titlebar support and app window controls.
-- Added pnpm 8.7.0 project rules, README, AGENTS, and large-feature implementation docs.
+- Follows PotPlayer through its window-message API: position, duration, play state and the full path of the current file; several PotPlayer windows are supported with automatic or manual selection.
+- Loads same-name subtitles from the media folder (`.srt`, `.ass`, `.ssa`, `.vtt`, `.lrc`, including `name.<tag>.ext` and `name.mp4.ext`), detects UTF-8/16, GBK, Shift-JIS and Big5, and reloads when the folder changes.
+- Bilingual display in two lines: single-file bilingual subtitles and separate Chinese/Japanese files, Chinese on top by default, with Both / Chinese only / Japanese only modes.
+- Transparent, always-on-top, click-through subtitle overlay with an edit mode for dragging, resizing and multi-display placement.
+- Control panel with full and compact layouts, live preview, per-language typography, outline, shadow and backing-plate styles.
+- Global shortcuts, tray menu, launch at login, per-file timing offset, and Simplified Chinese, Traditional Chinese, English and Japanese UI.

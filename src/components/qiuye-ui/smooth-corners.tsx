@@ -2,10 +2,7 @@
 
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
-import {
-  smoothCorners,
-  smoothCornersCSS,
-} from "@qiuyedx/smooth-corners";
+import { smoothCorners, smoothCornersCSS } from "@qiuyedx/smooth-corners";
 import { observe, unobserve } from "@qiuyedx/smooth-corners/observer";
 
 import { cn } from "@/lib/utils";
@@ -15,7 +12,39 @@ type SmoothCornerStyle = React.CSSProperties & Partial<SmoothCornerVars>;
 
 const STYLE_ID = "qiuye-ui-smooth-corners-style";
 
+function subscribeToSmoothCornersSupport() {
+  return () => undefined;
+}
+
+function getSmoothCornersSupport() {
+  return (
+    typeof CSS !== "undefined" &&
+    CSS.supports("corner-shape", "superellipse(2)")
+  );
+}
+
+function getServerSmoothCornersSupport() {
+  return null;
+}
+
+/**
+ * 可复用的基础 CSS。需要手动放入全局样式时可直接使用该字符串。
+ */
 export const smoothCornersBaseCSS = smoothCornersCSS;
+
+/**
+ * 检测当前浏览器是否支持 SmoothCorners 使用的 CSS `corner-shape` 语法。
+ *
+ * 服务端渲染及客户端首次水合时返回 `null`，完成水合后返回实际支持状态。
+ * 不支持时 SmoothCorners 仍会自动回退到标准 `border-radius`。
+ */
+export function useSmoothCornersSupport(): boolean | null {
+  return React.useSyncExternalStore(
+    subscribeToSmoothCornersSupport,
+    getSmoothCornersSupport,
+    getServerSmoothCornersSupport,
+  );
+}
 
 function ensureSmoothCornersStyles() {
   if (typeof document === "undefined") return;
@@ -55,16 +84,63 @@ function normalizeNumber(value: number | undefined, fallback: number) {
   return Number.isFinite(value) ? Number(value) : fallback;
 }
 
-export interface SmoothCornersProps
-  extends Omit<React.HTMLAttributes<HTMLElement>, "style"> {
+/** SmoothCorners 组件的属性 */
+export interface SmoothCornersProps extends Omit<
+  React.HTMLAttributes<HTMLElement>,
+  "style"
+> {
+  /**
+   * 原始圆角半径，单位 px。
+   * @default 16
+   */
   radius?: number;
+  /**
+   * 平滑强度，范围 0..1。0 表示标准圆弧，1 表示最大平滑。
+   * @default 0.6
+   */
   smoothing?: number;
+  /**
+   * 是否根据元素实际尺寸自动压缩 smoothing。
+   * 开启后会用 ResizeObserver 读取元素尺寸，适合大圆角或尺寸动态变化的元素。
+   * @default false
+   */
   observeSize?: boolean;
+  /**
+   * 是否把效果应用到唯一子元素本身，而不是额外包一层 div。
+   * 适合 Button、Card、图片、链接等已有语义元素。
+   * @default false
+   */
   asChild?: boolean;
+  /**
+   * 禁用平滑圆角效果。
+   * @default false
+   */
   disabled?: boolean;
+  /**
+   * 根元素样式。组件会合并 `--sc-r`、`--sc-i`、`--sc-s` 自定义属性。
+   */
   style?: SmoothCornerStyle;
 }
 
+/**
+ * SmoothCorners — Figma/iOS 风格平滑圆角包装组件
+ *
+ * 基于 CSS `corner-shape: superellipse(...)` 做渐进增强：
+ * - 支持时使用补偿半径 + superellipse 获得连续圆角
+ * - 不支持时回退到原始 `border-radius`
+ *
+ * @example
+ * ```tsx
+ * <SmoothCorners radius={28} smoothing={0.7} className="bg-primary p-6" />
+ * ```
+ *
+ * @example
+ * ```tsx
+ * <SmoothCorners asChild radius={18} smoothing={0.75}>
+ *   <Button>Continuous button</Button>
+ * </SmoothCorners>
+ * ```
+ */
 export const SmoothCorners = React.forwardRef<HTMLElement, SmoothCornersProps>(
   (
     {
@@ -77,7 +153,7 @@ export const SmoothCorners = React.forwardRef<HTMLElement, SmoothCornersProps>(
       style,
       ...props
     },
-    forwardedRef
+    forwardedRef,
   ) => {
     useSmoothCornersStyles();
 
@@ -89,35 +165,36 @@ export const SmoothCorners = React.forwardRef<HTMLElement, SmoothCornersProps>(
       if (disabled) return {};
       return smoothCorners(
         normalizedRadius,
-        normalizedSmoothing
+        normalizedSmoothing,
       ) as SmoothCornerStyle;
     }, [disabled, normalizedRadius, normalizedSmoothing]);
 
     React.useEffect(() => {
-      const element = localRef.current;
-      if (!element || disabled || !observeSize) return;
+      const el = localRef.current;
+      if (!el || disabled || !observeSize) return;
 
-      observe(element, {
+      observe(el, {
         radius: normalizedRadius,
         smoothing: normalizedSmoothing,
       });
 
       return () => {
-        unobserve(element);
+        unobserve(el);
       };
     }, [disabled, normalizedRadius, normalizedSmoothing, observeSize]);
 
-    const Component = asChild ? Slot : "div";
+    const Comp = asChild ? Slot : "div";
+    const mergedRef = composeRefs<HTMLElement>(localRef, forwardedRef);
 
     return (
-      <Component
-        ref={composeRefs(localRef, forwardedRef)}
+      <Comp
+        ref={mergedRef}
         className={cn(!disabled && "smooth-corners", className)}
         style={{ ...style, ...vars }}
         {...props}
       />
     );
-  }
+  },
 );
 
 SmoothCorners.displayName = "SmoothCorners";

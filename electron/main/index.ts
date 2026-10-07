@@ -1,15 +1,14 @@
-import {
-  app,
-  BrowserWindow,
-  ipcMain,
-  Menu,
-  Notification,
-  shell,
-} from "electron";
+import { app, BrowserWindow, ipcMain, Menu, Notification } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import os from "node:os";
+import { Controller } from "./controller";
+import { registerIpc } from "./ipc";
+import { runQaScript } from "./qa";
+import { SettingsStore } from "./settings";
+import { AppTray } from "./tray";
 import { setupUpdateIPC } from "./update";
+import { ControlWindow } from "./windows/control";
+import { OverlayWindow } from "./windows/overlay";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -23,16 +22,12 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
   ? path.join(process.env.APP_ROOT, "public")
   : RENDERER_DIST;
 
-const START_LOADING_PROGRESS_CHANNEL = "qiuye-template-start-loading-progress";
-const preload = path.join(__dirname, "../preload/index.mjs");
-const indexHtml = path.join(RENDERER_DIST, "index.html");
-
-if (os.release().startsWith("6.1")) {
-  app.disableHardwareAcceleration();
-}
+const controlPreload = path.join(__dirname, "../preload/index.mjs");
+const overlayPreload = path.join(__dirname, "../preload/overlay.mjs");
+const startHidden = process.argv.includes("--hidden");
 
 if (process.platform === "win32") {
-  app.setAppUserModelId(app.getName());
+  app.setAppUserModelId("com.qiuyedx.potsuboverlay");
 }
 
 if (!app.requestSingleInstanceLock()) {
@@ -40,133 +35,107 @@ if (!app.requestSingleInstanceLock()) {
   process.exit(0);
 }
 
-let win: BrowserWindow | null = null;
-
-async function createWindow() {
-  win = new BrowserWindow({
-    title: process.env.APP_NAME || "QiuYe Electron Template",
-    icon: path.join(process.env.VITE_PUBLIC, "favicon.ico"),
-    width: 1080,
-    height: 786,
-    minWidth: 786,
-    minHeight: 540,
-    resizable: true,
-    show: false,
-    titleBarStyle: "hidden",
-    ...(process.platform === "darwin"
-      ? { trafficLightPosition: { x: 15, y: 11.5 } }
-      : {}),
-    webPreferences: {
-      preload,
-    },
-  });
-
-  const startLoadingProgress = () => {
-    if (!win || win.webContents.isDestroyed()) return;
-    win.webContents.send(START_LOADING_PROGRESS_CHANNEL);
+/** Load a renderer page from the dev server or the built files. */
+function pageLoader(page: "index" | "overlay") {
+  return async (win: BrowserWindow) => {
+    if (VITE_DEV_SERVER_URL) {
+      await win.loadURL(page === "index" ? VITE_DEV_SERVER_URL : `${VITE_DEV_SERVER_URL}overlay.html`);
+      return;
+    }
+    await win.loadFile(path.join(RENDERER_DIST, `${page}.html`));
   };
+}
 
-  win.once("ready-to-show", () => {
-    if (!win || win.isDestroyed()) return;
-    win.show();
-    startLoadingProgress();
-  });
-
-  win.webContents.on("dom-ready", () => {
-    if (win?.isVisible()) {
-      startLoadingProgress();
-    }
-  });
-
-  if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL);
-  } else {
-    win.loadFile(indexHtml);
-
-    win.webContents.on("before-input-event", (event, input) => {
-      const isCtrlOrCmd = input.control || input.meta;
-      const key = input.key.toLowerCase();
-
-      if (input.key === "F5" || (isCtrlOrCmd && key === "r")) {
-        event.preventDefault();
-        return;
-      }
-
-      if (input.key === "F12" || (isCtrlOrCmd && input.shift && key === "i")) {
-        event.preventDefault();
-      }
-    });
-
-    Menu.setApplicationMenu(Menu.buildFromTemplate([]));
-  }
-
-  win.webContents.setWindowOpenHandler(({ url }) => {
-    if (/^https?:\/\//i.test(url) || /^mailto:/i.test(url)) {
-      shell.openExternal(url);
-    }
-    return { action: "deny" };
+/** In production, disable reload and devtools shortcuts like the template does. */
+function lockDownShortcuts(win: BrowserWindow) {
+  if (VITE_DEV_SERVER_URL) return;
+  win.webContents.on("before-input-event", (event, input) => {
+    const isCtrlOrCmd = input.control || input.meta;
+    const key = input.key.toLowerCase();
+    if (input.key === "F5" || (isCtrlOrCmd && key === "r")) event.preventDefault();
+    if (input.key === "F12" || (isCtrlOrCmd && input.shift && key === "i")) event.preventDefault();
   });
 }
 
+let quitting = false;
+
 app.whenReady().then(() => {
-  void createWindow();
+  if (!VITE_DEV_SERVER_URL) Menu.setApplicationMenu(Menu.buildFromTemplate([]));
+
+  const iconPath = path.join(process.env.VITE_PUBLIC, "favicon.ico");
+  const settings = new SettingsStore();
+  let controller: Controller | null = null;
+
+  const overlay = new OverlayWindow(
+    {
+      preload: overlayPreload,
+      load: pageLoader("overlay"),
+      onCopyData: (lParam) => controller?.handleCopyData(lParam),
+    },
+    settings.get().placement,
+    settings.get().style
+  );
+  lockDownShortcuts(overlay.win);
+
+  const control = new ControlWindow({
+    preload: controlPreload,
+    icon: iconPath,
+    load: async (win) => {
+      lockDownShortcuts(win);
+      await pageLoader("index")(win);
+    },
+    shouldHideOnClose: () => !quitting && settings.get().closeToTray,
+    compactAlwaysOnTop: () => settings.get().compactAlwaysOnTop,
+    onHiddenToTray: () => {
+      if (settings.get().trayHintShown) return;
+      tray.showRunningHint();
+      settings.update({ trayHintShown: true });
+    },
+  });
+
+  controller = new Controller(settings, overlay, control);
+  controller.onSnapshot((snapshot) => {
+    if (control.isVisible) control.send("app:snapshot", snapshot);
+  });
+
+  const tray = new AppTray(
+    iconPath,
+    {
+      open: () => control.show(),
+      toggleOverlay: () => controller?.toggleOverlay(),
+      edit: () => void controller?.setEditing(true),
+      setLangMode: (langMode) => controller?.updateSettings({ langMode }),
+      quit: () => {
+        quitting = true;
+        control.markQuitting();
+        app.quit();
+      },
+    },
+    () => settings.get()
+  );
+  settings.on("change", () => tray.refresh());
+
+  registerIpc({ controller, settings, control, tray, overlay });
   setupUpdateIPC();
+
+  control.create(!startHidden);
+  controller.start();
+  void runQaScript({ controller, overlay, control });
+
+  app.on("before-quit", () => {
+    quitting = true;
+    control.markQuitting();
+    controller?.stop();
+    overlay.destroy();
+    tray.destroy();
+  });
+
+  app.on("second-instance", () => control.show());
 });
 
+// The app lives in the tray; closing windows does not quit it.
 app.on("window-all-closed", () => {
-  win = null;
-  if (process.platform !== "darwin") app.quit();
-});
-
-app.on("second-instance", () => {
-  if (!win) return;
-  if (win.isMinimized()) win.restore();
-  win.focus();
-});
-
-app.on("activate", () => {
-  const allWindows = BrowserWindow.getAllWindows();
-  if (allWindows.length) {
-    allWindows[0].focus();
-  } else {
-    void createWindow();
-  }
-});
-
-type WindowControlAction = "close" | "minimize" | "toggle-maximize";
-
-ipcMain.handle("window-control", (event, action: WindowControlAction) => {
-  const targetWindow = BrowserWindow.fromWebContents(event.sender);
-  if (!targetWindow) {
-    return { success: false };
-  }
-
-  switch (action) {
-    case "minimize":
-      targetWindow.minimize();
-      return { success: true };
-    case "toggle-maximize":
-      if (targetWindow.isMaximized()) {
-        targetWindow.unmaximize();
-      } else {
-        targetWindow.maximize();
-      }
-      return { success: true, isMaximized: targetWindow.isMaximized() };
-    case "close":
-      targetWindow.close();
-      return { success: true };
-    default:
-      return { success: false };
-  }
-});
-
-ipcMain.handle("open-external", async (_event, url: string) => {
-  if (!/^https?:\/\//i.test(url) && !/^mailto:/i.test(url)) {
-    return { success: false, message: "Only http(s) and mailto URLs are allowed." };
-  }
-
-  await shell.openExternal(url);
-  return { success: true };
+  if (quitting) app.quit();
 });
 
 ipcMain.on(
@@ -177,4 +146,3 @@ ipcMain.on(
     }
   }
 );
-

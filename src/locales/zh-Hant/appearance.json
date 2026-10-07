@@ -1,0 +1,73 @@
+{
+  "sample": {
+    "zh": "接下來將為您展現的是",
+    "ja": "これから ご覧に入れますのは"
+  },
+  "preview": {
+    "source": "預覽內容",
+    "sample": "範例",
+    "live": "即時",
+    "silent": "此刻沒有字幕"
+  },
+  "text": {
+    "title": "文字",
+    "description": "中文與日文分別設定",
+    "language": "語言",
+    "zh": "中文",
+    "ja": "日文",
+    "font": "字型",
+    "size": "字級",
+    "weight": "字重",
+    "weights": {
+      "400": "標準",
+      "500": "中等",
+      "600": "半粗",
+      "700": "粗體",
+      "900": "特粗"
+    },
+    "color": "顏色"
+  },
+  "font": {
+    "search": "搜尋字型",
+    "recommended": "推薦",
+    "all": "全部字型",
+    "loading": "正在讀取系統字型…",
+    "empty": "沒有符合的字型",
+    "sample_zh": "字幕範例 永",
+    "sample_ja": "字幕サンプル 永"
+  },
+  "layout": {
+    "title": "排版",
+    "order": "上下順序",
+    "zh_first": "中文在上",
+    "ja_first": "日文在上",
+    "secondary_scale": "第二語言大小",
+    "secondary_scale_hint": "相對於第一語言的字級",
+    "block_gap": "語言間距",
+    "line_gap": "行距",
+    "letter_spacing": "字距"
+  },
+  "effects": {
+    "title": "描邊與陰影",
+    "description": "讓字幕在明亮畫面上依然清晰",
+    "outline_width": "描邊粗細",
+    "outline_color": "描邊顏色",
+    "shadow_blur": "陰影擴散",
+    "shadow_opacity": "陰影濃度"
+  },
+  "background": {
+    "title": "背景",
+    "style": "背景樣式",
+    "style_hint": "底板適合畫面明亮或繽紛的遊戲",
+    "none": "無",
+    "box": "底板",
+    "color": "底板顏色",
+    "opacity": "不透明度"
+  },
+  "motion": {
+    "title": "動態效果",
+    "animation": "切換動畫",
+    "animation_hint": "字幕切換時輕微淡入淡出"
+  },
+  "reset": "恢復預設外觀"
+}

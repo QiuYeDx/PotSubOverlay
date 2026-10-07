@@ -1,7 +1,7 @@
 {
   "title": "关于",
-  "description": "模板信息、版本和项目链接。",
-  "tagline": "一个偏向个人项目初始化的 Electron 模板，保留通用体验，避免混入具体业务。",
+  "description": "版本、项目链接与许可信息。",
+  "tagline": "把 PotPlayer 正在播放的字幕，放到游戏画面上。为边玩游戏边听日语动画、ASMR 与音声作品而做。",
   "buttons": {
     "repo": "仓库",
     "releases": "发布记录"
@@ -15,7 +15,7 @@
   "links": {
     "repo": {
       "title": "源码仓库",
-      "desc": "复制模板后优先修改仓库、appId、应用名和图标。"
+      "desc": "问题反馈、功能建议与源码。"
     },
     "author": {
       "title": "作者主页",
@@ -27,7 +27,7 @@
     },
     "contact": {
       "title": "联系",
-      "desc": "用于模板维护和项目协作。"
+      "desc": "合作与反馈。"
     }
   },
   "subtitle": {
@@ -43,6 +43,5 @@
     "i18n": "国际化",
     "pkg": "包管理"
   },
-  "license_note": "模板默认使用 MIT License；复制为私有或商业项目时请按目标项目重新确认许可。"
+  "license_note": "PotSubOverlay 以 MIT License 开源。PotPlayer 是 Kakao 的产品，本项目与其无关联。"
 }
-

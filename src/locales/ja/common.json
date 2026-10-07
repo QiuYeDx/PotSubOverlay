@@ -1,5 +1,5 @@
 {
-  "app_name": "QiuYe Electron Template",
+  "app_name": "PotSubOverlay",
   "lang": {
     "zh": "简体中文",
     "zh-Hant": "繁體中文",
@@ -7,27 +7,29 @@
     "ja": "日本語"
   },
   "menu": {
-    "home": "ホーム",
-    "about": "情報",
-    "setting": "設定"
+    "player": "再生中",
+    "appearance": "外観",
+    "setting": "設定",
+    "about": "情報"
   },
   "action": {
-    "check_update": "更新を確認",
+    "check_update": "アップデートを確認",
     "toggle_theme": "テーマを切り替え"
   },
   "window": {
-    "close": "ウィンドウを閉じる",
-    "minimize": "ウィンドウを最小化",
-    "toggle_maximize": "最大化または復元"
+    "close": "ウインドウを閉じる",
+    "minimize": "ウインドウを最小化",
+    "toggle_maximize": "ウインドウを最大化または元に戻す",
+    "compact": "コンパクトモードに切り替え",
+    "compact_short": "コンパクト"
   },
   "update": {
-    "title": "アプリ更新",
+    "title": "アップデート",
     "checking": "確認中",
     "available_title": "新しいバージョン {{version}} があります",
     "up_to_date_title": "最新バージョンです",
-    "error_title": "更新確認に失敗しました",
+    "error_title": "アップデートを確認できませんでした",
     "open_releases": "Releases を開く",
     "changelog_title": "変更履歴"
   }
 }
-

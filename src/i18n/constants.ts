@@ -1,11 +1,11 @@
 import { LangEnum } from "@/type/lang";
 
-export const LANGUAGE_STORAGE_KEY = "qiuye-electron-template-lang";
+export const LANGUAGE_STORAGE_KEY = "potsuboverlay-lang";
 export const DEFAULT_LANGUAGE = LangEnum.ZH;
 export const FALLBACK_LANGUAGE = LangEnum.ZH;
 export const SUPPORTED_LANGUAGES = Object.values(LangEnum) as LangEnum[];
 
-export const NAMESPACES = ["common", "home", "about", "setting"] as const;
+export const NAMESPACES = ["common", "player", "appearance", "about", "setting"] as const;
 
 export type Namespace = (typeof NAMESPACES)[number];
 

@@ -1,6 +1,19 @@
 <svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="12" y="12" width="104" height="104" rx="24" fill="#09090B"/>
-  <rect x="78" y="78" width="27" height="15" rx="7.5" transform="rotate(45 78 78)" fill="#D4D4D8"/>
-  <path fill-rule="evenodd" clip-rule="evenodd" d="M64 30C45.2223 30 30 45.2223 30 64C30 82.7777 45.2223 98 64 98C82.7777 98 98 82.7777 98 64C98 45.2223 82.7777 30 64 30ZM64 49C55.7157 49 49 55.7157 49 64C49 72.2843 55.7157 79 64 79C72.2843 79 79 72.2843 79 64C79 55.7157 72.2843 49 64 49Z" fill="#FAFAFA"/>
-  <circle cx="64" cy="64" r="15" fill="#09090B"/>
+  <defs>
+    <linearGradient id="pso-bg" x1="14" y1="10" x2="114" y2="118" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5B6CFF"/>
+      <stop offset="0.55" stop-color="#8B5CF6"/>
+      <stop offset="1" stop-color="#EC4899"/>
+    </linearGradient>
+    <linearGradient id="pso-sheen" x1="64" y1="8" x2="64" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0.18"/>
+      <stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.12"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#pso-bg)"/>
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#pso-sheen)"/>
+  <path d="M56 33.5L76 46L56 58.5Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="7" stroke-linejoin="round"/>
+  <rect x="26" y="76" width="76" height="12" rx="6" fill="#FFFFFF"/>
+  <rect x="39" y="94" width="50" height="9" rx="4.5" fill="#FFFFFF" fill-opacity="0.68"/>
 </svg>

@@ -9,7 +9,7 @@ interface ThemeStore {
 }
 
 const LEGACY_KEY = "theme";
-const STORAGE_KEY = "qiuye-electron-template-theme";
+const STORAGE_KEY = "potsuboverlay-theme";
 
 const isThemeValue = (theme: unknown): theme is ThemeValue =>
   theme === "light" || theme === "dark" || theme === "system";

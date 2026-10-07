@@ -1,0 +1,73 @@
+{
+  "sample": {
+    "zh": "接下来将为您展现的是",
+    "ja": "これから ご覧に入れますのは"
+  },
+  "preview": {
+    "source": "Preview",
+    "sample": "Sample",
+    "live": "Live",
+    "silent": "No subtitle at this moment"
+  },
+  "text": {
+    "title": "Text",
+    "description": "Chinese and Japanese are styled separately",
+    "language": "Language",
+    "zh": "Chinese",
+    "ja": "Japanese",
+    "font": "Font",
+    "size": "Size",
+    "weight": "Weight",
+    "weights": {
+      "400": "Regular",
+      "500": "Medium",
+      "600": "Semibold",
+      "700": "Bold",
+      "900": "Black"
+    },
+    "color": "Color"
+  },
+  "font": {
+    "search": "Search fonts",
+    "recommended": "Recommended",
+    "all": "All Fonts",
+    "loading": "Loading system fonts…",
+    "empty": "No matching fonts",
+    "sample_zh": "字幕示例 永",
+    "sample_ja": "字幕サンプル 永"
+  },
+  "layout": {
+    "title": "Layout",
+    "order": "Order",
+    "zh_first": "Chinese on Top",
+    "ja_first": "Japanese on Top",
+    "secondary_scale": "Second Language Size",
+    "secondary_scale_hint": "Relative to the first language",
+    "block_gap": "Language Spacing",
+    "line_gap": "Line Spacing",
+    "letter_spacing": "Letter Spacing"
+  },
+  "effects": {
+    "title": "Outline & Shadow",
+    "description": "Keeps subtitles readable over bright scenes",
+    "outline_width": "Outline Width",
+    "outline_color": "Outline Color",
+    "shadow_blur": "Shadow Blur",
+    "shadow_opacity": "Shadow Strength"
+  },
+  "background": {
+    "title": "Background",
+    "style": "Style",
+    "style_hint": "A backing plate helps over bright or busy games",
+    "none": "None",
+    "box": "Plate",
+    "color": "Plate Color",
+    "opacity": "Opacity"
+  },
+  "motion": {
+    "title": "Motion",
+    "animation": "Transitions",
+    "animation_hint": "Gently fade between subtitle lines"
+  },
+  "reset": "Restore Default Appearance"
+}

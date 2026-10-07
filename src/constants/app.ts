@@ -1,11 +1,11 @@
-export const APP_NAME = "QiuYe Electron Template";
-export const APP_SHORT_NAME = "Electron Template";
+export const APP_NAME = "PotSubOverlay";
+export const APP_SHORT_NAME = "PotSubOverlay";
 export const APP_DESCRIPTION =
-  "A clean Electron starter with React, shadcn/ui, i18n, theme motion, and GitHub release checks.";
+  "Show the subtitles PotPlayer is playing on top of your game.";
 
 export const APP_REPO_OWNER = import.meta.env.VITE_UPDATE_OWNER || "QiuYeDx";
 export const APP_REPO_NAME =
-  import.meta.env.VITE_UPDATE_REPO || "qiuye-electron-template";
+  import.meta.env.VITE_UPDATE_REPO || "PotSubOverlay";
 export const APP_REPO_URL = `https://github.com/${APP_REPO_OWNER}/${APP_REPO_NAME}`;
 export const APP_RELEASES_URL =
   import.meta.env.VITE_UPDATE_RELEASES_URL || `${APP_REPO_URL}/releases`;

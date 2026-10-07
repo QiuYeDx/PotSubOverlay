@@ -1,5 +1,5 @@
 {
-  "app_name": "QiuYe Electron Template",
+  "app_name": "PotSubOverlay",
   "lang": {
     "zh": "简体中文",
     "zh-Hant": "繁體中文",
@@ -7,27 +7,29 @@
     "ja": "日本語"
   },
   "menu": {
-    "home": "Home",
-    "about": "About",
-    "setting": "Settings"
+    "player": "Playing",
+    "appearance": "Appearance",
+    "setting": "Settings",
+    "about": "About"
   },
   "action": {
     "check_update": "Check for Updates",
-    "toggle_theme": "Toggle theme"
+    "toggle_theme": "Toggle Theme"
   },
   "window": {
-    "close": "Close window",
-    "minimize": "Minimize window",
-    "toggle_maximize": "Maximize or restore window"
+    "close": "Close Window",
+    "minimize": "Minimize Window",
+    "toggle_maximize": "Maximize or Restore Window",
+    "compact": "Switch to Compact Mode",
+    "compact_short": "Compact"
   },
   "update": {
     "title": "App Update",
     "checking": "Checking",
-    "available_title": "Version {{version}} is available",
-    "up_to_date_title": "You are up to date",
-    "error_title": "Update check failed",
+    "available_title": "Version {{version}} Available",
+    "up_to_date_title": "You're Up to Date",
+    "error_title": "Update Check Failed",
     "open_releases": "Open Releases",
     "changelog_title": "Changelog"
   }
 }
-

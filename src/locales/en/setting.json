@@ -1,19 +1,27 @@
 {
   "title": "Settings",
-  "description": "Tune template-level preferences and common behavior.",
+  "description": "Subtitle behavior, shortcuts and app preferences.",
   "nav": {
     "general": {
       "label": "General",
       "hint": "Language and theme"
     },
+    "behavior": {
+      "label": "Behavior",
+      "hint": "Hiding and subtitles"
+    },
+    "hotkeys": {
+      "label": "Shortcuts",
+      "hint": "Quick actions in game"
+    },
     "update": {
       "label": "Updates",
-      "hint": "Check strategy"
+      "hint": "Check policy"
     }
   },
   "subtitle": {
-    "general_config": "General Settings",
-    "update_config": "Update Settings"
+    "general_config": "General",
+    "update_config": "Updates"
   },
   "fields": {
     "language": "Language",
@@ -21,24 +29,57 @@
     "light_mode": "Light",
     "dark_mode": "Dark",
     "system_mode": "System",
-    "notification": {
-      "label": "System Notification",
-      "test_btn": "Test Notification",
-      "test_title": "Notification Connected",
-      "test_body": "The Electron main process can show system notifications."
-    },
     "update": {
       "auto_check": {
-        "label": "Auto check on startup",
-        "desc": "Silently checks GitHub Releases after startup and only notifies when a new version exists."
+        "label": "Check on Launch",
+        "desc": "Quietly check GitHub Releases on launch and only notify when there's a new version."
       },
       "show_changelog": {
-        "label": "Show changelog",
-        "desc": "When a new version exists, try to fetch CHANGELOG.md and show related entries."
+        "label": "Show Changelog",
+        "desc": "Read CHANGELOG.md and show the relevant entries when a new version is available."
       },
-      "target_repo": "Target repository",
-      "target_repo_desc": "After copying the template, configure the target repo through .env, package.json template.update, and app constants."
+      "target_repo": "Update Source",
+      "target_repo_desc": "New versions are checked on this GitHub repository's Releases. Nothing is downloaded automatically."
+    }
+  },
+  "behavior": {
+    "overlay_title": "Subtitle Display",
+    "hide_foreground": "Hide When PotPlayer Is in Front",
+    "hide_foreground_hint": "Avoids doubling up with PotPlayer's own subtitles when you switch back to watch",
+    "hide_paused": "Hide When Paused",
+    "hide_paused_hint": "Don't show subtitles while PotPlayer is paused",
+    "subtitle_title": "Subtitle Files",
+    "filter_signs": "Filter Sign Subtitles",
+    "filter_signs_hint": "Ignore positioned on-screen text and signs in ASS files",
+    "variant": "Chinese Variant",
+    "variant_hint": "Preferred when both Simplified and Traditional files exist",
+    "variant_sc": "简体",
+    "variant_tc": "繁體",
+    "offset_step": "Timing Step",
+    "offset_step_hint": "How much each earlier/later adjustment moves",
+    "app_title": "App",
+    "close_to_tray": "Keep Running in the Tray",
+    "close_to_tray_hint": "Closing the window keeps subtitles working; reopen from the tray icon",
+    "launch_at_login": "Launch at Login",
+    "launch_at_login_hint": "Start quietly in the tray after you sign in to Windows",
+    "compact_on_top": "Keep Compact Mode on Top",
+    "compact_on_top_hint": "The compact window stays above other windows"
+  },
+  "hotkeys": {
+    "title": "Global Shortcuts",
+    "description": "Work inside games too. Click, then press a new combination. Esc cancels, Backspace clears.",
+    "reset": "Restore Defaults",
+    "recording": "Press a combination…",
+    "none": "Not set",
+    "clear": "Clear shortcut",
+    "conflict": "Another app already uses this combination — choose a different one",
+    "conflict_short": "In use",
+    "actions": {
+      "toggleOverlay": "Show / Hide Subtitles",
+      "toggleEdit": "Adjust Subtitle Position",
+      "cycleLangMode": "Cycle Both / Chinese / Japanese",
+      "offsetBackward": "Subtitles {{step}} Earlier",
+      "offsetForward": "Subtitles {{step}} Later"
     }
   }
 }
-

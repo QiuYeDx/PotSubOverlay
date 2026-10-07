@@ -1,5 +1,7 @@
 import { useTranslation } from "react-i18next";
+import { Minimize2 } from "lucide-react";
 import { APP_NAME } from "@/constants/app";
+import useAppStore from "@/store/useAppStore";
 
 const isMac = navigator.userAgent.includes("Mac");
 const isWindows = navigator.userAgent.includes("Windows");
@@ -31,6 +33,7 @@ const WINDOWS_TRAFFIC_LIGHTS: ReadonlyArray<{
 function AppTitleBar() {
   const { t } = useTranslation();
   const appName = t("common:app_name", { defaultValue: APP_NAME });
+  const setCompact = useAppStore((state) => state.setCompact);
 
   const handleWindowControl = async (action: WindowControlAction) => {
     try {
@@ -75,6 +78,16 @@ function AppTitleBar() {
           appName
         )}
       </div>
+      <button
+        type="button"
+        aria-label={t("common:window.compact")}
+        title={t("common:window.compact")}
+        className="app-region-no-drag absolute top-1/2 right-2.5 flex h-7 -translate-y-1/2 items-center gap-1.5 rounded-full border border-border/40 bg-background/60 px-2.5 text-xs text-muted-foreground backdrop-blur-md transition-colors hover:text-foreground"
+        onClick={() => setCompact(true)}
+      >
+        <Minimize2 className="size-3.5" />
+        {t("common:window.compact_short")}
+      </button>
     </div>
   );
 }

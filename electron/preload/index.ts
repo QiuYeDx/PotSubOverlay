@@ -63,7 +63,7 @@ const safeDOM = {
 type ThemeValue = 'light' | 'dark' | 'system'
 type LoadingColorMode = 'light' | 'dark'
 
-const THEME_STORAGE_KEY = 'qiuye-electron-template-theme'
+const THEME_STORAGE_KEY = 'potsuboverlay-theme'
 const LEGACY_THEME_KEY = 'theme'
 const START_LOADING_PROGRESS_CHANNEL = 'qiuye-template-start-loading-progress'
 
@@ -332,7 +332,7 @@ function useLoading() {
   oDiv.className = 'app-loading-wrap'
   oDiv.dataset.fkColorMode = resolveLoadingColorMode()
   oDiv.setAttribute('role', 'progressbar')
-  oDiv.setAttribute('aria-label', 'QiuYe Electron Template loading')
+  oDiv.setAttribute('aria-label', 'PotSubOverlay loading')
   oDiv.setAttribute('aria-live', 'polite')
   oDiv.setAttribute('aria-valuemin', '0')
   oDiv.setAttribute('aria-valuemax', '100')
@@ -341,11 +341,11 @@ function useLoading() {
     <div class="fk-exit-mask" aria-hidden="true"></div>
     <div class="fk-progress-stack" aria-hidden="true">
       <div class="fk-progress-content">
-        <div class="fk-wordmark">QiuYe Electron Template</div>
+        <div class="fk-wordmark">PotSubOverlay</div>
         <div class="fk-percent">0%</div>
       </div>
     </div>
-    <span class="fk-sr-only">QiuYe Electron Template is starting</span>
+    <span class="fk-sr-only">PotSubOverlay is starting</span>
   `
 
   const progressLabel = oDiv.querySelector<HTMLElement>('.fk-percent')

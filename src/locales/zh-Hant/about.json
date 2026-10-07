@@ -1,10 +1,10 @@
 {
   "title": "關於",
-  "description": "模板資訊、版本和專案連結。",
-  "tagline": "一個偏向個人專案初始化的 Electron 模板，保留通用體驗，避免混入具體業務。",
+  "description": "版本、專案連結與授權資訊。",
+  "tagline": "把 PotPlayer 正在播放的字幕，放到遊戲畫面上。為邊玩遊戲邊聽日語動畫、ASMR 與音聲作品而做。",
   "buttons": {
-    "repo": "倉庫",
-    "releases": "發布記錄"
+    "repo": "儲存庫",
+    "releases": "發布紀錄"
   },
   "stats": {
     "platform": "平台",
@@ -14,20 +14,20 @@
   },
   "links": {
     "repo": {
-      "title": "原始碼倉庫",
-      "desc": "複製模板後優先修改倉庫、appId、應用名稱和圖示。"
+      "title": "原始碼",
+      "desc": "問題回報、功能建議與原始碼。"
     },
     "author": {
-      "title": "作者主頁",
+      "title": "作者首頁",
       "desc": "個人專案與作品入口。"
     },
     "blog": {
       "title": "部落格",
-      "desc": "記錄設計、開發和實驗過程。"
+      "desc": "記錄設計、開發和折騰過程。"
     },
     "contact": {
       "title": "聯絡",
-      "desc": "用於模板維護和專案協作。"
+      "desc": "合作與回饋。"
     }
   },
   "subtitle": {
@@ -39,10 +39,9 @@
     "build_tool": "建置工具",
     "style": "樣式",
     "state": "狀態",
-    "motion": "動效",
+    "motion": "動態效果",
     "i18n": "國際化",
     "pkg": "套件管理"
   },
-  "license_note": "模板預設使用 MIT License；複製為私有或商業專案時請按目標專案重新確認授權。"
+  "license_note": "PotSubOverlay 以 MIT License 開源。PotPlayer 是 Kakao 的產品，本專案與其無關聯。"
 }
-

@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: corepack pnpm install --frozen-lockfile
+
+      - name: Check
+        run: corepack pnpm check
+
+      - name: Build installer
+        run: corepack pnpm release:win
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: PotSubOverlay ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            release/*/PotSubOverlay_*_x64.exe
+            release/*/PotSubOverlay_*_x64.exe.blockmap

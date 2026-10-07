@@ -1,0 +1,82 @@
+{
+  "drop_hint": "Drop to load this subtitle file",
+  "nothing_playing": "Nothing Playing",
+  "open_potplayer_hint": "Play a video or audio file in PotPlayer",
+  "state": {
+    "no_player": "Not Connected",
+    "playing": "Playing",
+    "paused": "Paused",
+    "stopped": "Stopped"
+  },
+  "stage": {
+    "no_player": "Play a video or audio file in PotPlayer and its subtitles appear here",
+    "waiting_path": "Reading the file being played…",
+    "scanning": "Looking for subtitles…",
+    "none_found": "No subtitles with the same name in this folder",
+    "error": "Can't read the media folder",
+    "silent": "No subtitle at this moment",
+    "no_enabled": "No subtitle file is enabled"
+  },
+  "notice": {
+    "hidden": "Subtitles off",
+    "suppressed": "Hidden while PotPlayer is in front"
+  },
+  "controls": {
+    "visibility": "Subtitles",
+    "shown": "Showing",
+    "hidden": "Off",
+    "suppressed": "Hidden for now",
+    "language": "Language",
+    "offset": "Timing",
+    "position": "Position",
+    "edit_position": "Adjust Position",
+    "finish_edit": "Done Adjusting"
+  },
+  "lang": {
+    "both": "Both",
+    "zh": "Chinese",
+    "ja": "Japanese",
+    "single_hint": "This subtitle has only one language"
+  },
+  "offset": {
+    "earlier": "Show subtitles {{step}} earlier",
+    "later": "Show subtitles {{step}} later",
+    "explain": "Positive values delay subtitles",
+    "reset": "Click to reset"
+  },
+  "players": {
+    "title": "Players",
+    "count": "{{count}} PotPlayer windows found",
+    "empty_title": "PotPlayer Not Found",
+    "empty_hint": "Start PotPlayer and play any video or audio — it shows up here automatically.",
+    "auto": "Follow Automatically",
+    "auto_hint": "Always follow the window that is playing",
+    "untitled": "Untitled",
+    "following": "Current"
+  },
+  "tracks": {
+    "title": "Subtitle Files",
+    "multi_hint": "Several files can be on at once, e.g. separate Chinese and Japanese files",
+    "rescan": "Rescan",
+    "pick": "Choose Subtitle File…",
+    "reveal": "Show in Folder",
+    "bilingual": "Bilingual",
+    "lang_zh": "Chinese",
+    "lang_ja": "Japanese",
+    "lang_other": "Other",
+    "cues": "{{count}} lines",
+    "read_failed": "Couldn't read",
+    "idle_title": "Waiting for Playback",
+    "idle_hint": "Once PotPlayer starts playing, subtitles with the same name in that folder are found automatically.",
+    "scanning": "Looking for subtitles…",
+    "error_title": "Can't Read the Folder",
+    "error_hint": "Make sure the folder is still reachable, e.g. that the network drive is connected.",
+    "none_title": "No Matching Subtitles",
+    "none_hint": "Supports .srt .ass .ssa .vtt .lrc named after the media, like “name.ja.srt”. You can also drop a subtitle file here."
+  },
+  "compact": {
+    "expand": "Expand",
+    "hide": "Hide Subtitles",
+    "show": "Show Subtitles"
+  }
+}

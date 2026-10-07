@@ -1,7 +1,7 @@
 import { MouseEvent, useMemo } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import * as htmlToImage from "html-to-image";
-import { Home, Info, Moon, Settings, Sun } from "lucide-react";
+import { Captions, Info, Moon, Palette, Settings, Sun } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useWindowSize } from "@reactuses/core";
@@ -34,9 +34,10 @@ function BottomNavigation() {
 
   const mainNavItems = useMemo(
     () => [
-      { path: "/", icon: Home, label: "common:menu.home" },
-      { path: "/about", icon: Info, label: "common:menu.about" },
+      { path: "/", icon: Captions, label: "common:menu.player" },
+      { path: "/appearance", icon: Palette, label: "common:menu.appearance" },
       { path: "/setting", icon: Settings, label: "common:menu.setting" },
+      { path: "/about", icon: Info, label: "common:menu.about" },
     ],
     []
   );

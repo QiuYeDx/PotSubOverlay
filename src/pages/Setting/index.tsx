@@ -1,13 +1,22 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { type ComponentType, useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { MonitorUp, Settings as SettingsIcon } from "lucide-react";
+import { Keyboard, MonitorUp, Settings as SettingsIcon, SlidersHorizontal } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import BehaviorConfig from "./components/BehaviorConfig";
 import GeneralConfig from "./components/GeneralConfig";
+import HotkeyConfig from "./components/HotkeyConfig";
 import UpdateConfig from "./components/UpdateConfig";
 
-type TabKey = "general" | "update";
+type TabKey = "general" | "behavior" | "hotkeys" | "update";
+
+const PANELS: Record<TabKey, ComponentType> = {
+  general: GeneralConfig,
+  behavior: BehaviorConfig,
+  hotkeys: HotkeyConfig,
+  update: UpdateConfig,
+};
 
 const NAV = [
   {
@@ -15,6 +24,18 @@ const NAV = [
     labelKey: "setting:nav.general.label",
     hintKey: "setting:nav.general.hint",
     icon: SettingsIcon,
+  },
+  {
+    key: "behavior" as const,
+    labelKey: "setting:nav.behavior.label",
+    hintKey: "setting:nav.behavior.hint",
+    icon: SlidersHorizontal,
+  },
+  {
+    key: "hotkeys" as const,
+    labelKey: "setting:nav.hotkeys.label",
+    hintKey: "setting:nav.hotkeys.hint",
+    icon: Keyboard,
   },
   {
     key: "update" as const,
@@ -96,7 +117,7 @@ function Setting() {
   }, [tab, checkScroll]);
 
   return (
-    <div className="mx-auto flex h-[calc(100dvh-120px)] max-w-5xl flex-col px-4 pb-[40px] sm:px-8">
+    <div className="mx-auto flex h-[calc(100dvh-132px)] max-w-5xl flex-col px-4 pb-[40px] sm:px-8">
       <div className="mb-5 shrink-0">
         <div className="text-2xl font-semibold tracking-tight">
           {t("setting:title")}
@@ -166,9 +187,12 @@ function Setting() {
                 onAnimationStart={(definition) => {
                   if (definition === "animate") checkScroll();
                 }}
-                className="flex flex-col gap-4 py-1 pr-3"
+                className="flex flex-col gap-6 py-1 pr-3"
               >
-                {tab === "general" ? <GeneralConfig /> : <UpdateConfig />}
+                {(() => {
+                  const Panel = PANELS[tab];
+                  return <Panel />;
+                })()}
               </motion.div>
             </AnimatePresence>
           </ScrollArea>

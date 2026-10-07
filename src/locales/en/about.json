@@ -1,7 +1,7 @@
 {
   "title": "About",
-  "description": "Template information, version, and project links.",
-  "tagline": "An Electron template for personal project bootstrapping: reusable app experience without domain-specific business code.",
+  "description": "Version, project links and license.",
+  "tagline": "Puts the subtitles PotPlayer is playing on top of your game. Made for listening to Japanese anime, ASMR and voice works while you play.",
   "buttons": {
     "repo": "Repository",
     "releases": "Releases"
@@ -9,25 +9,25 @@
   "stats": {
     "platform": "Platform",
     "license": "License",
-    "build": "Build",
+    "build": "Version",
     "stack": "Stack"
   },
   "links": {
     "repo": {
-      "title": "Source Repository",
-      "desc": "After copying the template, update the repo, appId, app name, and icons first."
+      "title": "Source Code",
+      "desc": "Issues, feature requests and source."
     },
     "author": {
-      "title": "Author Site",
-      "desc": "Personal projects and portfolio entry."
+      "title": "Author",
+      "desc": "Personal projects and work."
     },
     "blog": {
       "title": "Blog",
-      "desc": "Notes about design, development, and experiments."
+      "desc": "Notes on design and development."
     },
     "contact": {
       "title": "Contact",
-      "desc": "For template maintenance and project collaboration."
+      "desc": "Collaboration and feedback."
     }
   },
   "subtitle": {
@@ -37,12 +37,11 @@
     "framework": "Framework",
     "language": "Language",
     "build_tool": "Build Tool",
-    "style": "Style",
+    "style": "Styling",
     "state": "State",
     "motion": "Motion",
     "i18n": "i18n",
     "pkg": "Package Manager"
   },
-  "license_note": "The template defaults to MIT License. Re-check the license when turning it into a private or commercial project."
+  "license_note": "PotSubOverlay is open source under the MIT License. PotPlayer is a Kakao product; this project is not affiliated with it."
 }
-

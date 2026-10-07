@@ -1,0 +1,82 @@
+{
+  "drop_hint": "ドロップしてこの字幕を読み込む",
+  "nothing_playing": "再生していません",
+  "open_potplayer_hint": "PotPlayer で動画や音声を再生してください",
+  "state": {
+    "no_player": "未接続",
+    "playing": "再生中",
+    "paused": "一時停止",
+    "stopped": "停止"
+  },
+  "stage": {
+    "no_player": "PotPlayer で動画や音声を再生すると、ここに字幕が表示されます",
+    "waiting_path": "再生中のファイルを確認しています…",
+    "scanning": "字幕を探しています…",
+    "none_found": "同じフォルダーに同名の字幕が見つかりません",
+    "error": "メディアのフォルダーを読み込めません",
+    "silent": "この時点の字幕はありません",
+    "no_enabled": "有効な字幕ファイルがありません"
+  },
+  "notice": {
+    "hidden": "字幕はオフです",
+    "suppressed": "PotPlayer が前面にあるため非表示中"
+  },
+  "controls": {
+    "visibility": "字幕表示",
+    "shown": "表示中",
+    "hidden": "オフ",
+    "suppressed": "一時的に非表示",
+    "language": "言語",
+    "offset": "タイミング",
+    "position": "位置",
+    "edit_position": "位置を調整",
+    "finish_edit": "調整を完了"
+  },
+  "lang": {
+    "both": "両方",
+    "zh": "中国語",
+    "ja": "日本語",
+    "single_hint": "この字幕は一言語のみです"
+  },
+  "offset": {
+    "earlier": "字幕を {{step}} 早める",
+    "later": "字幕を {{step}} 遅らせる",
+    "explain": "正の値で字幕を遅らせます",
+    "reset": "クリックでリセット"
+  },
+  "players": {
+    "title": "プレーヤー",
+    "count": "PotPlayer のウインドウが {{count}} 個あります",
+    "empty_title": "PotPlayer が見つかりません",
+    "empty_hint": "PotPlayer を起動して動画や音声を再生すると、ここに自動で表示されます。",
+    "auto": "自動で追従",
+    "auto_hint": "再生中のウインドウに常に追従します",
+    "untitled": "名称未設定",
+    "following": "現在"
+  },
+  "tracks": {
+    "title": "字幕ファイル",
+    "multi_hint": "中国語と日本語が別ファイルの場合など、複数を同時に有効にできます",
+    "rescan": "再スキャン",
+    "pick": "字幕ファイルを選択…",
+    "reveal": "フォルダーで表示",
+    "bilingual": "二か国語",
+    "lang_zh": "中国語",
+    "lang_ja": "日本語",
+    "lang_other": "その他",
+    "cues": "{{count}} 行",
+    "read_failed": "読み込み失敗",
+    "idle_title": "再生待ち",
+    "idle_hint": "PotPlayer で再生が始まると、同じフォルダーの同名字幕を自動で探します。",
+    "scanning": "字幕を探しています…",
+    "error_title": "フォルダーを読み込めません",
+    "error_hint": "ネットワークドライブが接続されているかなど、フォルダーにアクセスできるか確認してください。",
+    "none_title": "同名の字幕がありません",
+    "none_hint": ".srt .ass .ssa .vtt .lrc に対応。メディアと同じ名前（例：「名前.ja.srt」）にしてください。字幕ファイルをここにドロップすることもできます。"
+  },
+  "compact": {
+    "expand": "展開",
+    "hide": "字幕を隠す",
+    "show": "字幕を表示"
+  }
+}

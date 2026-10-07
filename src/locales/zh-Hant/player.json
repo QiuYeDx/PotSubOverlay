@@ -1,0 +1,82 @@
+{
+  "drop_hint": "放開以載入這個字幕檔",
+  "nothing_playing": "尚未播放",
+  "open_potplayer_hint": "在 PotPlayer 中播放影片或音訊",
+  "state": {
+    "no_player": "未連線",
+    "playing": "正在播放",
+    "paused": "已暫停",
+    "stopped": "已停止"
+  },
+  "stage": {
+    "no_player": "開啟 PotPlayer 播放影片或音訊，字幕會顯示在這裡",
+    "waiting_path": "正在讀取播放的檔案…",
+    "scanning": "正在尋找字幕…",
+    "none_found": "同一資料夾下沒有找到同名字幕",
+    "error": "無法讀取媒體所在的資料夾",
+    "silent": "此刻沒有字幕",
+    "no_enabled": "沒有啟用任何字幕檔"
+  },
+  "notice": {
+    "hidden": "字幕已關閉",
+    "suppressed": "PotPlayer 在前景，已暫時隱藏"
+  },
+  "controls": {
+    "visibility": "字幕顯示",
+    "shown": "顯示中",
+    "hidden": "已關閉",
+    "suppressed": "暫時隱藏",
+    "language": "語言",
+    "offset": "時間偏移",
+    "position": "位置",
+    "edit_position": "調整位置",
+    "finish_edit": "完成調整"
+  },
+  "lang": {
+    "both": "雙語",
+    "zh": "中文",
+    "ja": "日文",
+    "single_hint": "目前字幕只有一種語言"
+  },
+  "offset": {
+    "earlier": "字幕提前 {{step}}",
+    "later": "字幕延後 {{step}}",
+    "explain": "正數表示字幕延後顯示",
+    "reset": "點擊歸零"
+  },
+  "players": {
+    "title": "播放器",
+    "count": "偵測到 {{count}} 個 PotPlayer 視窗",
+    "empty_title": "未偵測到 PotPlayer",
+    "empty_hint": "啟動 PotPlayer 並播放任意影片或音訊，這裡會自動出現。",
+    "auto": "自動跟隨",
+    "auto_hint": "始終跟隨正在播放的視窗",
+    "untitled": "未命名",
+    "following": "目前"
+  },
+  "tracks": {
+    "title": "字幕檔",
+    "multi_hint": "可同時啟用多個檔案，例如分開的中文與日文字幕",
+    "rescan": "重新掃描",
+    "pick": "選擇字幕檔…",
+    "reveal": "在資料夾中顯示",
+    "bilingual": "雙語",
+    "lang_zh": "中文",
+    "lang_ja": "日文",
+    "lang_other": "其他",
+    "cues": "{{count}} 條",
+    "read_failed": "讀取失敗",
+    "idle_title": "等待播放",
+    "idle_hint": "PotPlayer 開始播放後，會自動尋找同一資料夾下的同名字幕。",
+    "scanning": "正在尋找字幕…",
+    "error_title": "無法讀取所在資料夾",
+    "error_hint": "請確認資料夾仍可存取，例如網路磁碟是否已連線。",
+    "none_title": "沒有找到同名字幕",
+    "none_hint": "支援 .srt .ass .ssa .vtt .lrc，檔名需與媒體相同，如「名字.ja.srt」。也可以直接把字幕檔拖進來。"
+  },
+  "compact": {
+    "expand": "展開完整模式",
+    "hide": "隱藏字幕",
+    "show": "顯示字幕"
+  }
+}

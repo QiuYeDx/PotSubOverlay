@@ -13,7 +13,7 @@ const useNotificationStore = create<NotificationStore>()(
       setEnabled: (enabled) => set({ enabled }),
     }),
     {
-      name: "qiuye-electron-template-notification",
+      name: "potsuboverlay-notification",
       storage: createJSONStorage(() => localStorage),
     }
   )

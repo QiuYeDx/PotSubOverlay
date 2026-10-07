@@ -4,7 +4,7 @@ import path from "node:path";
 const root = process.cwd();
 const localesRoot = path.join(root, "src", "locales");
 const languages = ["zh", "zh-Hant", "en", "ja"];
-const namespaces = ["common", "home", "about", "setting"];
+const namespaces = ["common", "player", "appearance", "about", "setting"];
 
 function flattenKeys(value, prefix = "") {
   if (Array.isArray(value)) {

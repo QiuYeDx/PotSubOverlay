@@ -1,10 +1,18 @@
 {
   "title": "設定",
-  "description": "調整模板級偏好和通用行為。",
+  "description": "調整字幕行為、快速鍵與應用程式偏好。",
   "nav": {
     "general": {
-      "label": "通用",
+      "label": "一般",
       "hint": "語言與主題"
+    },
+    "behavior": {
+      "label": "行為",
+      "hint": "隱藏規則與字幕"
+    },
+    "hotkeys": {
+      "label": "快速鍵",
+      "hint": "遊戲中快速操作"
     },
     "update": {
       "label": "更新",
@@ -12,33 +20,66 @@
     }
   },
   "subtitle": {
-    "general_config": "通用設定",
-    "update_config": "更新設定"
+    "general_config": "一般",
+    "update_config": "更新"
   },
   "fields": {
-    "language": "語言",
-    "theme": "主題",
+    "language": "介面語言",
+    "theme": "外觀主題",
     "light_mode": "淺色",
     "dark_mode": "深色",
     "system_mode": "跟隨系統",
-    "notification": {
-      "label": "系統通知",
-      "test_btn": "測試通知",
-      "test_title": "通知已連接",
-      "test_body": "Electron 主程序可以正常顯示系統通知。"
-    },
     "update": {
       "auto_check": {
         "label": "啟動時自動檢查",
-        "desc": "應用啟動後靜默檢查 GitHub Releases，發現新版本時再提示。"
+        "desc": "啟動後靜默檢查 GitHub Releases，有新版本時再提示。"
       },
       "show_changelog": {
         "label": "顯示更新日誌",
-        "desc": "有新版本時嘗試讀取遠端 CHANGELOG.md，並展示相關版本條目。"
+        "desc": "有新版本時讀取 CHANGELOG.md 並顯示相關條目。"
       },
-      "target_repo": "目標倉庫",
-      "target_repo_desc": "複製模板後可透過 .env、package.json template.update 和常量檔設定目標倉庫。"
+      "target_repo": "更新來源",
+      "target_repo_desc": "從這個 GitHub 儲存庫的 Releases 檢查新版本，只提示，不自動下載。"
+    }
+  },
+  "behavior": {
+    "overlay_title": "字幕顯示",
+    "hide_foreground": "PotPlayer 在前景時隱藏",
+    "hide_foreground_hint": "切回播放器觀看時，避免與播放器內建字幕重複",
+    "hide_paused": "暫停時隱藏",
+    "hide_paused_hint": "PotPlayer 暫停時不顯示字幕",
+    "subtitle_title": "字幕檔",
+    "filter_signs": "過濾特效字幕",
+    "filter_signs_hint": "忽略 ASS 中帶定位的螢幕字、招牌等特效",
+    "variant": "簡繁偏好",
+    "variant_hint": "同時有簡體與繁體字幕時預設選用",
+    "variant_sc": "简体",
+    "variant_tc": "繁體",
+    "offset_step": "偏移步長",
+    "offset_step_hint": "每次提前或延後調整的時間",
+    "app_title": "應用程式",
+    "close_to_tray": "關閉視窗時保留在系統匣",
+    "close_to_tray_hint": "字幕繼續運作，可從系統匣圖示重新開啟",
+    "launch_at_login": "開機啟動",
+    "launch_at_login_hint": "登入 Windows 後在系統匣中靜默啟動",
+    "compact_on_top": "簡潔模式置頂",
+    "compact_on_top_hint": "簡潔模式的小視窗保持在其他視窗之上"
+  },
+  "hotkeys": {
+    "title": "全域快速鍵",
+    "description": "遊戲中也能使用。點擊後按下新組合鍵，Esc 取消，Backspace 清除。",
+    "reset": "恢復預設",
+    "recording": "請按下組合鍵…",
+    "none": "未設定",
+    "clear": "清除快速鍵",
+    "conflict": "這個組合已被其他程式佔用，請換一個",
+    "conflict_short": "被佔用",
+    "actions": {
+      "toggleOverlay": "顯示 / 隱藏字幕",
+      "toggleEdit": "調整字幕位置",
+      "cycleLangMode": "切換雙語 / 中文 / 日文",
+      "offsetBackward": "字幕提前 {{step}}",
+      "offsetForward": "字幕延後 {{step}}"
     }
   }
 }
-

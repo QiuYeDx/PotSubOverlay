@@ -14,6 +14,7 @@ export default defineConfig(({ command }) => {
   const sourcemap = isServe || Boolean(process.env.VSCODE_DEBUG);
   const appVersion = process.env.VITE_APP_VERSION ?? pkg.version;
   const dependencyNames = Object.keys(pkg.dependencies ?? {});
+  const mainExternal = ["koffi", /^@koromix\//];
   const preloadExternal = dependencyNames.filter(
     (dependencyName) => dependencyName !== "motion"
   );
@@ -52,13 +53,18 @@ export default defineConfig(({ command }) => {
               minify: isBuild,
               outDir: "dist-electron/main",
               rollupOptions: {
-                external: dependencyNames,
+                // Only native modules stay external (shipped in node_modules and
+                // unpacked from the asar); everything else is bundled into main.
+                external: mainExternal,
               },
             },
           },
         },
         preload: {
-          input: "electron/preload/index.ts",
+          input: {
+            index: "electron/preload/index.ts",
+            overlay: "electron/preload/overlay.ts",
+          },
           vite: {
             resolve: {
               alias: {
@@ -71,6 +77,11 @@ export default defineConfig(({ command }) => {
               outDir: "dist-electron/preload",
               rollupOptions: {
                 external: preloadExternal,
+                // Two preload entries (control panel + overlay) share no modules,
+                // so each still builds to a single self-contained file.
+                output: {
+                  inlineDynamicImports: false,
+                },
               },
             },
           },
@@ -87,6 +98,14 @@ export default defineConfig(({ command }) => {
         };
       })()
       : undefined,
+    build: {
+      rollupOptions: {
+        input: {
+          index: path.join(__dirname, "index.html"),
+          overlay: path.join(__dirname, "overlay.html"),
+        },
+      },
+    },
     clearScreen: false,
   };
 });

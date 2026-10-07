@@ -1,23 +1,25 @@
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "com.qiuyedx.electron-template",
+  "appId": "com.qiuyedx.potsuboverlay",
+  "productName": "PotSubOverlay",
   "asar": true,
+  "asarUnpack": [
+    "node_modules/koffi/**",
+    "node_modules/@koromix/**"
+  ],
   "directories": {
     "buildResources": "build",
     "output": "release/${version}"
   },
   "files": [
     "dist-electron",
-    "dist"
+    "dist",
+    "!**/*.map",
+    "!node_modules/**/*",
+    "node_modules/koffi/**/*",
+    "!node_modules/koffi/doc/**/*",
+    "node_modules/@koromix/**/*"
   ],
-  "mac": {
-    "artifactName": "${productName}_${version}_${arch}.${ext}",
-    "target": [
-      "dmg",
-      "zip"
-    ],
-    "icon": "build/icon.icns"
-  },
   "win": {
     "target": [
       {
@@ -40,10 +42,6 @@
     "installerHeaderIcon": "build/icon.ico",
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
-    "shortcutName": "QiuYe Electron Template"
-  },
-  "dmg": {
-    "icon": "build/icon.icns"
+    "shortcutName": "PotSubOverlay"
   }
 }
-

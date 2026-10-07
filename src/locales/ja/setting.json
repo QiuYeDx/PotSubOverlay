@@ -1,44 +1,85 @@
 {
   "title": "設定",
-  "description": "テンプレートレベルの設定と共通動作を調整します。",
+  "description": "字幕の動作、ショートカット、アプリの設定。",
   "nav": {
     "general": {
       "label": "一般",
       "hint": "言語とテーマ"
     },
+    "behavior": {
+      "label": "動作",
+      "hint": "非表示ルールと字幕"
+    },
+    "hotkeys": {
+      "label": "ショートカット",
+      "hint": "ゲーム中の操作"
+    },
     "update": {
-      "label": "更新",
-      "hint": "確認方針"
+      "label": "アップデート",
+      "hint": "確認方法"
     }
   },
   "subtitle": {
-    "general_config": "一般設定",
-    "update_config": "更新設定"
+    "general_config": "一般",
+    "update_config": "アップデート"
   },
   "fields": {
-    "language": "言語",
+    "language": "表示言語",
     "theme": "テーマ",
     "light_mode": "ライト",
     "dark_mode": "ダーク",
     "system_mode": "システム",
-    "notification": {
-      "label": "システム通知",
-      "test_btn": "通知をテスト",
-      "test_title": "通知が接続されました",
-      "test_body": "Electron メインプロセスからシステム通知を表示できます。"
-    },
     "update": {
       "auto_check": {
-        "label": "起動時に自動確認",
-        "desc": "起動後に GitHub Releases を静かに確認し、新しいバージョンがある場合だけ通知します。"
+        "label": "起動時に確認",
+        "desc": "起動時に GitHub Releases を静かに確認し、新しいバージョンがあるときだけ通知します。"
       },
       "show_changelog": {
         "label": "変更履歴を表示",
-        "desc": "新しいバージョンがある場合、CHANGELOG.md を取得して関連項目を表示します。"
+        "desc": "新しいバージョンがあるとき CHANGELOG.md を読み込み、該当項目を表示します。"
       },
-      "target_repo": "対象リポジトリ",
-      "target_repo_desc": "テンプレートをコピーした後、.env、package.json template.update、アプリ定数で対象リポジトリを設定できます。"
+      "target_repo": "アップデート元",
+      "target_repo_desc": "この GitHub リポジトリの Releases で新しいバージョンを確認します。自動ダウンロードはしません。"
+    }
+  },
+  "behavior": {
+    "overlay_title": "字幕表示",
+    "hide_foreground": "PotPlayer が前面にあるときは隠す",
+    "hide_foreground_hint": "プレーヤーに戻って視聴するとき、内蔵字幕との二重表示を防ぎます",
+    "hide_paused": "一時停止中は隠す",
+    "hide_paused_hint": "PotPlayer の一時停止中は字幕を表示しません",
+    "subtitle_title": "字幕ファイル",
+    "filter_signs": "エフェクト字幕を除外",
+    "filter_signs_hint": "ASS の位置指定された画面内テキストや看板などを無視します",
+    "variant": "簡体字 / 繁体字",
+    "variant_hint": "両方の字幕がある場合に優先する方",
+    "variant_sc": "简体",
+    "variant_tc": "繁體",
+    "offset_step": "調整幅",
+    "offset_step_hint": "早める・遅らせるの 1 回あたりの調整量",
+    "app_title": "アプリ",
+    "close_to_tray": "閉じてもトレイに常駐",
+    "close_to_tray_hint": "ウインドウを閉じても字幕は動作し、トレイアイコンから再度開けます",
+    "launch_at_login": "ログイン時に起動",
+    "launch_at_login_hint": "Windows にサインインした後、トレイで静かに起動します",
+    "compact_on_top": "コンパクトモードを最前面に",
+    "compact_on_top_hint": "コンパクトウインドウを常に他のウインドウより前に表示します"
+  },
+  "hotkeys": {
+    "title": "グローバルショートカット",
+    "description": "ゲーム中でも使えます。クリックして新しい組み合わせを押してください。Esc でキャンセル、Backspace で消去。",
+    "reset": "デフォルトに戻す",
+    "recording": "キーを押してください…",
+    "none": "未設定",
+    "clear": "ショートカットを消去",
+    "conflict": "この組み合わせは他のアプリで使用中です。別の組み合わせを選んでください",
+    "conflict_short": "使用中",
+    "actions": {
+      "toggleOverlay": "字幕の表示 / 非表示",
+      "toggleEdit": "字幕の位置を調整",
+      "cycleLangMode": "二か国語 / 中国語 / 日本語を切り替え",
+      "offsetBackward": "字幕を {{step}} 早める",
+      "offsetForward": "字幕を {{step}} 遅らせる"
     }
   }
 }
-
