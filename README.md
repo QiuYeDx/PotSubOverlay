@@ -81,7 +81,7 @@
 corepack enable
 corepack pnpm install
 corepack pnpm dev            # Vite + Electron
-corepack pnpm check          # typecheck + i18n + 单元测试
+corepack pnpm check          # typecheck + i18n + 变更日志 + 单元测试
 corepack pnpm release:win    # 构建 NSIS 安装包到 release/
 ```
 
@@ -94,6 +94,8 @@ corepack pnpm subtitle:inspect "D:/Anime/第01话.mkv"
 # 修改 src/assets/app-logo.svg 后重新生成图标
 corepack pnpm icons:build
 ```
+
+发布或合入用户可见的改动时请更新 [CHANGELOG.md](CHANGELOG.md)（格式见 [docs/CHANGELOG_TEMPLATE.md](docs/CHANGELOG_TEMPLATE.md)），`check` 会检查当前版本是否有对应条目。
 
 开发调试时可以设置环境变量 `POTSUB_FAKE_PLAYER="<媒体路径>|<起始毫秒>"`，用模拟播放器代替 PotPlayer；`POTSUB_QA_SCRIPT` 可以驱动窗口截图做视觉验收（见 `electron/main/qa.ts`）。
 

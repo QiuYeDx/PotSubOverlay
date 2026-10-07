@@ -37,10 +37,11 @@
     "release:win": "corepack pnpm build:renderer && electron-builder --win --publish never",
     "electron:check": "electron scripts/check-electron-runtime.mjs",
     "i18n:check": "node scripts/check-i18n.mjs",
-    "check": "corepack pnpm typecheck && corepack pnpm i18n:check && corepack pnpm test",
+    "check": "corepack pnpm typecheck && corepack pnpm i18n:check && corepack pnpm changelog:check && corepack pnpm test",
     "test": "vitest run",
     "subtitle:inspect": "vite-node --config vitest.config.ts scripts/inspect-subtitle.ts",
-    "icons:build": "electron scripts/build-icons.cjs"
+    "icons:build": "electron scripts/build-icons.cjs",
+    "changelog:check": "node scripts/check-changelog.mjs"
   },
   "dependencies": {
     "@koromix/koffi-win32-x64": "3.3.2",

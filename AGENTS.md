@@ -34,6 +34,8 @@ PotSubOverlay：读取 PotPlayer 正在播放的文件与进度，把同名外�
 
 ## 约定
 
+- 每次发布或合入用户可见的改动，都要更新 `CHANGELOG.md`（中文，按“新增 / 优化 / 修复 …”分组，格式见 `docs/CHANGELOG_TEMPLATE.md`）；升级版本号时必须同时写好对应条目，`corepack pnpm check` 中的 `changelog:check` 会拦截缺失的版本。
+
 - 新增页面文案要进入 `src/locales/{zh,zh-Hant,en,ja}/`，托盘文案在 `electron/main/tray.ts`。
 - 更新检查只提示并打开 GitHub Releases，不下载、不执行、不安装。
 - 保留 Windows titlebar、窗口按钮和拖拽热区的可用性。

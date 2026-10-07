@@ -1,34 +1,67 @@
 # Changelog
 
-All notable changes to PotSubOverlay are documented in this file.
+本项目的所有重要更改都将记录在此文件中。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
 ## [1.1.0] - 2026-10-08
 
-### Added
+### 新增
 
-- Bilingual subtitles in any language pair: Chinese, Japanese, Korean, English, French, German, Spanish, Portuguese, Italian, Russian, Thai, Vietnamese and Arabic are recognised, and file tags such as `chseng`, `zh-en` or `中英双语` are understood.
-- Primary language setting (default Chinese); the two lines are styled as primary / second language, with an automatic font per language.
-- Tray menu drawn in the app's own style, following the app theme, with keyboard navigation.
+- 双语字幕不再限定“中文 + 日文”：可识别中文、日语、韩语、英语、法语、德语、西班牙语、葡萄牙语、意大利语、俄语、泰语、越南语、阿拉伯语，任意两种语言组合都能按两行显示（如中日、中英、日英、韩英）
+- 按“主语言 / 第二语言”显示双语字幕：新增「设置 → 行为 → 主语言」（默认中文），字幕包含主语言时它就是第一语言，否则取字幕中先出现的语言
+- 语言模式改为「双语 / 仅主语言 / 仅第二语言」，播放页、简洁模式和托盘菜单直接显示真实语言名（例如“双语 / 中文 / 英语”）；快捷键 `Ctrl+Alt+J` 同样按这三种模式循环
+- 外观设置改为按主语言与第二语言分别设置字体、字号、字重和颜色；字体新增“自动”选项，按语言自动使用合适的字体（中文雅黑、日文 Yu Gothic、韩文 Malgun Gothic、西文 Segoe UI 等）
+- 字体选择器按当前语言推荐常用字体，并用该语言的示例文字预览每种字体
+- 外观页与调整位置时的示例字幕跟随当前字幕的实际语言
+- 托盘右键菜单改为与应用一致的自绘样式（参照 shadcn/ui 下拉菜单），跟随应用的浅色 / 深色主题，支持 ↑ / ↓ 键选择、Enter 确认与 Esc 关闭；“字幕语言”从二级子菜单改为菜单内的单选项
+- 开发工具 `subtitle:inspect` 可传入主语言参数，查看默认选中的字幕与各模式下的显示结果
 
-### Changed
+### 优化
 
-- Defaults: 30px primary text, 24px second-language text, 1.5px outline (untouched 1.0 values are migrated).
-- Language mode reads Both / <primary> / <second> with real language names, also in the tray menu.
+- 语言识别按文字系统分类（假名、谚文、西里尔、泰文、阿拉伯文、越南语字母、汉字），拉丁字母字幕用高频功能词区分英、法、德、西、葡、意，没有把握时按英语处理；仍按 ASS 样式或行序投票回填仅含汉字或字母的行
+- 文件名语言标记扩展到全部支持的语言，并能拆分连写组合，例如 `scjp`、`chseng`、`zhen`、`zh-en`、`简英`、`中日双语`
+- 默认字幕选择改为优先“包含主语言的双语文件”，其次“主语言文件 + 另一种语言的文件”
+- 新的默认样式：主语言 30px、第二语言 24px、描边 1.5px
+- 设置文件升级到第 3 版：自动迁移 1.0 的中文 / 日文样式与语言模式；仍保持 1.0 默认值（34px、25px、3px 描边）的项改为新默认值，用户改过的值保持不变
+- 字幕窗口禁用系统的窗口显示 / 隐藏动画
 
-### Fixed
+### 修复
 
-- Compact mode: expand and close buttons could not be clicked while no subtitle was showing.
-- Showing or hiding subtitles could stutter; the overlay now fades in the page instead of hiding the window.
-- The font list no longer runs past the bottom of the window; it shrinks or opens above the field.
-- Even corner insets for the compact-mode button and the theme toggle.
+- 简洁模式在“此刻没有字幕”时，右上角的展开与关闭按钮无法点击
+- 打开或关闭字幕（包括 PotPlayer 切到前台时的自动隐藏）偶尔会闪烁、像动画执行一半又重来；现在字幕窗口始终保持显示，只在页面内淡入淡出，快速连续切换也会从当前状态平滑反向
+- 字幕窗口启动时可能错过初始状态，导致字幕一直不显示；页面加载后会主动获取完整状态
+- 字体下拉菜单在靠近窗口底部时超出窗口、显示不全；现在高度不超过可用空间，下方空间不足时向上展开
+- 标题栏“简洁”按钮的上边距与右边距不一致（6px / 10px → 6px / 6px）
+- 右下角主题切换按钮的下边距与右边距不一致（11px / 24px → 11px / 11px）；同一问题已同步修复到 qiuye-electron-template 的 `main` 与 `electron-modern` 分支
+
+### 测试与文档
+
+- 单元测试增至 26 项，覆盖中英、韩英双语识别、法语识别、组合语言标记和设置迁移；用媒体库中的真实字幕回归验证（含中英双语 `Zootopia.srt`）
+- README 改为通用的多语言说明，补充语言标记与默认选择规则
+- 新增 `changelog:check`：`package.json` 当前版本必须在本文件中有对应条目，并已加入 `corepack pnpm check`
+- 更新设计文档、执行计划与 v1.1.0 实施记录；AGENTS.md 补充多语言、字幕窗口显隐和自绘托盘菜单的约束
 
 ## [1.0.0] - 2026-10-08
 
-### Added
+### 新增
 
-- Follows PotPlayer through its window-message API: position, duration, play state and the full path of the current file; several PotPlayer windows are supported with automatic or manual selection.
-- Loads same-name subtitles from the media folder (`.srt`, `.ass`, `.ssa`, `.vtt`, `.lrc`, including `name.<tag>.ext` and `name.mp4.ext`), detects UTF-8/16, GBK, Shift-JIS and Big5, and reloads when the folder changes.
-- Bilingual display in two lines: single-file bilingual subtitles and separate Chinese/Japanese files, Chinese on top by default, with Both / Chinese only / Japanese only modes.
-- Transparent, always-on-top, click-through subtitle overlay with an edit mode for dragging, resizing and multi-display placement.
-- Control panel with full and compact layouts, live preview, per-language typography, outline, shadow and backing-plate styles.
-- Global shortcuts, tray menu, launch at login, per-file timing offset, and Simplified Chinese, Traditional Chinese, English and Japanese UI.
+- 跟随 PotPlayer 播放：通过 PotPlayer 的窗口消息读取当前位置、总时长、播放状态和正在播放文件的完整路径，暂停、拖动进度、切换文件都会自动跟上；支持多个 PotPlayer 窗口，可自动跟随正在播放的窗口或手动指定
+- 自动加载同名字幕：在媒体所在文件夹查找 `.srt`、`.ass`、`.ssa`、`.vtt`、`.lrc`，支持 `名字.ext`、`名字.<标记>.ext`、`名字.mp4.ext` 等命名；自动识别 UTF-8 / UTF-16 / GBK / Shift-JIS / Big5 编码；文件夹中字幕变化时自动重新加载，也可手动重新扫描、选择或拖入字幕文件
+- 中日双语两行显示：支持单文件双语（`中文\N日文`、双语 LRC 同一时间戳两行）与两个单语文件合并，默认中文在上，可切换为仅中文或仅日文
+- 字幕解析：过滤 ASS 中带定位的特效与屏幕字、去除样式标签；YouTube 机翻字幕的滚动重复行自动去重；LRC 支持 `[offset:]` 与多时间戳
+- 透明、置顶、鼠标穿透、不抢焦点的字幕窗口；PotPlayer 在前台时自动隐藏，可选暂停时隐藏
+- 调整位置模式：拖动字幕移动、拖动两侧调整宽度、居中吸附、方向键微调，支持多显示器，位置按显示器比例保存
+- 控制面板：播放 / 外观 / 设置 / 关于四个页面，带实时预览；完整模式与可置顶的简洁模式
+- 外观设置：字体、字号、字重、颜色、描边、阴影、底板、行间距与切换动画
+- 每个媒体文件单独记住时间偏移与启用的字幕文件
+- 全局快捷键（可录制修改并提示冲突）、托盘菜单、关闭到托盘、开机启动
+- 简体中文 / 繁體中文 / English / 日本語 界面，浅色 / 深色主题，GitHub Releases 更新检查
+
+### 测试与文档
+
+- 字幕引擎单元测试，并用媒体库中的真实字幕抽样验证
+- README、设计文档、执行计划与实施记录；CI 与发布工作流
+
+### 已知限制
+
+- 无法覆盖独占全屏的游戏，需要将游戏设为无边框窗口
+- 安装包未签名，首次运行可能出现 SmartScreen 提示
