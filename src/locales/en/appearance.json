@@ -21,7 +21,8 @@
       "700": "Bold",
       "900": "Black"
     },
-    "color": "Color"
+    "color": "Color",
+    "opacity": "Opacity"
   },
   "font": {
     "search": "Search fonts",
@@ -45,6 +46,7 @@
     "description": "Keeps subtitles readable over bright scenes",
     "outline_width": "Outline Width",
     "outline_color": "Outline Color",
+    "outline_opacity": "Outline Opacity",
     "shadow_blur": "Shadow Blur",
     "shadow_opacity": "Shadow Strength"
   },

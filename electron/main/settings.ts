@@ -74,6 +74,12 @@ function sanitize(settings: Settings): Settings {
         : DEFAULT_SETTINGS.primaryLang,
     langMode: valid(settings.langMode, ["both", "primary", "secondary"], "both"),
     langOrder: valid(settings.langOrder, ["primary-first", "secondary-first"], "primary-first"),
+    style: {
+      ...settings.style,
+      primary: { ...settings.style.primary, opacity: finite(settings.style.primary.opacity, 0, 1) ?? 1 },
+      secondary: { ...settings.style.secondary, opacity: finite(settings.style.secondary.opacity, 0, 1) ?? 1 },
+      outlineOpacity: finite(settings.style.outlineOpacity, 0, 1) ?? 1,
+    },
   };
 }
 

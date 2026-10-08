@@ -115,6 +115,8 @@ export interface TextStyle {
   fontSize: number;
   fontWeight: number;
   color: string;
+  /** Opacity of the text fill, 0–1 (the outline has its own). */
+  opacity: number;
 }
 
 export interface OverlayStyle {
@@ -122,6 +124,8 @@ export interface OverlayStyle {
   secondary: TextStyle;
   outlineWidth: number;
   outlineColor: string;
+  /** 0–1 */
+  outlineOpacity: number;
   shadowBlur: number;
   shadowOpacity: number;
   background: "none" | "box";

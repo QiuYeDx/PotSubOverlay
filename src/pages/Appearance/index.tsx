@@ -141,6 +141,15 @@ function Appearance() {
                 triggerClassName="border-foreground/20"
               />
             </SettingsRow>
+            <SettingsRow label={t("appearance:text.opacity")}>
+              <ValueSlider
+                value={Math.round(text.opacity * 100)}
+                min={10}
+                max={100}
+                onChange={(v) => updateStyle({ [role]: { opacity: v / 100 } })}
+                format={(v) => `${v}%`}
+              />
+            </SettingsRow>
           </SettingsGroup>
 
           <SettingsGroup title={t("appearance:layout.title")}>
@@ -209,6 +218,15 @@ function Appearance() {
                 onChange={(outlineColor) => updateStyle({ outlineColor })}
                 triggerSize="sm"
                 triggerClassName="border-foreground/20"
+              />
+            </SettingsRow>
+            <SettingsRow label={t("appearance:effects.outline_opacity")}>
+              <ValueSlider
+                value={Math.round(style.outlineOpacity * 100)}
+                min={0}
+                max={100}
+                onChange={(v) => updateStyle({ outlineOpacity: v / 100 })}
+                format={(v) => `${v}%`}
               />
             </SettingsRow>
             <SettingsRow label={t("appearance:effects.shadow_blur")}>

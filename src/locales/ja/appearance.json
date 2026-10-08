@@ -21,7 +21,8 @@
       "700": "ボールド",
       "900": "ブラック"
     },
-    "color": "色"
+    "color": "色",
+    "opacity": "不透明度"
   },
   "font": {
     "search": "フォントを検索",
@@ -45,6 +46,7 @@
     "description": "明るい画面でも字幕を読みやすく保ちます",
     "outline_width": "縁取りの太さ",
     "outline_color": "縁取りの色",
+    "outline_opacity": "縁取りの不透明度",
     "shadow_blur": "影のぼかし",
     "shadow_opacity": "影の濃さ"
   },

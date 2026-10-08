@@ -21,7 +21,8 @@
       "700": "粗体",
       "900": "特粗"
     },
-    "color": "颜色"
+    "color": "颜色",
+    "opacity": "不透明度"
   },
   "font": {
     "search": "搜索字体",
@@ -45,6 +46,7 @@
     "description": "让字幕在明亮画面上依然清晰",
     "outline_width": "描边粗细",
     "outline_color": "描边颜色",
+    "outline_opacity": "描边不透明度",
     "shadow_blur": "阴影扩散",
     "shadow_opacity": "阴影浓度"
   },
