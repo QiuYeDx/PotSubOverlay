@@ -39,15 +39,23 @@ export const DEFAULT_HOTKEYS: Record<HotkeyAction, string> = {
   cycleLangMode: "Control+Alt+J",
   offsetBackward: "Control+Alt+[",
   offsetForward: "Control+Alt+]",
+  recallLine: "Control+Alt+Up",
+  playPause: "Control+Alt+K",
+  replayLine: "Control+Alt+Down",
+  seekBackward: "Control+Alt+Left",
+  seekForward: "Control+Alt+Right",
 };
 
-export const HOTKEY_ACTIONS: HotkeyAction[] = [
-  "toggleOverlay",
-  "toggleEdit",
-  "cycleLangMode",
-  "offsetBackward",
-  "offsetForward",
+/** Hotkeys as listed in settings. */
+export const HOTKEY_GROUPS: { key: "subtitle" | "playback"; actions: HotkeyAction[] }[] = [
+  {
+    key: "subtitle",
+    actions: ["toggleOverlay", "toggleEdit", "cycleLangMode", "recallLine", "offsetBackward", "offsetForward"],
+  },
+  { key: "playback", actions: ["playPause", "replayLine", "seekBackward", "seekForward"] },
 ];
+
+export const HOTKEY_ACTIONS: HotkeyAction[] = HOTKEY_GROUPS.flatMap((group) => group.actions);
 
 export const DEFAULT_SETTINGS: Settings = {
   version: 3,
@@ -60,8 +68,11 @@ export const DEFAULT_SETTINGS: Settings = {
   filterSigns: true,
   preferVariant: "sc",
   offsetStepMs: 500,
+  seekStepMs: 5000,
   style: DEFAULT_STYLE,
   placement: DEFAULT_PLACEMENT,
+  autoPlacement: true,
+  placementProfiles: {},
   hotkeys: DEFAULT_HOTKEYS,
   launchAtLogin: false,
   closeToTray: true,

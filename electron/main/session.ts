@@ -180,7 +180,8 @@ export class SubtitleSession extends EventEmitter<{ change: [] }> {
     return this.loaded.flatMap((entry) => (entry.track ? [entry.track] : []));
   }
 
-  private enabledTracks(): SubtitleTrack[] {
+  /** Tracks currently shown, for line navigation. */
+  enabledTracks(): SubtitleTrack[] {
     return this.tracks().filter((track) => this.enabled.has(track.path));
   }
 

@@ -5,13 +5,14 @@ import { app } from "electron";
 import { DEFAULT_SETTINGS } from "@/shared/defaults";
 import { isSubtitleLang } from "@/shared/languages";
 import { isPlainObject, migrateSettings, SETTINGS_VERSION } from "./settings-migrate";
-import type { MediaPrefs, Settings } from "@/shared/types";
+import type { MediaPrefs, OverlayPlacement, PlacementProfile, Settings } from "@/shared/types";
 
 const MAX_MEDIA_ENTRIES = 400;
+const MAX_PLACEMENT_PROFILES = 100;
 const SAVE_DEBOUNCE_MS = 300;
 
 type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K] };
-export type SettingsPatch = DeepPartial<Omit<Settings, "media" | "version">>;
+export type SettingsPatch = DeepPartial<Omit<Settings, "media" | "placementProfiles" | "version">>;
 
 /** Merge `patch` into `base`, keeping only keys that exist in `base` and matching types. */
 function mergeKnown<T>(base: T, patch: unknown): T {
@@ -30,6 +31,34 @@ function mergeKnown<T>(base: T, patch: unknown): T {
     }
   }
   return result as T;
+}
+
+const finite = (value: unknown, min: number, max: number): number | null =>
+  typeof value === "number" && Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : null;
+
+export function sanitizePlacement(value: unknown): OverlayPlacement | null {
+  if (!isPlainObject(value)) return null;
+  const x = finite(value.x, 0, 1);
+  const y = finite(value.y, 0, 1);
+  const width = finite(value.width, 0.05, 1);
+  if (x === null || y === null || width === null) return null;
+  const displayId = typeof value.displayId === "number" ? value.displayId : null;
+  return { displayId, x, y, width };
+}
+
+function sanitizeProfiles(value: unknown): Record<string, PlacementProfile> {
+  const result: Record<string, PlacementProfile> = {};
+  if (!isPlainObject(value)) return result;
+  for (const [app, entry] of Object.entries(value)) {
+    if (!isPlainObject(entry)) continue;
+    const placement = sanitizePlacement(entry.placement);
+    if (!placement) continue;
+    result[app.toLowerCase()] = {
+      placement,
+      touched: typeof entry.touched === "number" ? entry.touched : 0,
+    };
+  }
+  return result;
 }
 
 /** Drop values a hand-edited or older file could carry that the app cannot use. */
@@ -65,7 +94,11 @@ export class SettingsStore extends EventEmitter<{ change: [Settings, Settings] }
   update(patch: SettingsPatch): Settings {
     const previous = this.settings;
     const next = mergeKnown(previous, patch);
-    this.settings = sanitize({ ...next, media: previous.media });
+    this.settings = sanitize({
+      ...next,
+      media: previous.media,
+      placementProfiles: previous.placementProfiles,
+    });
     this.scheduleSave();
     this.emit("change", this.settings, previous);
     return this.settings;
@@ -75,6 +108,26 @@ export class SettingsStore extends EventEmitter<{ change: [Settings, Settings] }
     const patch: Record<string, unknown> = {};
     for (const key of keys) patch[key] = DEFAULT_SETTINGS[key];
     return this.update(patch as SettingsPatch);
+  }
+
+  /** Remember (or, with null, forget) a program's own subtitle position. */
+  setPlacementProfile(app: string, placement: OverlayPlacement | null): Settings {
+    const previous = this.settings;
+    const profiles = { ...previous.placementProfiles };
+    const key = app.toLowerCase();
+    if (placement) profiles[key] = { placement, touched: Date.now() };
+    else delete profiles[key];
+    const keys = Object.keys(profiles);
+    if (keys.length > MAX_PLACEMENT_PROFILES) {
+      keys
+        .sort((a, b) => profiles[a].touched - profiles[b].touched)
+        .slice(0, keys.length - MAX_PLACEMENT_PROFILES)
+        .forEach((name) => delete profiles[name]);
+    }
+    this.settings = { ...previous, placementProfiles: profiles };
+    this.scheduleSave();
+    this.emit("change", this.settings, previous);
+    return this.settings;
   }
 
   getMedia(mediaPath: string): MediaPrefs | undefined {
@@ -110,7 +163,7 @@ export class SettingsStore extends EventEmitter<{ change: [Settings, Settings] }
       const raw = migrateSettings(JSON.parse(fs.readFileSync(this.filePath, "utf8"))) as Partial<Settings>;
       const merged = mergeKnown(DEFAULT_SETTINGS, raw);
       const media = isPlainObject(raw.media) ? (raw.media as Settings["media"]) : {};
-      return sanitize({ ...merged, media });
+      return sanitize({ ...merged, media, placementProfiles: sanitizeProfiles(raw.placementProfiles) });
     } catch {
       return structuredClone(DEFAULT_SETTINGS);
     }

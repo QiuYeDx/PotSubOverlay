@@ -7,6 +7,7 @@ const DISCOVERY_INTERVAL_MS = 1000;
 const POLL_PLAYING_MS = 50;
 const POLL_IDLE_MS = 250;
 const FOREGROUND_INTERVAL_MS = 250;
+const PLAYER_SETTLE_MS = 40;
 
 interface TrackedInstance extends PlayerInstance {
   hwnd: bigint;
@@ -86,10 +87,47 @@ export class PlayerMonitor extends EventEmitter<MonitorEvents> {
     this.updateActive();
   }
 
+  /** True when the process owns one of the PotPlayer windows. */
+  isPlayerPid(pid: number): boolean {
+    for (const instance of this.instances.values()) if (instance.pid === pid) return true;
+    return false;
+  }
+
+  /** Jump the followed instance to a position; false when nothing is followed. */
+  seek(positionMs: number): boolean {
+    const instance = this.activeInstance();
+    if (!instance || !this.bridge.seek(instance.hwnd, positionMs)) return false;
+    this.pollSoon();
+    return true;
+  }
+
+  setPlaying(playing: boolean): boolean {
+    const instance = this.activeInstance();
+    if (!instance || !this.bridge.setPlaying(instance.hwnd, playing)) return false;
+    this.pollSoon();
+    return true;
+  }
+
+  command(id: number): boolean {
+    const instance = this.activeInstance();
+    if (!instance || !this.bridge.command(instance.hwnd, id)) return false;
+    this.pollSoon();
+    return true;
+  }
+
   /** Re-read the active instance's file path (e.g. after the user asks to rescan). */
   refreshPath(): void {
     const instance = this.activeId ? this.instances.get(this.activeId) : undefined;
     if (instance) void this.fetchPath(instance);
+  }
+
+  private activeInstance(): TrackedInstance | undefined {
+    return this.activeId ? this.instances.get(this.activeId) : undefined;
+  }
+
+  /** Commands are posted, so give the player a moment before reading the result. */
+  private pollSoon(): void {
+    this.schedulePoll(PLAYER_SETTLE_MS);
   }
 
   private discover(): void {

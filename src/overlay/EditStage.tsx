@@ -9,7 +9,7 @@ import type {
   OverlayPlacement,
   OverlayStyle,
 } from "@/shared/types";
-import { stringsFor } from "./strings";
+import { stringsFor, type OverlayStrings } from "./strings";
 
 const SNAP_PX = 10;
 const MIN_WIDTH = 0.2;
@@ -189,6 +189,17 @@ function EditStage({
         onDone={finish}
       />
 
+      {mode.app ? (
+        <ScopeBar
+          app={mode.app}
+          appScope={mode.appHasProfile}
+          strings={t}
+          onChange={(appScope) => {
+            void window.overlayApi.invoke("overlay:app-profile", appScope, placement);
+          }}
+        />
+      ) : null}
+
       <div
         ref={blockRef}
         className="group absolute"
@@ -209,6 +220,67 @@ function EditStage({
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * Who the edited position applies to: every program, or only the one that
+ * was in front when editing started (usually the game).
+ */
+function ScopeBar({
+  app,
+  appScope,
+  strings,
+  onChange,
+}: {
+  app: string;
+  appScope: boolean;
+  strings: OverlayStrings;
+  onChange: (appScope: boolean) => void;
+}) {
+  const options = [
+    { value: false, label: strings.scopeAll },
+    { value: true, label: app },
+  ];
+  return (
+    <motion.div
+      className="absolute top-[104px] left-1/2 flex -translate-x-1/2 flex-col items-center gap-1.5"
+      initial={{ y: -8, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ type: "spring", duration: 0.45, bounce: 0.12, delay: 0.05 }}
+      onPointerDown={(event) => event.stopPropagation()}
+    >
+      <div
+        className="flex items-center gap-2 rounded-xl py-1 pr-1 pl-3 text-white"
+        style={{
+          background: "rgba(28,28,30,0.82)",
+          boxShadow: "0 0 0 1px rgba(255,255,255,0.10), 0 8px 28px rgba(0,0,0,0.40)",
+          backdropFilter: "blur(20px) saturate(160%)",
+        }}
+      >
+        <span className="text-[12px] text-white/60">{strings.scope}</span>
+        <div className="flex items-center gap-0.5 rounded-lg bg-white/8 p-0.5">
+          {options.map((option) => (
+            <button
+              key={String(option.value)}
+              type="button"
+              title={option.label}
+              className="h-7 max-w-[220px] truncate rounded-md px-2.5 text-xs transition-colors"
+              style={{
+                background: appScope === option.value ? "rgba(255,255,255,0.22)" : "transparent",
+                color: appScope === option.value ? "#fff" : "rgba(255,255,255,0.72)",
+              }}
+              onClick={() => option.value !== appScope && onChange(option.value)}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <span className="text-[11px] text-white/55 [text-shadow:0_1px_2px_rgba(0,0,0,0.6)]">
+        {appScope ? strings.scopeAppHint(app) : strings.scopeAllHint}
+      </span>
+    </motion.div>
   );
 }
 

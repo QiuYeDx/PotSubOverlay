@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Eye, EyeOff, Maximize2, Move, X } from "lucide-react";
+import { Eye, EyeOff, Maximize2, Move, Pause, Play, X } from "lucide-react";
 import { MiddleTruncate } from "@/components/app/MiddleTruncate";
 import { SubtitleStage } from "@/components/app/SubtitleStage";
 import { Button } from "@/components/ui/button";
@@ -20,11 +20,13 @@ function IconButton({
   onClick,
   children,
   active,
+  disabled,
 }: {
   label: string;
   onClick: () => void;
   children: React.ReactNode;
   active?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <Tooltip>
@@ -34,6 +36,7 @@ function IconButton({
           size="icon-sm"
           aria-label={label}
           className={cn("size-7 text-muted-foreground", active && "bg-accent text-foreground")}
+          disabled={disabled}
           onClick={onClick}
         >
           {children}
@@ -52,6 +55,7 @@ function Compact() {
   const updateSettings = useAppStore((s) => s.updateSettings);
   const setEditing = useAppStore((s) => s.setEditing);
   const setCompact = useAppStore((s) => s.setCompact);
+  const playback = useAppStore((s) => s.playback);
   const active = useActiveInstance();
   const stage = useStageState();
   const progress = active && active.durationMs > 0 ? active.positionMs / active.durationMs : 0;
@@ -107,6 +111,17 @@ function Compact() {
           onClick={() => updateSettings({ overlayVisible: !settings.overlayVisible })}
         >
           {settings.overlayVisible ? <Eye className="size-3.5" /> : <EyeOff className="size-3.5" />}
+        </IconButton>
+        <IconButton
+          label={active?.state === "playing" ? t("player:transport.pause") : t("player:transport.play")}
+          disabled={!active}
+          onClick={() => playback("playPause")}
+        >
+          {active?.state === "playing" ? (
+            <Pause className="size-3.5 fill-current" />
+          ) : (
+            <Play className="size-3.5 fill-current" />
+          )}
         </IconButton>
         <div className="min-w-0 flex-1">
           <LangModeControl />

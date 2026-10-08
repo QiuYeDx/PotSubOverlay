@@ -41,6 +41,7 @@ const COPYDATASTRUCT = koffi.struct("COPYDATASTRUCT", {
 
 export const WM_USER = 0x0400;
 export const WM_COPYDATA = 0x004a;
+export const WM_COMMAND = 0x0111;
 const SMTO_ABORTIFHUNG = 0x0002;
 
 const toBigInt = (value: number | bigint) => BigInt(value);

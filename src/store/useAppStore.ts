@@ -5,11 +5,12 @@ import type {
   HotkeyAction,
   OverlayPlacement,
   OverlayStyle,
+  PlaybackAction,
   Settings,
 } from "@/shared/types";
 
 type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K] };
-export type SettingsPatch = DeepPartial<Omit<Settings, "media" | "version">>;
+export type SettingsPatch = DeepPartial<Omit<Settings, "media" | "placementProfiles" | "version">>;
 
 const EMPTY_SNAPSHOT: AppSnapshot = {
   instances: [],
@@ -24,6 +25,10 @@ const EMPTY_SNAPSHOT: AppSnapshot = {
   overlayVisible: true,
   overlaySuppressed: false,
   editing: false,
+  history: [],
+  foregroundApp: null,
+  placementApp: null,
+  keyframeSeek: false,
 };
 
 function mergeDeep<T>(base: T, patch: unknown): T {
@@ -62,6 +67,9 @@ interface AppStore {
   addFile: (path: string) => Promise<void>;
   setOffset: (offsetMs: number) => void;
   nudgeOffset: (direction: 1 | -1) => void;
+  playback: (action: PlaybackAction) => void;
+  playLine: (startMs: number) => void;
+  removePlacementProfile: (app: string) => void;
   setEditing: (editing: boolean) => void;
   commitPlacement: (placement: OverlayPlacement) => void;
   setCompact: (compact: boolean) => void;
@@ -130,6 +138,9 @@ const useAppStore = create<AppStore>((set, get) => ({
   addFile: (path) => invoke("subtitle:add-file", path),
   setOffset: (offsetMs) => void invoke("subtitle:offset", offsetMs),
   nudgeOffset: (direction) => void invoke("subtitle:nudge", direction),
+  playback: (action) => void invoke("player:control", action),
+  playLine: (startMs) => void invoke("player:play-line", startMs),
+  removePlacementProfile: (app) => void invoke("placement:remove-profile", app),
   setEditing: (editing) => void invoke("overlay:set-editing", editing),
   commitPlacement: (placement) => void invoke("overlay:commit-placement", placement),
   setCompact: (compact) => void invoke("window:set-compact", compact),

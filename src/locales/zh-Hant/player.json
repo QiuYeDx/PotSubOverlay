@@ -74,5 +74,19 @@
     "expand": "展開完整模式",
     "hide": "隱藏字幕",
     "show": "顯示字幕"
+  },
+  "transport": {
+    "replay": "重聽這一句",
+    "back": "倒退 {{step}}",
+    "forward": "快轉 {{step}}",
+    "play": "播放",
+    "pause": "暫停"
+  },
+  "recent": {
+    "title": "最近字幕",
+    "description": "點擊任意一句，從那裡開始播放",
+    "empty": "播放時，最近顯示過的字幕會出現在這裡",
+    "play_from": "從這一句開始播放",
+    "current": "目前"
   }
 }

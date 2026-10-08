@@ -65,11 +65,22 @@
     "launch_at_login": "ログイン時に起動",
     "launch_at_login_hint": "Windows にサインインした後、トレイで静かに起動します",
     "compact_on_top": "コンパクトモードを最前面に",
-    "compact_on_top_hint": "コンパクトウインドウを常に他のウインドウより前に表示します"
+    "compact_on_top_hint": "コンパクトウインドウを常に他のウインドウより前に表示します",
+    "playback_title": "再生操作",
+    "playback_desc": "ショートカットと再生ページのボタンによる PotPlayer の操作です。",
+    "seek_step": "戻る / 進む の間隔",
+    "seek_step_hint": "1 回で戻る・進む時間",
+    "keyframe_title": "PotPlayer がキーフレーム単位で移動しています",
+    "keyframe_hint": "直前の移動が目標より数秒早くなりました。動画はキーフレームでしか止まれないためです。正確に移動したい場合は、PotPlayer の右クリックメニュー「再生 → ジャンプ」で「キーフレームで移動」をオフにしてください。音声ファイルには影響しません。",
+    "placement_title": "アプリごとの字幕位置",
+    "auto_placement": "前面のアプリに合わせて位置を切り替える",
+    "auto_placement_hint": "ゲームごとに記憶した位置を、そのゲームが前面にあるときに使います",
+    "profiles_empty": "専用の位置を持つアプリはまだありません。ゲーム中に {{key}} で位置を調整するとき、「適用先」をそのゲームに切り替えてください。",
+    "profile_active": "使用中",
+    "profile_summary": "水平 {{x}} · 下端 {{y}} · 幅 {{width}}",
+    "profile_remove": "削除して既定の位置を使う"
   },
   "hotkeys": {
-    "title": "グローバルショートカット",
-    "description": "ゲーム中でも使えます。クリックして新しい組み合わせを押してください。Esc でキャンセル、Backspace で消去。",
     "reset": "デフォルトに戻す",
     "recording": "キーを押してください…",
     "none": "未設定",
@@ -81,7 +92,22 @@
       "toggleEdit": "字幕の位置を調整",
       "cycleLangMode": "両方 / 第一言語 / 第二言語を切り替え",
       "offsetBackward": "字幕を {{step}} 早める",
-      "offsetForward": "字幕を {{step}} 遅らせる"
+      "offsetForward": "字幕を {{step}} 遅らせる",
+      "recallLine": "ひとつ前のセリフを表示（続けて押すとさらに前へ）",
+      "playPause": "再生 / 一時停止",
+      "replayLine": "このセリフをもう一度（続けて押すとさらに前へ）",
+      "seekBackward": "{{step}} 戻る",
+      "seekForward": "{{step}} 進む"
+    },
+    "groups": {
+      "subtitle": {
+        "title": "字幕",
+        "description": "ゲーム中でも使えます。クリックして新しい組み合わせを押します。Esc で取り消し、Backspace で削除。"
+      },
+      "playback": {
+        "title": "再生操作",
+        "description": "追従中の PotPlayer をウィンドウを切り替えずに操作します。"
+      }
     }
   }
 }

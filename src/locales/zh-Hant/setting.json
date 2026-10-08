@@ -65,11 +65,22 @@
     "launch_at_login": "開機啟動",
     "launch_at_login_hint": "登入 Windows 後在系統匣中靜默啟動",
     "compact_on_top": "簡潔模式置頂",
-    "compact_on_top_hint": "簡潔模式的小視窗保持在其他視窗之上"
+    "compact_on_top_hint": "簡潔模式的小視窗保持在其他視窗之上",
+    "playback_title": "播放控制",
+    "playback_desc": "快捷鍵與播放頁按鈕對 PotPlayer 的操作。",
+    "seek_step": "倒退 / 快轉間隔",
+    "seek_step_hint": "每次倒退或快轉的時間",
+    "keyframe_title": "PotPlayer 正依關鍵影格跳轉",
+    "keyframe_hint": "剛才的跳轉比目標早了幾秒，影片只能停在關鍵影格上。需要精確跳轉時，在 PotPlayer 右鍵選單「播放 → 跳轉」中取消勾選「以關鍵影格跳轉」。音訊檔案不受影響。",
+    "placement_title": "依程式的字幕位置",
+    "auto_placement": "依前景程式切換位置",
+    "auto_placement_hint": "為某個遊戲單獨記住的位置，會在它位於前景時自動使用",
+    "profiles_empty": "還沒有單獨記住位置的程式。在遊戲中按 {{key}} 調整位置時，把「用於」切換到該遊戲即可。",
+    "profile_active": "使用中",
+    "profile_summary": "水平 {{x}} · 底部 {{y}} · 寬度 {{width}}",
+    "profile_remove": "刪除，改用預設位置"
   },
   "hotkeys": {
-    "title": "全域快速鍵",
-    "description": "遊戲中也能使用。點擊後按下新組合鍵，Esc 取消，Backspace 清除。",
     "reset": "恢復預設",
     "recording": "請按下組合鍵…",
     "none": "未設定",
@@ -81,7 +92,22 @@
       "toggleEdit": "調整字幕位置",
       "cycleLangMode": "切換 雙語 / 主語言 / 第二語言",
       "offsetBackward": "字幕提前 {{step}}",
-      "offsetForward": "字幕延後 {{step}}"
+      "offsetForward": "字幕延後 {{step}}",
+      "recallLine": "回看上一句（連按繼續往前）",
+      "playPause": "播放 / 暫停",
+      "replayLine": "重聽這一句（連按繼續往前）",
+      "seekBackward": "倒退 {{step}}",
+      "seekForward": "快轉 {{step}}"
+    },
+    "groups": {
+      "subtitle": {
+        "title": "字幕",
+        "description": "遊戲中也能使用。點擊後按下新組合鍵，Esc 取消，Backspace 清除。"
+      },
+      "playback": {
+        "title": "播放控制",
+        "description": "直接控制正在跟隨的 PotPlayer，不需要切換視窗。"
+      }
     }
   }
 }

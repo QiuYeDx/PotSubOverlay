@@ -6,6 +6,7 @@ import {
   postMessage,
   readCopyData,
   sendMessageTimeout,
+  WM_COMMAND,
   WM_USER,
 } from "../win32/user32";
 
@@ -15,12 +16,22 @@ import {
  */
 const POT_GET_TOTAL_TIME = 0x5002;
 const POT_GET_CURRENT_TIME = 0x5004;
+const POT_SET_CURRENT_TIME = 0x5005;
 const POT_GET_PLAY_STATUS = 0x5006;
+/** lParam: 1 = pause, 2 = play. */
+const POT_SET_PLAY_STATUS = 0x5007;
 /** Replies asynchronously with WM_COPYDATA (dwData = 0x6020, UTF-8 path). */
 const POT_GET_PLAYFILE_NAME = 0x6020;
 
+/**
+ * PotPlayer menu command ids (WM_COMMAND), from the menu resources of
+ * PotPlayer64.dll. Used where the WM_USER interface has no equivalent.
+ */
+export const POT_CMD_NEXT_KEYFRAME = 10787;
+
 const WINDOW_CLASSES = new Set(["PotPlayer64", "PotPlayer"]);
 const PATH_REQUEST_TIMEOUT_MS = 400;
+const POLL_TIMEOUT_MS = 80;
 
 export interface PotWindow {
   hwnd: bigint;
@@ -49,6 +60,11 @@ export interface PlayerBridge {
   queryTimes(hwnd: bigint): PotTimes | null;
   requestPath(hwnd: bigint): Promise<string | null>;
   handleCopyData(lParam: Buffer): void;
+  /** Jump to a position. Asynchronous; the next poll reports where it landed. */
+  seek(hwnd: bigint, positionMs: number): boolean;
+  setPlaying(hwnd: bigint, playing: boolean): boolean;
+  /** Send a PotPlayer menu command. */
+  command(hwnd: bigint, id: number): boolean;
   dispose(): void;
 }
 
@@ -77,9 +93,13 @@ export class PotPlayerBridge implements PlayerBridge {
   }
 
   queryPosition(hwnd: bigint): { positionMs: number; state: PlayState } | null {
-    const position = sendMessageTimeout(hwnd, WM_USER, POT_GET_CURRENT_TIME, 0);
-    const state = toState(sendMessageTimeout(hwnd, WM_USER, POT_GET_PLAY_STATUS, 0));
-    if (position === null || state === null) return null;
+    // Polled up to 20 times a second on our main thread: keep the wait short
+    // (PotPlayer normally answers in microseconds, but stalls while seeking)
+    // and do not ask again once it has not answered.
+    const position = sendMessageTimeout(hwnd, WM_USER, POT_GET_CURRENT_TIME, 0, POLL_TIMEOUT_MS);
+    if (position === null) return null;
+    const state = toState(sendMessageTimeout(hwnd, WM_USER, POT_GET_PLAY_STATUS, 0, POLL_TIMEOUT_MS));
+    if (state === null) return null;
     return { positionMs: Math.max(0, position), state };
   }
 
@@ -88,6 +108,19 @@ export class PotPlayerBridge implements PlayerBridge {
     const duration = sendMessageTimeout(hwnd, WM_USER, POT_GET_TOTAL_TIME, 0);
     if (!now || duration === null) return null;
     return { ...now, durationMs: Math.max(0, duration) };
+  }
+
+  // Control messages are posted: they never block on the player and need no reply.
+  seek(hwnd: bigint, positionMs: number): boolean {
+    return postMessage(hwnd, WM_USER, POT_SET_CURRENT_TIME, BigInt(Math.max(0, Math.round(positionMs))));
+  }
+
+  setPlaying(hwnd: bigint, playing: boolean): boolean {
+    return postMessage(hwnd, WM_USER, POT_SET_PLAY_STATUS, playing ? 2n : 1n);
+  }
+
+  command(hwnd: bigint, id: number): boolean {
+    return postMessage(hwnd, WM_COMMAND, id, 0n);
   }
 
   /**

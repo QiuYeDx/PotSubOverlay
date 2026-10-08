@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { app, type BrowserWindow } from "electron";
+import type { HotkeyAction } from "@/shared/types";
 import type { Controller } from "./controller";
 import type { ControlWindow } from "./windows/control";
 import type { OverlayWindow } from "./windows/overlay";
@@ -22,6 +23,11 @@ type Step =
   | { eval: string; file: string }
   | { size: [number, number] }
   | { trayMenu: true }
+  | { hotkey: HotkeyAction }
+  | { foreground: string | null }
+  | { overlayJs: string }
+  /** Follow the PotPlayer window whose title contains this text, or stop the script. */
+  | { follow: string }
   | { quit: true };
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -70,6 +76,18 @@ export async function runQaScript(deps: {
       } else if ("js" in step) await deps.control.win?.webContents.executeJavaScript(step.js);
       else if ("size" in step) deps.control.win?.setSize(step.size[0], step.size[1]);
       else if ("trayMenu" in step) deps.trayMenu.open(deps.tray.menuState());
+      else if ("follow" in step) {
+        // Playback steps must never reach a player the tester did not open.
+        const target = deps.controller.monitor.list().find((i) => i.title.includes(step.follow));
+        if (target) deps.controller.selectInstance(target.id);
+        if (!target || deps.controller.monitor.active()?.id !== target.id) {
+          log(`abort: no player titled "${step.follow}"`);
+          app.quit();
+          return;
+        }
+      } else if ("hotkey" in step) deps.controller.runHotkey(step.hotkey);
+      else if ("foreground" in step) deps.controller.simulateForeground(step.foreground);
+      else if ("overlayJs" in step) await deps.overlay.win.webContents.executeJavaScript(step.overlayJs);
       else if ("quit" in step) app.quit();
     } catch (error) {
       log(`error: ${String(error)}`);

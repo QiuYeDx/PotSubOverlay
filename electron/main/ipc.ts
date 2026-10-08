@@ -1,14 +1,15 @@
 import path from "node:path";
 import { BrowserWindow, dialog, ipcMain, screen, shell } from "electron";
-import type { OverlayPlacement } from "@/shared/types";
+import type { OverlayPlacement, PlaybackAction } from "@/shared/types";
 import type { Controller } from "./controller";
 import { listFontFamilies } from "./fonts";
-import type { SettingsPatch, SettingsStore } from "./settings";
+import { sanitizePlacement, type SettingsPatch, type SettingsStore } from "./settings";
 import type { AppTray } from "./tray";
 import type { ControlWindow } from "./windows/control";
 import type { OverlayWindow } from "./windows/overlay";
 
 const SUBTITLE_FILTER = { name: "Subtitles", extensions: ["srt", "ass", "ssa", "vtt", "lrc"] };
+const PLAYBACK_ACTIONS: PlaybackAction[] = ["playPause", "replayLine", "seekBackward", "seekForward"];
 
 /**
  * IPC contract between the main process and both renderers.
@@ -43,6 +44,15 @@ export function registerIpc(deps: {
   ipcMain.handle("settings:reset", (_event, keys: (keyof SettingsPatch)[]) => settings.reset(keys));
 
   ipcMain.handle("player:select", (_event, id: string | null) => controller.selectInstance(id));
+  ipcMain.handle("player:control", (_event, action: PlaybackAction) => {
+    if (PLAYBACK_ACTIONS.includes(action)) controller.playback(action);
+  });
+  ipcMain.handle("player:play-line", (_event, startMs: number) => {
+    if (typeof startMs === "number" && Number.isFinite(startMs)) controller.playFromLine(startMs);
+  });
+  ipcMain.handle("placement:remove-profile", (_event, app: string) => {
+    if (typeof app === "string") controller.removePlacementProfile(app);
+  });
 
   ipcMain.handle("subtitle:toggle", (_event, trackPath: string, enabled: boolean) =>
     controller.setTrackEnabled(trackPath, enabled)
@@ -68,9 +78,14 @@ export function registerIpc(deps: {
   ipcMain.handle("subtitle:nudge", (_event, direction: 1 | -1) => controller.nudgeOffset(direction));
 
   ipcMain.handle("overlay:set-editing", (_event, editing: boolean) => controller.setEditing(editing));
-  ipcMain.handle("overlay:commit-placement", (_event, placement: OverlayPlacement) =>
-    controller.commitPlacement(placement)
-  );
+  ipcMain.handle("overlay:commit-placement", (_event, placement: OverlayPlacement) => {
+    const valid = sanitizePlacement(placement);
+    if (valid) controller.commitPlacement(valid);
+  });
+  ipcMain.handle("overlay:app-profile", (_event, enabled: boolean, placement: OverlayPlacement) => {
+    const valid = sanitizePlacement(placement);
+    if (valid) controller.setAppProfile(Boolean(enabled), valid);
+  });
   ipcMain.handle("overlay:displays", () => {
     const primaryId = screen.getPrimaryDisplay().id;
     return screen.getAllDisplays().map((display, index) => ({

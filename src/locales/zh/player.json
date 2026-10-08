@@ -74,5 +74,19 @@
     "expand": "展开完整模式",
     "hide": "隐藏字幕",
     "show": "显示字幕"
+  },
+  "transport": {
+    "replay": "重听这一句",
+    "back": "后退 {{step}}",
+    "forward": "前进 {{step}}",
+    "play": "播放",
+    "pause": "暂停"
+  },
+  "recent": {
+    "title": "最近字幕",
+    "description": "点击任意一句，从那里开始播放",
+    "empty": "播放时，最近显示过的字幕会出现在这里",
+    "play_from": "从这一句开始播放",
+    "current": "当前"
   }
 }

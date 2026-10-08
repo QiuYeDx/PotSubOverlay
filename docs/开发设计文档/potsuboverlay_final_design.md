@@ -135,3 +135,36 @@ v1.0 把双语写死为“中文 + 日文”。v1.1 改为按“角色”工作�
 - 外观按角色设置：`style.primary` / `style.secondary` 各自的字体（空 = 按语言自动）、字号、字重、颜色；取消 `secondaryScale`。
 - 默认轨道选择：优先包含主语言的双语文件；否则“主语言最佳文件 + 另一语言最佳文件”；再否则任意最佳文件。
 - 设置文件升级到 `version: 3`：自动迁移 v1 的 `zh/ja` 样式与模式；仍是 1.0 默认值（34px / 25px / 3px 描边）的项改为新默认值（30px / 24px / 1.5px），用户改过的值保持不变。
+
+## v1.2：游戏中不切出去
+
+目标：游戏进行中不需要 Alt+Tab 回 PotPlayer 或控制面板，也能控制播放、找回漏看的字幕，并让字幕位置适配不同游戏的界面。调研过程见 `docs/TODO.md`。
+
+### 播放控制
+
+- 新增 `PlayerBridge.seek / setPlaying / command`，PotPlayer 实现为 `PostMessage`：`WM_USER 0x5005`（跳转，毫秒）、`0x5007`（1 暂停 / 2 播放）、`WM_COMMAND 10787`（下一关键帧，ID 取自 `PotPlayer64.dll` 菜单资源）。只发给当前跟随的实例。
+- 快捷键（`HOTKEY_GROUPS.playback`）：播放 / 暂停 `Ctrl+Alt+K`、重听这一句 `Ctrl+Alt+Down`、后退 / 前进 `Ctrl+Alt+Left/Right`（`seekStepMs`，默认 5000）。`Ctrl+Alt+Space`、`Ctrl+Alt+R` 在开发机上已被占用，不作默认值。
+- 重听：目标 = 当前句开始时间（`lineAt`，多个单语文件取最早开始的一条）+ 本文件偏移 − 200ms；当前没有字幕时用上一句（`lineBefore`）。1.5s 内再按，从上次的目标句往前一句，而不是从尚未刷新的播放位置计算。
+- 后退 / 前进：1.2s 内连按在上次目标上累加；不越过 `时长 − 1s`。
+- 跳转落点检查（`checkSeekLanding`，每次轮询调用，3s 超时）：PotPlayer 跳转期间返回的读数不可靠（旧位置冻结或继续走、请求的时间本身、临时的 0、状态“已停止”），这些读数视为“未完成”，期间继续显示目标位置的字幕；第一个可靠读数即落点：
+  - 视频文件落点比目标早 800ms 以上 → `keyframeSeek = true`（换文件前保持），设置页提示关闭「以关键帧定位」；音频扩展名不参与判断。
+  - 前进时落点比起点前进不到半个步长（且目标本身足够远）→ 补发「下一关键帧」。
+- 反馈：主进程发 `overlay:toast`，字幕窗口在顶部显示约 1.3s 的提示胶囊。PotPlayer 的 `0x6040` OSD 不用，因为游戏时看不到 PotPlayer 画面。
+- 轮询：读取位置的 `SendMessageTimeout` 由 200ms 改为 80ms，位置无响应时不再查询状态；播放中单次读到 0 视为误读（连续两次才接受）。
+
+### 回看与最近字幕
+
+- `subtitle/lines.ts`（纯函数，可单测）：`lineAt`、`lineBefore`（开始时间相差 ≤250ms 的 cue 视为同一句，适配两个单语文件）、`linesBefore`（按当前语言模式合成，跳过空句与重复句）。
+- 回看 `Ctrl+Alt+Up`：`overlay:recall` 推送 `{ display, depth }`，字幕窗口以 0.82 倍字号、带「上一句 / 前 N 句」标签显示在当前字幕上方 5s；5s 内再按 depth + 1。字幕窗口高度增加 `recallReserve(style)`，窗口透明且鼠标穿透。
+- 快照新增 `history`（最近 5 句，含当前句，按行缓存），播放页「最近字幕」列表点击后 `player:play-line` 从该句播放。
+
+### 按程序的字幕位置
+
+- `ForegroundTracker`（300ms 轮询）：前台窗口 → 进程 → `QueryFullProcessImageNameW` 得到小写 exe 名；PotPlayer 实例、本应用进程和系统界面（explorer、开始菜单、搜索等）不改变“当前程序”，所以 Alt+Tab 到这些窗口时保持游戏的位置。读不到的进程（受保护进程）记为 null，使用默认位置。
+- 设置：`placementProfiles: Record<exe, { placement, touched }>`（最多 100 个，单独持久化，不走 `mergeKnown`）、`autoPlacement`（默认开）。生效位置 = `autoPlacement && profiles[当前程序]` ? 该位置 : `placement`。
+- 编辑模式进入时固定编辑对象 `editApp`（当时的当前程序）；工具栏下方「用于：所有程序 / xxx.exe」。切到 xxx.exe 即以当前草稿创建该程序的位置，切回所有程序即删除；拖动、微调、恢复默认都保存到当前选择的对象。
+- 设置页「按程序的字幕位置」列出各程序的位置并可删除，标出正在使用的一项。
+
+### 字幕窗口高度
+
+- 窗口底边 = 设定位置；高度在上方空间不足时缩短，而不是被屏幕上沿推下来（修复字幕放在顶部附近时比设定位置低的问题）。

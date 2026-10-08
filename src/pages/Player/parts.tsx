@@ -1,11 +1,11 @@
 import { useTranslation } from "react-i18next";
-import { Minus, Plus } from "lucide-react";
+import { ChevronsLeft, ChevronsRight, Minus, Pause, Play, Plus, RotateCcw } from "lucide-react";
 import { AnimatedNumber } from "@/components/qiuye-ui/animated-number";
 import { SegmentedControl } from "@/components/qiuye-ui/segmented-control";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import type { LangMode } from "@/shared/types";
+import type { LangMode, PlaybackAction } from "@/shared/types";
 import useLanguageName from "@/hooks/useLanguageName";
 import useAppStore from "@/store/useAppStore";
 
@@ -187,6 +187,82 @@ export function OffsetControl({ dense = false }: { dense?: boolean }) {
         </TooltipTrigger>
         <TooltipContent>{t("player:offset.later", { step: stepLabel })}</TooltipContent>
       </Tooltip>
+    </div>
+  );
+}
+
+const shortcutText = (accelerator: string) => accelerator.replace(/Control/g, "Ctrl");
+
+/**
+ * Play/pause, replay the current line and seek, sent to the followed
+ * PotPlayer window. Each tooltip names the hotkey that does the same in game.
+ */
+export function TransportControls({ dense = false }: { dense?: boolean }) {
+  const { t } = useTranslation();
+  const active = useActiveInstance();
+  const hotkeys = useAppStore((s) => s.settings.hotkeys);
+  const seekStep = useAppStore((s) => s.settings.seekStepMs);
+  const playback = useAppStore((s) => s.playback);
+  const hasLines = useAppStore((s) => s.snapshot.status === "ready");
+  const playing = active?.state === "playing";
+  const step = `${seekStep / 1000}s`;
+  const size = dense ? "size-7" : "size-8";
+
+  const items: {
+    action: PlaybackAction;
+    label: string;
+    icon: React.ReactNode;
+    disabled?: boolean;
+    primary?: boolean;
+  }[] = [
+    {
+      action: "replayLine",
+      label: t("player:transport.replay"),
+      icon: <RotateCcw className="size-3.5" />,
+      disabled: !hasLines,
+    },
+    {
+      action: "seekBackward",
+      label: t("player:transport.back", { step }),
+      icon: <ChevronsLeft className="size-4" />,
+    },
+    {
+      action: "playPause",
+      label: playing ? t("player:transport.pause") : t("player:transport.play"),
+      icon: playing ? <Pause className="size-3.5 fill-current" /> : <Play className="size-3.5 fill-current" />,
+      primary: true,
+    },
+    {
+      action: "seekForward",
+      label: t("player:transport.forward", { step }),
+      icon: <ChevronsRight className="size-4" />,
+    },
+  ];
+
+  return (
+    <div className="flex items-center gap-0.5">
+      {items.map((item) => (
+        <Tooltip key={item.action}>
+          <TooltipTrigger asChild>
+            <Button
+              variant={item.primary ? "secondary" : "ghost"}
+              size="icon-sm"
+              className={cn(size, item.primary ? "rounded-full" : "text-muted-foreground")}
+              disabled={!active || item.disabled}
+              aria-label={item.label}
+              onClick={() => playback(item.action)}
+            >
+              {item.icon}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {item.label}
+            {hotkeys[item.action] ? (
+              <span className="ml-1.5 opacity-60">{shortcutText(hotkeys[item.action])}</span>
+            ) : null}
+          </TooltipContent>
+        </Tooltip>
+      ))}
     </div>
   );
 }

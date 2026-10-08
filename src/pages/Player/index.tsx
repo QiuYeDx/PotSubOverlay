@@ -10,8 +10,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { baseName, dirName, formatTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import useAppStore from "@/store/useAppStore";
-import { LangModeControl, OffsetControl, StatusPill, useStageState } from "./parts";
+import { LangModeControl, OffsetControl, StatusPill, TransportControls, useStageState } from "./parts";
 import PlayersGroup from "./PlayersGroup";
+import RecentLines from "./RecentLines";
 import TracksGroup from "./TracksGroup";
 
 function Player() {
@@ -112,8 +113,9 @@ function Player() {
               {folder ?? t("player:open_potplayer_hint")}
             </div>
           </div>
+          <TransportControls />
           {active && active.durationMs > 0 ? (
-            <div className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
+            <div className="min-w-[96px] shrink-0 text-right font-mono text-xs tabular-nums text-muted-foreground">
               {formatTime(active.positionMs)}
               <span className="mx-1 opacity-50">/</span>
               {formatTime(active.durationMs)}
@@ -164,6 +166,8 @@ function Player() {
           </Button>
         </ControlTile>
       </section>
+
+      <RecentLines />
 
       <div className="grid grid-cols-2 items-start gap-5 max-[880px]:grid-cols-1">
         <PlayersGroup />

@@ -73,6 +73,16 @@ export interface DisplayPayload {
   blocks: DisplayBlock[];
 }
 
+/** A recently shown subtitle line, for the "recent lines" list. */
+export interface HistoryLine {
+  key: string;
+  /** Start of the line in subtitle-file time (before the per-file offset). */
+  startMs: number;
+  blocks: DisplayBlock[];
+  /** True for the line on screen right now. */
+  current: boolean;
+}
+
 export interface AppSnapshot {
   instances: PlayerInstance[];
   activeId: string | null;
@@ -89,6 +99,14 @@ export interface AppSnapshot {
   /** True while the overlay is hidden because PotPlayer is the foreground window, paused, etc. */
   overlaySuppressed: boolean;
   editing: boolean;
+  /** Recent lines up to the current one, oldest first. */
+  history: HistoryLine[];
+  /** Executable name of the program in front (games etc.), ignoring PotPlayer and this app. */
+  foregroundApp: string | null;
+  /** Program whose own subtitle position is in use; null = the default position. */
+  placementApp: string | null;
+  /** The last check found PotPlayer seeking to keyframes instead of the exact time. */
+  keyframeSeek: boolean;
 }
 
 export interface TextStyle {
@@ -131,7 +149,21 @@ export type HotkeyAction =
   | "toggleEdit"
   | "cycleLangMode"
   | "offsetBackward"
-  | "offsetForward";
+  | "offsetForward"
+  | "recallLine"
+  | "playPause"
+  | "replayLine"
+  | "seekBackward"
+  | "seekForward";
+
+/** Commands sent to the followed PotPlayer window. */
+export type PlaybackAction = "playPause" | "replayLine" | "seekBackward" | "seekForward";
+
+/** A subtitle position remembered for one program (by executable name). */
+export interface PlacementProfile {
+  placement: OverlayPlacement;
+  touched: number;
+}
 
 export interface Settings {
   version: 3;
@@ -145,8 +177,15 @@ export interface Settings {
   filterSigns: boolean;
   preferVariant: "sc" | "tc";
   offsetStepMs: number;
+  /** How far the seek hotkeys jump. */
+  seekStepMs: number;
   style: OverlayStyle;
+  /** Default subtitle position. */
   placement: OverlayPlacement;
+  /** Switch to a program's own position while it is in front. */
+  autoPlacement: boolean;
+  /** Positions remembered per program, keyed by lower-case executable name. */
+  placementProfiles: Record<string, PlacementProfile>;
   hotkeys: Record<HotkeyAction, string>;
   launchAtLogin: boolean;
   closeToTray: boolean;
@@ -182,6 +221,25 @@ export interface OverlayModeMessage {
   locale: string;
   /** Languages used for the sample text when nothing is playing. */
   sampleLangs: [SubtitleLang, SubtitleLang];
+  /** Program the position can be remembered for while editing; null when unknown. */
+  app: string | null;
+  /** Whether that program already has its own position (the one being edited). */
+  appHasProfile: boolean;
+}
+
+/** A brief notice shown above the subtitles after a playback hotkey. */
+export interface OverlayToast {
+  id: number;
+  kind: "pause" | "play" | "replay" | "back" | "forward" | "noPlayer" | "noLine";
+  /** Seconds, for "back" / "forward". */
+  seconds?: number;
+}
+
+/** A missed line brought back on demand, shown above the live subtitles. */
+export interface OverlayRecall {
+  display: DisplayPayload;
+  /** 1 = the previous line, 2 = the one before… */
+  depth: number;
 }
 
 /** What the custom tray menu renders. Labels are localized by the main process. */

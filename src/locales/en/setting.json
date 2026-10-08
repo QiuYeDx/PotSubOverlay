@@ -65,11 +65,22 @@
     "launch_at_login": "Launch at Login",
     "launch_at_login_hint": "Start quietly in the tray after you sign in to Windows",
     "compact_on_top": "Keep Compact Mode on Top",
-    "compact_on_top_hint": "The compact window stays above other windows"
+    "compact_on_top_hint": "The compact window stays above other windows",
+    "playback_title": "Playback",
+    "playback_desc": "What the hotkeys and the Player page buttons do in PotPlayer.",
+    "seek_step": "Seek step",
+    "seek_step_hint": "How far back or forward each press jumps",
+    "keyframe_title": "PotPlayer is seeking to keyframes",
+    "keyframe_hint": "The last jump landed a few seconds early because the video can only stop on keyframes. For exact jumps, untick “Use keyframe to jump to a time” in PotPlayer's right-click menu under Playback → Jump (to). Audio files are not affected.",
+    "placement_title": "Per-App Subtitle Position",
+    "auto_placement": "Switch position with the app in front",
+    "auto_placement_hint": "A position remembered for a game is used whenever that game is in front",
+    "profiles_empty": "No app has its own position yet. While adjusting the position in a game ({{key}}), switch “Use for” to that game.",
+    "profile_active": "In use",
+    "profile_summary": "Horizontal {{x}} · Bottom {{y}} · Width {{width}}",
+    "profile_remove": "Remove and use the default position"
   },
   "hotkeys": {
-    "title": "Global Shortcuts",
-    "description": "Work inside games too. Click, then press a new combination. Esc cancels, Backspace clears.",
     "reset": "Restore Defaults",
     "recording": "Press a combination…",
     "none": "Not set",
@@ -81,7 +92,22 @@
       "toggleEdit": "Adjust Subtitle Position",
       "cycleLangMode": "Cycle Both / Primary / Second Language",
       "offsetBackward": "Subtitles {{step}} Earlier",
-      "offsetForward": "Subtitles {{step}} Later"
+      "offsetForward": "Subtitles {{step}} Later",
+      "recallLine": "Show previous line (press again to go further back)",
+      "playPause": "Play / pause",
+      "replayLine": "Replay this line (press again to go further back)",
+      "seekBackward": "Back {{step}}",
+      "seekForward": "Forward {{step}}"
+    },
+    "groups": {
+      "subtitle": {
+        "title": "Subtitles",
+        "description": "Work in games too. Click, then press a new combination; Esc cancels, Backspace clears."
+      },
+      "playback": {
+        "title": "Playback",
+        "description": "Control the followed PotPlayer window without switching to it."
+      }
     }
   }
 }

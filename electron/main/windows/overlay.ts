@@ -3,7 +3,9 @@ import type {
   DisplayPayload,
   OverlayModeMessage,
   OverlayPlacement,
+  OverlayRecall,
   OverlayStyle,
+  OverlayToast,
 } from "@/shared/types";
 import { disableWindowTransitions } from "../win32/dwmapi";
 import { handleFromBuffer, WM_COPYDATA } from "../win32/user32";
@@ -39,12 +41,29 @@ export function overlayHeight(style: OverlayStyle): number {
   );
 }
 
+/**
+ * Room above the live subtitles for a recalled line (shown smaller, with a
+ * label) and the notice after a playback hotkey. The window is transparent
+ * and click-through, so the extra height costs nothing.
+ */
+export function recallReserve(style: OverlayStyle): number {
+  const scale = 0.82;
+  return Math.ceil(
+    28 + scale * (style.primary.fontSize * 1.35 * 2 + style.secondary.fontSize * 1.35 + style.blockGap)
+  );
+}
+
 export function normalBounds(placement: OverlayPlacement, style: OverlayStyle): Rectangle {
   const area = resolveDisplay(placement.displayId).bounds;
   const width = Math.round(area.width * placement.width);
-  const height = Math.min(overlayHeight(style), Math.round(area.height * 0.6));
   const centerX = area.x + area.width * placement.x;
   const bottom = area.y + area.height * placement.y;
+  // The subtitles sit at the window's bottom edge, so near the top of the
+  // display the window gets shorter rather than pushed down.
+  const height = Math.max(
+    1,
+    Math.min(overlayHeight(style) + recallReserve(style), Math.round(area.height * 0.7), Math.round(bottom - area.y))
+  );
   const x = Math.round(Math.min(Math.max(centerX - width / 2, area.x), area.x + area.width - width));
   const y = Math.round(Math.min(Math.max(bottom - height, area.y), area.y + area.height - height));
   return { x, y, width, height };
@@ -68,6 +87,7 @@ export class OverlayWindow {
   private lastDisplay: DisplayPayload = { key: "", blocks: [] };
   private locale = "zh";
   private sampleLangs: OverlayModeMessage["sampleLangs"] = ["zh", "en"];
+  private editTarget: { app: string | null; hasProfile: boolean } = { app: null, hasProfile: false };
 
   constructor(options: OverlayWindowOptions, placement: OverlayPlacement, style: OverlayStyle) {
     this.placement = placement;
@@ -168,6 +188,26 @@ export class OverlayWindow {
     if (!this.editing) this.applyBounds();
   }
 
+  /** Program the position being edited can be remembered for. */
+  setEditTarget(app: string | null, hasProfile: boolean): void {
+    this.editTarget = { app, hasProfile };
+    if (this.editing) this.send("overlay:mode", this.modeMessage());
+  }
+
+  /** Replace the position shown in edit mode (e.g. after switching to the default position). */
+  showPlacement(placement: OverlayPlacement): void {
+    this.setPlacement(placement);
+    if (this.editing) this.send("overlay:mode", this.modeMessage());
+  }
+
+  setRecall(recall: OverlayRecall | null): void {
+    this.send("overlay:recall", recall);
+  }
+
+  toast(toast: OverlayToast): void {
+    this.send("overlay:toast", toast);
+  }
+
   setPlacement(placement: OverlayPlacement): void {
     const displayChanged = placement.displayId !== this.placement.displayId;
     this.placement = placement;
@@ -232,6 +272,8 @@ export class OverlayWindow {
       })),
       locale: this.locale,
       sampleLangs: this.sampleLangs,
+      app: this.editTarget.app,
+      appHasProfile: this.editTarget.hasProfile,
     };
   }
 

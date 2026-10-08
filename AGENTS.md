@@ -21,6 +21,9 @@ PotSubOverlay：读取 PotPlayer 正在播放的文件与进度，把同名外�
 - 托盘菜单是自绘的透明窗口（`windows/tray-menu.ts` + `tray-menu.html`），因为 Windows 原生菜单无法主题化；新增菜单项在 `tray.ts` 的 `menuState()` 与 `src/tray-menu/TrayMenu.tsx` 同步修改。
 - 绝对定位的装饰层（如预览舞台里的字幕和占位文字）必须 `pointer-events-none`，避免挡住其上的按钮。
 - 主进程只把原生模块（koffi）设为 external，其余依赖打包进 bundle；electron-builder 只携带 koffi 与 `@koromix/koffi-win32-x64`。新增原生依赖时要同步 `vite.config.ts` 的 `mainExternal` 和 `electron-builder.json` 的 `files` / `asarUnpack`。
+- 播放控制只发给当前跟随的 PotPlayer 实例，且一律 `PostMessage`。PotPlayer 跳转期间的读数不可靠（旧位置、目标时间本身、临时 0、“已停止”），判断落点用 `Controller.checkSeekLanding` 的逐次轮询，不要改成固定延时读取。
+- 前台程序识别（`foreground.ts`）必须忽略 PotPlayer、本应用和系统界面，否则 Alt+Tab 会让按程序的字幕位置来回跳。`placementProfiles` 与 `media` 一样不走 `mergeKnown`，用专门的方法读写。
+- QA 中凡是会操作真实 PotPlayer 的脚本，先用 `follow` 步骤锁定自己用 `/new` 打开的测试实例；不要向用户正在使用的播放器发送播放控制。
 - 模板文件在 Windows 上以 CRLF 检出（`core.autocrlf=true`），脚本化的多行替换要考虑行尾。
 
 ## 前端服务进程
@@ -39,7 +42,7 @@ PotSubOverlay：读取 PotPlayer 正在播放的文件与进度，把同名外�
 - 新增页面文案要进入 `src/locales/{zh,zh-Hant,en,ja}/`，托盘文案在 `electron/main/tray.ts`。
 - 更新检查只提示并打开 GitHub Releases，不下载、不执行、不安装。
 - 保留 Windows titlebar、窗口按钮和拖拽热区的可用性。
-- 默认快捷键须在常见环境下可注册（避免 `Ctrl+Alt+E/L/M/O` 等常被占用的组合）。
+- 默认快捷键须在常见环境下可注册（避免 `Ctrl+Alt+E/L/M/O/W/A/F/R/Space` 等常被占用的组合）。
 
 ## 验证建议
 

@@ -23,6 +23,9 @@
 | PSO-009 自绘托盘菜单 | 已完成 | 2026-10-08 | `electron/main/windows/tray-menu.ts`; `src/tray-menu/*` | QA 截图 | [v1.1.0](potsuboverlay_implementation_records/2026-10-08_PSO-008-011_v1.1.0.md) | 真实托盘右键位置由用户确认 |
 | PSO-010 交互修复（简洁模式按钮、显隐闪烁、字体下拉溢出） | 已完成 | 2026-10-08 | `src/components/app/*`; `electron/main/windows/overlay.ts` | elementFromPoint 命中测试；popover 几何测量 | [v1.1.0](potsuboverlay_implementation_records/2026-10-08_PSO-008-011_v1.1.0.md) | - |
 | PSO-011 边距对齐（标题栏简洁按钮、主题切换按钮，含模板仓库） | 已完成 | 2026-10-08 | `src/pages/components/*`; qiuye-electron-template `main`/`electron-modern` | DOM 测量：上/右、下/右相等 | [v1.1.0](potsuboverlay_implementation_records/2026-10-08_PSO-008-011_v1.1.0.md) | - |
+| PSO-012 游戏内播放控制（播放/暂停、重听、后退/前进、关键帧检测） | 已完成 | 2026-10-08 | `electron/main/controller.ts`; `electron/main/player/*`; `src/overlay/LiveExtras.tsx` | 真实 PotPlayer 独立实例实测；模拟播放器 keyframe 模式；QA 截图 | [v1.2.0](potsuboverlay_implementation_records/2026-10-08_PSO-012-014_v1.2.0.md) | 被游戏遮挡的 PotPlayer 视频在实机游戏中的跳转反馈由用户确认 |
+| PSO-013 回看上一句与最近字幕列表 | 已完成 | 2026-10-08 | `electron/main/subtitle/lines.ts`; `src/pages/Player/RecentLines.tsx` | vitest 3 项；QA 截图与快照 | [v1.2.0](potsuboverlay_implementation_records/2026-10-08_PSO-012-014_v1.2.0.md) | - |
+| PSO-014 按程序的字幕位置 | 已完成 | 2026-10-08 | `electron/main/foreground.ts`; `electron/main/win32/kernel32.ts`; `src/overlay/EditStage.tsx`; `src/pages/Setting/components/PlaybackPlacementConfig.tsx` | 前台程序识别实测（claude.exe）；QA 模拟前台切换与编辑模式 | [v1.2.0](potsuboverlay_implementation_records/2026-10-08_PSO-012-014_v1.2.0.md) | 受保护（反作弊）游戏进程能否读到 exe 名由用户实机确认 |
 
 ## 不得违反的约束
 

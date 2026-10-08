@@ -6,6 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import useLanguageName from "@/hooks/useLanguageName";
 import { SUBTITLE_LANGS, type KnownLang } from "@/shared/languages";
 import useAppStore from "@/store/useAppStore";
+import { PlacementConfig, PlaybackConfig } from "./PlaybackPlacementConfig";
 
 const STEPS = [100, 250, 500, 1000];
 
@@ -98,6 +99,9 @@ function BehaviorConfig() {
           />
         </SettingsRow>
       </SettingsGroup>
+
+      <PlaybackConfig />
+      <PlacementConfig />
 
       <SettingsGroup title={t("setting:behavior.app_title")}>
         <SettingsRow

@@ -74,5 +74,19 @@
     "expand": "展開",
     "hide": "字幕を隠す",
     "show": "字幕を表示"
+  },
+  "transport": {
+    "replay": "このセリフをもう一度",
+    "back": "{{step}} 戻る",
+    "forward": "{{step}} 進む",
+    "play": "再生",
+    "pause": "一時停止"
+  },
+  "recent": {
+    "title": "最近の字幕",
+    "description": "クリックするとそのセリフから再生します",
+    "empty": "再生中、最近表示された字幕がここに並びます",
+    "play_from": "このセリフから再生",
+    "current": "表示中"
   }
 }

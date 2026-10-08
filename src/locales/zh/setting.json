@@ -65,11 +65,22 @@
     "launch_at_login": "开机启动",
     "launch_at_login_hint": "登录 Windows 后在托盘中静默启动",
     "compact_on_top": "简洁模式置顶",
-    "compact_on_top_hint": "简洁模式的小窗口保持在其他窗口之上"
+    "compact_on_top_hint": "简洁模式的小窗口保持在其他窗口之上",
+    "playback_title": "播放控制",
+    "playback_desc": "快捷键与播放页按钮对 PotPlayer 的操作。",
+    "seek_step": "后退 / 前进步长",
+    "seek_step_hint": "每次后退或前进的时间",
+    "keyframe_title": "PotPlayer 正按关键帧跳转",
+    "keyframe_hint": "刚才的跳转比目标早了几秒，视频只能停在关键帧上。需要精确跳转时，在 PotPlayer 右键菜单「播放 → 定位」中取消勾选「以关键帧定位」。音频文件不受影响。",
+    "placement_title": "按程序的字幕位置",
+    "auto_placement": "按前台程序切换位置",
+    "auto_placement_hint": "为某个游戏单独记住的位置，会在它处于前台时自动使用",
+    "profiles_empty": "还没有单独记住位置的程序。在游戏中按 {{key}} 调整位置时，把「用于」切换到该游戏即可。",
+    "profile_active": "使用中",
+    "profile_summary": "水平 {{x}} · 底部 {{y}} · 宽度 {{width}}",
+    "profile_remove": "删除，改用默认位置"
   },
   "hotkeys": {
-    "title": "全局快捷键",
-    "description": "游戏中也能使用。点击后按下新组合键，Esc 取消，Backspace 清除。",
     "reset": "恢复默认",
     "recording": "请按下组合键…",
     "none": "未设置",
@@ -81,7 +92,22 @@
       "toggleEdit": "调整字幕位置",
       "cycleLangMode": "切换 双语 / 主语言 / 第二语言",
       "offsetBackward": "字幕提前 {{step}}",
-      "offsetForward": "字幕延后 {{step}}"
+      "offsetForward": "字幕延后 {{step}}",
+      "recallLine": "回看上一句（连按继续往前）",
+      "playPause": "播放 / 暂停",
+      "replayLine": "重听这一句（连按继续往前）",
+      "seekBackward": "后退 {{step}}",
+      "seekForward": "前进 {{step}}"
+    },
+    "groups": {
+      "subtitle": {
+        "title": "字幕",
+        "description": "游戏中也能使用。点击后按下新组合键，Esc 取消，Backspace 清除。"
+      },
+      "playback": {
+        "title": "播放控制",
+        "description": "直接控制正在跟随的 PotPlayer，不需要切换窗口。"
+      }
     }
   }
 }

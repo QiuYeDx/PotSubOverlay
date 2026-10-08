@@ -74,5 +74,19 @@
     "expand": "Expand",
     "hide": "Hide Subtitles",
     "show": "Show Subtitles"
+  },
+  "transport": {
+    "replay": "Replay this line",
+    "back": "Back {{step}}",
+    "forward": "Forward {{step}}",
+    "play": "Play",
+    "pause": "Pause"
+  },
+  "recent": {
+    "title": "Recent Lines",
+    "description": "Click a line to play from there",
+    "empty": "Lines shown recently appear here during playback",
+    "play_from": "Play from this line",
+    "current": "Now"
   }
 }
