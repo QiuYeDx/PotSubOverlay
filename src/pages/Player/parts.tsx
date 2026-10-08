@@ -86,7 +86,16 @@ export function StatusPill({ compact = false }: { compact?: boolean }) {
   );
 }
 
-export function LangModeControl({ size = "sm", fullWidth = true }: { size?: "sm" | "md"; fullWidth?: boolean }) {
+/** @param dense For narrow rows (compact mode): items may shrink below their usual minimum. */
+export function LangModeControl({
+  size = "sm",
+  fullWidth = true,
+  dense = false,
+}: {
+  size?: "sm" | "md";
+  fullWidth?: boolean;
+  dense?: boolean;
+}) {
   const { t } = useTranslation();
   const langMode = useAppStore((s) => s.settings.langMode);
   const roles = useAppStore((s) => s.snapshot.roles);
@@ -100,13 +109,19 @@ export function LangModeControl({ size = "sm", fullWidth = true }: { size?: "sm"
       size={size}
       variant="contained"
       fullWidth={fullWidth}
+      itemClassName={dense ? "min-w-0 px-1.5" : undefined}
       value={langMode}
       disabled={!bilingual}
       onValueChange={(value) => updateSettings({ langMode: value as LangMode })}
       items={[
         { value: "both", label: t("player:lang.both") },
-        { value: "primary", label: roles.primary ? nameOf(roles.primary) : t("player:lang.primary") },
-        { value: "secondary", label: roles.secondary ? nameOf(roles.secondary) : t("player:lang.secondary") },
+        ...(["primary", "secondary"] as const).map((role) => {
+          const lang = roles[role];
+          const name = lang ? nameOf(lang) : t(`player:lang.${role}`);
+          // Long names ("Japanese") do not fit a narrow row; show the code instead.
+          const short = dense && lang && lang !== "other" && name.length > 4 ? lang.toUpperCase() : name;
+          return { value: role, label: short, ariaLabel: name };
+        }),
       ]}
     />
   );

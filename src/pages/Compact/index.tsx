@@ -20,13 +20,11 @@ function IconButton({
   onClick,
   children,
   active,
-  disabled,
 }: {
   label: string;
   onClick: () => void;
   children: React.ReactNode;
   active?: boolean;
-  disabled?: boolean;
 }) {
   return (
     <Tooltip>
@@ -36,7 +34,6 @@ function IconButton({
           size="icon-sm"
           aria-label={label}
           className={cn("size-7 text-muted-foreground", active && "bg-accent text-foreground")}
-          disabled={disabled}
           onClick={onClick}
         >
           {children}
@@ -59,6 +56,7 @@ function Compact() {
   const active = useActiveInstance();
   const stage = useStageState();
   const progress = active && active.durationMs > 0 ? active.positionMs / active.durationMs : 0;
+  const playLabel = active?.state === "playing" ? t("player:transport.pause") : t("player:transport.play");
 
   return (
     <div className="app-region-drag flex h-screen flex-col gap-2 bg-background p-2 select-none">
@@ -77,6 +75,20 @@ function Compact() {
             {active?.mediaPath ? <MiddleTruncate text={baseName(active.mediaPath)} tail={14} /> : null}
           </div>
           <div className="app-region-no-drag flex items-center gap-0.5">
+            <button
+              type="button"
+              aria-label={playLabel}
+              title={playLabel}
+              disabled={!active}
+              className="flex size-6 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/15 hover:text-white disabled:pointer-events-none disabled:opacity-40"
+              onClick={() => playback("playPause")}
+            >
+              {active?.state === "playing" ? (
+                <Pause className="size-3.5 fill-current" />
+              ) : (
+                <Play className="size-3.5 fill-current" />
+              )}
+            </button>
             <button
               type="button"
               aria-label={t("player:compact.expand")}
@@ -112,19 +124,8 @@ function Compact() {
         >
           {settings.overlayVisible ? <Eye className="size-3.5" /> : <EyeOff className="size-3.5" />}
         </IconButton>
-        <IconButton
-          label={active?.state === "playing" ? t("player:transport.pause") : t("player:transport.play")}
-          disabled={!active}
-          onClick={() => playback("playPause")}
-        >
-          {active?.state === "playing" ? (
-            <Pause className="size-3.5 fill-current" />
-          ) : (
-            <Play className="size-3.5 fill-current" />
-          )}
-        </IconButton>
         <div className="min-w-0 flex-1">
-          <LangModeControl />
+          <LangModeControl dense />
         </div>
         <div className="w-[136px] shrink-0">
           <OffsetControl dense />
