@@ -46,9 +46,11 @@
 
 - 简体中文 / 繁體中文 / English / 日本語 界面，浅色 / 深色主题，托盘常驻（菜单与应用同一套设计），开机启动。
 
-| 外观设置（深色） | 调整字幕位置 |
+![游戏中：按 Ctrl+Alt+↑ 回看上一句，播放控制后显示操作提示](docs/images/recall.png)
+
+| 外观设置（深色） | 调整字幕位置（可只用于当前游戏） |
 |---|---|
-| ![外观设置：主语言与第二语言分别设置样式](docs/images/appearance-dark.png) | ![调整字幕位置：拖动移动、拖动两侧调整宽度](docs/images/edit-position.png) |
+| ![外观设置：主语言与第二语言分别设置样式和不透明度](docs/images/appearance-dark.png) | ![调整字幕位置：拖动移动、拖动两侧调整宽度，可选择只用于当前游戏](docs/images/edit-position.png) |
 | **简洁模式（中英双语）** | **托盘菜单** |
 | ![简洁模式：中英双语字幕](docs/images/compact.png) | ![托盘菜单](docs/images/tray-menu.png) |
 
