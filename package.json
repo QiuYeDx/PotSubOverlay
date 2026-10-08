@@ -1,7 +1,7 @@
 {
   "name": "potsuboverlay",
   "productName": "PotSubOverlay",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Show the subtitles PotPlayer is playing on top of your game — transparent, click-through, bilingual in any language pair.",
   "author": "QiuYeDx <qiuyedx@foxmail.com>",
   "license": "MIT",
