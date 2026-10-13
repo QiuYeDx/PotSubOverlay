@@ -215,12 +215,14 @@ export function SubtitleView({ display, style, scale = 1, animate = true, classN
                   return (
                     <span
                       key={lineIndex}
-                      className="max-w-full"
-                      style={{
-                        background: hexToRgba(style.backgroundColor, style.backgroundOpacity),
-                        borderRadius: 8 * scale,
-                        padding: `${2 * scale}px ${12 * scale}px`,
-                      }}
+                      className="max-w-full rounded-smooth-[var(--plate-radius)]"
+                      style={
+                        {
+                          "--plate-radius": `${8 * scale}px`,
+                          background: hexToRgba(style.backgroundColor, style.backgroundOpacity),
+                          padding: `${2 * scale}px ${12 * scale}px`,
+                        } as CSSProperties
+                      }
                     >
                       <span className="block whitespace-pre-wrap break-words" style={css}>
                         {text}

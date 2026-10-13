@@ -19,6 +19,8 @@ PotSubOverlay：读取 PotPlayer 正在播放的文件与进度，把同名外�
 - 双语按“主语言 / 第二语言”角色工作，语言表（名称、字体栈、示例文本）集中在 `src/shared/languages.ts`；业务逻辑与文案里不要写死具体语言组合。
 - 字幕窗口创建后始终保持显示，“隐藏字幕”是页面内淡出（`overlay:visible`）；不要改回 `win.hide()/show()`，系统窗口动画会造成闪烁。
 - 托盘菜单是自绘的透明窗口（`windows/tray-menu.ts` + `tray-menu.html`），因为 Windows 原生菜单无法主题化；新增菜单项在 `tray.ts` 的 `menuState()` 与 `src/tray-menu/TrayMenu.tsx` 同步修改。
+- 简洁模式是独立的无边框透明窗口（`index.html?view=compact`，`COMPACT_VIEW`），由 `ControlWindow` 管理：切换时隐藏一个、显示另一个，不要改回调整同一个窗口的尺寸（Windows 的 8px 窗口圆角无法放大）。主进程推送用 `send()`（两个页面都收）或 `sendActive()`（只发当前页面，如快照）。
+- 平滑圆角用 `rounded-smooth-*`（`src/smooth-corners.css`）；`cn()` 已让它与 `rounded-*` 互相覆盖。嵌套圆角按“外半径 = 内半径 + 间距”取值；胶囊和圆形保持 `rounded-full`。
 - 绝对定位的装饰层（如预览舞台里的字幕和占位文字）必须 `pointer-events-none`，避免挡住其上的按钮。
 - 主进程只把原生模块（koffi）设为 external，其余依赖打包进 bundle；electron-builder 只携带 koffi 与 `@koromix/koffi-win32-x64`。新增原生依赖时要同步 `vite.config.ts` 的 `mainExternal` 和 `electron-builder.json` 的 `files` / `asarUnpack`。
 - 播放控制只发给当前跟随的 PotPlayer 实例，且一律 `PostMessage`。PotPlayer 跳转期间的读数不可靠（旧位置、目标时间本身、临时 0、“已停止”），判断落点用 `Controller.checkSeekLanding` 的逐次轮询，不要改成固定延时读取。

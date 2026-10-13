@@ -170,7 +170,7 @@ export function SeekBar({
 
       {usable && pointer !== null ? (
         <div
-          className="pointer-events-none absolute bottom-full mb-1.5 -translate-x-1/2 rounded-md bg-foreground px-1.5 py-0.5 font-mono text-[11px] tabular-nums text-background shadow-sm"
+          className="pointer-events-none absolute bottom-full mb-1.5 -translate-x-1/2 rounded-smooth-sm bg-foreground px-1.5 py-0.5 font-mono text-[11px] tabular-nums text-background shadow-sm"
           style={{ left: `clamp(24px, ${pointer * 100}%, calc(100% - 24px))` }}
         >
           {formatTime(pointer * durationMs)}

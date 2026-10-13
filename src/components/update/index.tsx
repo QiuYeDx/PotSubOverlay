@@ -250,7 +250,7 @@ function UpdateDialogBody({ result }: { result: UpdateCheckResult | null }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between rounded-lg border bg-card p-4">
+      <div className="flex items-center justify-between rounded-smooth-lg border bg-card p-4">
         <div className="space-y-1">
           <p className="text-sm font-medium leading-none">
             {t("common:update.available_title", {
@@ -293,7 +293,7 @@ function ChangelogSection({ entries }: { entries: ChangelogEntry[] }) {
         <FileText className="h-3.5 w-3.5" />
         {t("common:update.changelog_title")}
       </p>
-      <ScrollArea className="max-h-[240px] overflow-auto rounded-lg border bg-muted/30">
+      <ScrollArea className="max-h-[240px] overflow-auto rounded-smooth-lg border bg-muted/30">
         <div className="space-y-3 p-3">
           {entries.map((entry, index) => (
             <div key={entry.version}>

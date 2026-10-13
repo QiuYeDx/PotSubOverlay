@@ -31,6 +31,9 @@ const EMPTY_SNAPSHOT: AppSnapshot = {
   keyframeSeek: false,
 };
 
+/** This page is the compact panel in its own window (`index.html?view=compact`). */
+export const COMPACT_VIEW = new URLSearchParams(window.location.search).get("view") === "compact";
+
 function mergeDeep<T>(base: T, patch: unknown): T {
   if (typeof base !== "object" || base === null || typeof patch !== "object" || patch === null) {
     return (patch === undefined ? base : patch) as T;
@@ -51,8 +54,12 @@ interface AppStore {
   snapshot: AppSnapshot;
   settings: Settings;
   hotkeyFailures: HotkeyAction[];
+  /** Fixed per window: see `COMPACT_VIEW`. */
   compact: boolean;
-  /** True between the main process announcing a layout switch and applying it. */
+  /**
+   * True from the main process announcing a switch away from this page until
+   * the page is on screen again. The compact page starts hidden.
+   */
   switchingLayout: boolean;
   fonts: string[] | null;
 
@@ -86,8 +93,8 @@ const useAppStore = create<AppStore>((set, get) => ({
   snapshot: EMPTY_SNAPSHOT,
   settings: DEFAULT_SETTINGS,
   hotkeyFailures: [],
-  compact: false,
-  switchingLayout: false,
+  compact: COMPACT_VIEW,
+  switchingLayout: COMPACT_VIEW,
   fonts: null,
 
   init: () => {
@@ -96,9 +103,8 @@ const useAppStore = create<AppStore>((set, get) => ({
       invoke<AppSnapshot>("app:snapshot"),
       invoke<Settings>("settings:get"),
       invoke<HotkeyAction[]>("app:hotkey-status"),
-      invoke<boolean>("window:is-compact"),
-    ]).then(([snapshot, settings, hotkeyFailures, compact]) =>
-      set({ snapshot, settings, hotkeyFailures, compact, ready: true })
+    ]).then(([snapshot, settings, hotkeyFailures]) =>
+      set({ snapshot, settings, hotkeyFailures, ready: true })
     );
 
     const onSnapshot = (_event: unknown, snapshot: unknown) =>
@@ -108,14 +114,19 @@ const useAppStore = create<AppStore>((set, get) => ({
     const onHotkeys = (_event: unknown, failures: unknown) =>
       set({ hotkeyFailures: failures as HotkeyAction[] });
     const onPrepare = () => set({ switchingLayout: true });
-    const onCompact = (_event: unknown, compact: unknown) =>
-      set({ compact: Boolean(compact), switchingLayout: false });
+    // This page is on screen again: fade in, with a fresh snapshot (none arrive while hidden).
+    const onCompact = () => {
+      set({ switchingLayout: false });
+      void invoke<AppSnapshot>("app:snapshot").then((snapshot) => set({ snapshot }));
+    };
 
     ipc.on("app:snapshot", onSnapshot);
     ipc.on("settings:changed", onSettings);
     ipc.on("hotkeys:status", onHotkeys);
     ipc.on("window:compact-prepare", onPrepare);
     ipc.on("window:compact", onCompact);
+    // Listeners are in place: the main process may now show this page.
+    if (COMPACT_VIEW) ipc.send("window:compact-ready");
     return () => {
       ipc.off("app:snapshot", onSnapshot);
       ipc.off("settings:changed", onSettings);

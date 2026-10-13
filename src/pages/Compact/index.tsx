@@ -34,7 +34,7 @@ function IconButton({
           variant="ghost"
           size="icon-sm"
           aria-label={label}
-          className={cn("size-7 text-muted-foreground", active && "bg-accent text-foreground")}
+          className={cn("size-7 rounded-full text-muted-foreground", active && "bg-accent text-foreground")}
           onClick={onClick}
         >
           {children}
@@ -45,7 +45,13 @@ function IconButton({
   );
 }
 
-/** Mini player layout: everything needed while a game is running. */
+/**
+ * Mini player layout: everything needed while a game is running. It fills its
+ * own transparent window and draws the panel itself, with corners nested at a
+ * constant gap: panel 24 = stage 16 + 8 padding, and the stage's 8px inset
+ * leaves room for its 24px-high pills; the round buttons in the bottom
+ * corners sit on the panel's curve the same way.
+ */
 function Compact() {
   const { t } = useTranslation();
   const snapshot = useAppStore((s) => s.snapshot);
@@ -60,88 +66,91 @@ function Compact() {
   const playLabel = active?.state === "playing" ? t("player:transport.pause") : t("player:transport.play");
 
   return (
-    <div className="app-region-drag flex h-screen flex-col gap-2 bg-background p-2 select-none">
-      <SubtitleStage
-        display={snapshot.display}
-        style={settings.style}
-        placement={settings.placement}
-        minScale={0.34}
-        maxScale={0.42}
-        className="min-h-0 flex-1 rounded-xl [--stage-pad:20px]"
-        placeholder={stage.placeholder}
-      >
-        <div className="absolute inset-x-2 top-2 flex items-center gap-2">
-          <StatusPill compact />
-          <div className="min-w-0 flex-1 text-[11px] font-medium text-white/75">
-            {active?.mediaPath ? <MiddleTruncate text={baseName(active.mediaPath)} tail={14} /> : null}
+    // The 12px around the panel is for its shadow (COMPACT_SHADOW_MARGIN in windows/control.ts).
+    <div className="h-screen p-3 select-none">
+      <div className="app-region-drag flex h-full flex-col gap-2 rounded-smooth-[24px] border bg-background p-2 shadow-[0_2px_10px_rgba(0,0,0,0.16)] dark:border-white/10 dark:shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
+        <SubtitleStage
+          display={snapshot.display}
+          style={settings.style}
+          placement={settings.placement}
+          minScale={0.34}
+          maxScale={0.42}
+          className="min-h-0 flex-1 rounded-smooth-[16px] [--stage-pad:20px]"
+          placeholder={stage.placeholder}
+        >
+          <div className="absolute inset-x-2 top-2 flex items-center gap-2">
+            <StatusPill compact />
+            <div className="min-w-0 flex-1 text-[11px] font-medium text-white/75">
+              {active?.mediaPath ? <MiddleTruncate text={baseName(active.mediaPath)} tail={14} /> : null}
+            </div>
+            <div className="app-region-no-drag flex items-center gap-0.5">
+              <button
+                type="button"
+                aria-label={playLabel}
+                title={playLabel}
+                disabled={!active}
+                className="flex size-6 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/15 hover:text-white disabled:pointer-events-none disabled:opacity-40"
+                onClick={() => playback("playPause")}
+              >
+                {active?.state === "playing" ? (
+                  <Pause className="size-3.5 fill-current" />
+                ) : (
+                  <Play className="size-3.5 fill-current" />
+                )}
+              </button>
+              <button
+                type="button"
+                aria-label={t("player:compact.expand")}
+                title={t("player:compact.expand")}
+                className="flex size-6 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/15 hover:text-white"
+                onClick={() => setCompact(false)}
+              >
+                <Maximize2 className="size-3.5" />
+              </button>
+              <button
+                type="button"
+                aria-label={t("common:window.close")}
+                title={t("common:window.close")}
+                className="flex size-6 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/15 hover:text-white"
+                onClick={() => void window.ipcRenderer.invoke("window-control", "close")}
+              >
+                <X className="size-3.5" />
+              </button>
+            </div>
           </div>
-          <div className="app-region-no-drag flex items-center gap-0.5">
-            <button
-              type="button"
-              aria-label={playLabel}
-              title={playLabel}
-              disabled={!active}
-              className="flex size-6 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/15 hover:text-white disabled:pointer-events-none disabled:opacity-40"
-              onClick={() => playback("playPause")}
-            >
-              {active?.state === "playing" ? (
-                <Pause className="size-3.5 fill-current" />
-              ) : (
-                <Play className="size-3.5 fill-current" />
-              )}
-            </button>
-            <button
-              type="button"
-              aria-label={t("player:compact.expand")}
-              title={t("player:compact.expand")}
-              className="flex size-6 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/15 hover:text-white"
-              onClick={() => setCompact(false)}
-            >
-              <Maximize2 className="size-3.5" />
-            </button>
-            <button
-              type="button"
-              aria-label={t("common:window.close")}
-              title={t("common:window.close")}
-              className="flex size-6 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/15 hover:text-white"
-              onClick={() => void window.ipcRenderer.invoke("window-control", "close")}
-            >
-              <X className="size-3.5" />
-            </button>
-          </div>
-        </div>
-        <SeekBar
-          tone="stage"
-          className="app-region-no-drag absolute inset-x-3 bottom-0.5"
-          positionMs={active?.positionMs ?? 0}
-          durationMs={active?.durationMs ?? 0}
-          stepMs={settings.seekStepMs}
-          disabled={!active}
-          label={t("player:seek")}
-          onSeek={seek}
-        />
-      </SubtitleStage>
+          <SeekBar
+            tone="stage"
+            className="app-region-no-drag absolute inset-x-3 bottom-0.5"
+            positionMs={active?.positionMs ?? 0}
+            durationMs={active?.durationMs ?? 0}
+            stepMs={settings.seekStepMs}
+            disabled={!active}
+            label={t("player:seek")}
+            onSeek={seek}
+          />
+        </SubtitleStage>
 
-      <div className="app-region-no-drag flex h-8 shrink-0 items-center gap-1.5">
-        <IconButton
-          label={settings.overlayVisible ? t("player:compact.hide") : t("player:compact.show")}
-          onClick={() => updateSettings({ overlayVisible: !settings.overlayVisible })}
-        >
-          {settings.overlayVisible ? <Eye className="size-3.5" /> : <EyeOff className="size-3.5" />}
-        </IconButton>
-        <div className="min-w-0 flex-1">
-          <LangModeControl dense />
+        <div className="app-region-no-drag flex h-8 shrink-0 items-center gap-1.5">
+          <IconButton
+            label={settings.overlayVisible ? t("player:compact.hide") : t("player:compact.show")}
+            onClick={() => updateSettings({ overlayVisible: !settings.overlayVisible })}
+          >
+            {settings.overlayVisible ? <Eye className="size-3.5" /> : <EyeOff className="size-3.5" />}
+          </IconButton>
+          <div className="min-w-0 flex-1">
+            <LangModeControl dense />
+          </div>
+          <div className="w-[136px] shrink-0">
+            <OffsetControl dense />
+          </div>
+          <IconButton
+            label={snapshot.editing ? t("player:controls.finish_edit") : t("player:controls.edit_position")}
+            active={snapshot.editing}
+            onClick={() => setEditing(!snapshot.editing)}
+          >
+            <Move className="size-3.5" />
+          </IconButton>
         </div>
-        <div className="w-[136px] shrink-0">
-          <OffsetControl dense />
-        </div>
-        <IconButton
-          label={snapshot.editing ? t("player:controls.finish_edit") : t("player:controls.edit_position")}
-          active={snapshot.editing}
-          onClick={() => setEditing(!snapshot.editing)}
-        >
-          <Move className="size-3.5" />
-        </IconButton>
       </div>
     </div>
   );

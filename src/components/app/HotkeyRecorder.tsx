@@ -148,7 +148,7 @@ export function HotkeyRecorder({
         type="button"
         onClick={() => setRecording((current) => !current)}
         className={cn(
-          "flex h-8 min-w-[148px] items-center justify-center rounded-lg border px-2 transition-[box-shadow,background-color] duration-150",
+          "flex h-8 min-w-[148px] items-center justify-center rounded-smooth-lg border px-2 transition-[box-shadow,background-color] duration-150",
           recording
             ? "bg-accent ring-2 ring-ring/40"
             : "bg-background hover:bg-accent/60 dark:bg-input/30"
@@ -171,7 +171,7 @@ export function HotkeyRecorder({
           type="button"
           aria-label={t("setting:hotkeys.clear")}
           title={t("setting:hotkeys.clear")}
-          className="flex size-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          className="flex size-6 items-center justify-center rounded-smooth-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           onClick={() => onChange("")}
         >
           <X className="size-3.5" />

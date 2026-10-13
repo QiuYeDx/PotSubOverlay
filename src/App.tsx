@@ -15,7 +15,9 @@ import { Toaster } from "@/components/ui/sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Update from "@/components/update";
+import { LANGUAGE_STORAGE_KEY } from "@/i18n/constants";
 import useAppStore from "@/store/useAppStore";
+import useThemeStore from "@/store/useThemeStore";
 import useUpdatePreferencesStore from "@/store/useUpdatePreferencesStore";
 
 const ROUTE_ORDER: Record<string, number> = {
@@ -115,6 +117,21 @@ function FullLayout() {
   );
 }
 
+/** The compact window has no settings of its own: it follows the full window's theme and language. */
+function useFollowFullWindow(enabled: boolean) {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    if (!enabled) return;
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === LANGUAGE_STORAGE_KEY && event.newValue) void i18n.changeLanguage(event.newValue);
+      else if (event.key === useThemeStore.persist.getOptions().name) void useThemeStore.persist.rehydrate();
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [enabled, i18n]);
+}
+
 function App() {
   const { i18n } = useTranslation();
   const init = useAppStore((s) => s.init);
@@ -122,14 +139,16 @@ function App() {
   const switching = useAppStore((s) => s.switchingLayout);
 
   useEffect(() => init(), [init]);
+  useFollowFullWindow(compact);
 
-  // The tray menu and the overlay follow the UI language.
+  // The tray menu and the overlay follow the UI language (set in the full window).
   useEffect(() => {
+    if (compact) return;
     const send = (lng: string) => window.ipcRenderer.send("app:locale", lng);
     send(i18n.resolvedLanguage || i18n.language);
     i18n.on("languageChanged", send);
     return () => i18n.off("languageChanged", send);
-  }, [i18n]);
+  }, [compact, i18n]);
 
   return (
     <TooltipProvider delayDuration={400}>

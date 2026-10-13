@@ -59,7 +59,7 @@ function Item({
       // Hover moves focus, as in shadcn's DropdownMenu, so mouse and keyboard share one highlight.
       onPointerMove={(event) => event.currentTarget.focus({ preventScroll: true })}
       className={cn(
-        "relative flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-[13px] outline-none",
+        "relative flex h-8 w-full items-center gap-2 rounded-smooth-md px-2 text-left text-[13px] outline-none",
         "transition-colors duration-100 focus:bg-accent focus:text-accent-foreground",
         "disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0"
       )}
@@ -156,7 +156,7 @@ function TrayMenu() {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: "spring", duration: 0.22, bounce: 0 }}
         style={{ transformOrigin: "bottom right" }}
-        className="w-[236px] rounded-lg border bg-popover p-1 text-popover-foreground shadow-[0_8px_30px_rgba(0,0,0,0.18)] outline-none dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)]"
+        className="w-[236px] rounded-smooth-[12px] border bg-popover p-1 text-popover-foreground shadow-[0_8px_30px_rgba(0,0,0,0.18)] outline-none dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)]"
       >
         <Item icon={<AppWindow />} onSelect={() => send({ type: "open" })}>
           {labels.open}

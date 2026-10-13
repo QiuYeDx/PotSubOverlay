@@ -58,7 +58,7 @@ function Player() {
       onDrop={onDrop}
     >
       {/* Now playing: live preview + what is playing. */}
-      <section className="overflow-hidden rounded-[20px] border bg-card shadow-xs">
+      <section className="overflow-hidden rounded-smooth-[20px] border bg-card shadow-xs">
         <SubtitleStage
           display={snapshot.display}
           style={settings.style}
@@ -92,7 +92,7 @@ function Player() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-3 z-10 flex items-center justify-center gap-2 rounded-xl border border-dashed border-white/40 bg-black/50 text-sm text-white/85 backdrop-blur-sm"
+                className="absolute inset-3 z-10 flex items-center justify-center gap-2 rounded-smooth-xl border border-dashed border-white/40 bg-black/50 text-sm text-white/85 backdrop-blur-sm"
               >
                 <Upload className="size-4" />
                 {t("player:drop_hint")}
@@ -189,7 +189,7 @@ function Player() {
 
 function ControlTile({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex min-w-0 flex-col justify-between gap-2.5 rounded-xl border bg-card px-3.5 pt-2.5 pb-3 shadow-xs">
+    <div className="flex min-w-0 flex-col justify-between gap-2.5 rounded-smooth-xl border bg-card px-3.5 pt-2.5 pb-3 shadow-xs">
       <div className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
         {label}
       </div>

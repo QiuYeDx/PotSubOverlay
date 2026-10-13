@@ -1,29 +1,45 @@
 import { BrowserWindow, screen, shell, type Rectangle } from "electron";
+import { disableWindowTransitions } from "../win32/dwmapi";
+import { handleFromBuffer } from "../win32/user32";
 
 export const FULL_SIZE = { width: 980, height: 700, minWidth: 820, minHeight: 580 };
+/** The compact panel itself; its window adds `COMPACT_SHADOW_MARGIN` on every side. */
 export const COMPACT_SIZE = { width: 392, height: 212 };
+/** Transparent margin the compact page leaves around the panel for its shadow (`p-3` there). */
+const COMPACT_SHADOW_MARGIN = 12;
 const MODE_SWITCH_DELAY_MS = 140;
+/** How long a first switch waits for the compact page to load before showing it anyway. */
+const COMPACT_READY_TIMEOUT_MS = 3000;
 const START_LOADING_PROGRESS_CHANNEL = "qiuye-template-start-loading-progress";
 
 export interface ControlWindowOptions {
   preload: string;
   icon: string;
   load: (win: BrowserWindow) => Promise<void>;
+  /** Load the page in its compact layout (`index.html?view=compact`). */
+  loadCompact: (win: BrowserWindow) => Promise<void>;
   /** Return true to hide instead of closing. */
   shouldHideOnClose: () => boolean;
   compactAlwaysOnTop: () => boolean;
   onHiddenToTray?: () => void;
 }
 
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 /**
- * The control panel. Supports a full layout and a compact "mini player"
- * layout; the window keeps its full-size bounds while compact so it can
- * restore exactly where it was.
+ * The control panel: a normal window for the full layout, and a separate
+ * frameless, transparent window for the compact "mini player". Windows draws
+ * every framed window with the same small corner radius, so the compact
+ * panel paints its own larger, smooth corners. Switching hides one window
+ * and shows the other; the full window keeps its bounds and maximized state.
  */
 export class ControlWindow {
+  /** The full window. */
   win: BrowserWindow | null = null;
+  private compactWin: BrowserWindow | null = null;
+  private compactReady: Promise<void> | null = null;
   private compact = false;
-  private fullBounds: Rectangle | null = null;
+  private switching = false;
   private quitting = false;
 
   constructor(private readonly options: ControlWindowOptions) {}
@@ -32,8 +48,20 @@ export class ControlWindow {
     return this.compact;
   }
 
+  /** The window the user is working with: the compact panel while compact, else the full window. */
+  get activeWin(): BrowserWindow | null {
+    const win = this.compact ? this.compactWin : this.win;
+    return win && !win.isDestroyed() ? win : null;
+  }
+
+  /** The compact window, if it has been created (it is kept, hidden, after the first use). */
+  get compactWindow(): BrowserWindow | null {
+    return this.compactWin && !this.compactWin.isDestroyed() ? this.compactWin : null;
+  }
+
   get isVisible(): boolean {
-    return Boolean(this.win && !this.win.isDestroyed() && this.win.isVisible() && !this.win.isMinimized());
+    const win = this.activeWin;
+    return Boolean(win && win.isVisible() && !win.isMinimized());
   }
 
   markQuitting(): void {
@@ -45,57 +73,62 @@ export class ControlWindow {
       this.create();
       return;
     }
-    if (this.win.isMinimized()) this.win.restore();
-    this.win.show();
-    this.win.focus();
+    const win = this.activeWin ?? this.win;
+    if (win.isMinimized()) win.restore();
+    win.show();
+    win.focus();
   }
 
+  /** Send to every control page (full and compact): both keep settings and status. */
   send(channel: string, ...args: unknown[]): void {
-    if (this.win && !this.win.isDestroyed()) this.win.webContents.send(channel, ...args);
+    for (const win of [this.win, this.compactWin]) {
+      if (win && !win.isDestroyed()) win.webContents.send(channel, ...args);
+    }
+  }
+
+  /** Send to the page in use only; the other one refreshes when it is shown again. */
+  sendActive(channel: string, ...args: unknown[]): void {
+    this.activeWin?.webContents.send(channel, ...args);
   }
 
   async setCompact(compact: boolean): Promise<void> {
-    const win = this.win;
-    if (!win || win.isDestroyed() || compact === this.compact) return;
-    this.send("window:compact-prepare", compact);
-    await new Promise((resolve) => setTimeout(resolve, MODE_SWITCH_DELAY_MS));
-    if (win.isDestroyed()) return;
+    const full = this.win;
+    if (!full || full.isDestroyed() || compact === this.compact || this.switching) return;
+    this.switching = true;
+    try {
+      // The page being left fades out while the other one gets ready.
+      this.activeWin?.webContents.send("window:compact-prepare", compact);
+      if (compact) this.ensureCompactWindow();
+      await Promise.all([delay(MODE_SWITCH_DELAY_MS), compact ? this.compactReady : null]);
+      if (full.isDestroyed()) return;
 
-    this.compact = compact;
-    if (compact) {
-      if (win.isMaximized()) win.unmaximize();
-      this.fullBounds = win.getBounds();
-      const area = screen.getDisplayMatching(this.fullBounds).workArea;
-      const x = Math.min(
-        this.fullBounds.x + this.fullBounds.width - COMPACT_SIZE.width,
-        area.x + area.width - COMPACT_SIZE.width
-      );
-      win.setMinimumSize(COMPACT_SIZE.width, COMPACT_SIZE.height);
-      win.setResizable(false);
-      win.setMaximizable(false);
-      win.setBounds({ x: Math.max(area.x, x), y: Math.max(area.y, this.fullBounds.y), ...COMPACT_SIZE });
-      win.setAlwaysOnTop(this.options.compactAlwaysOnTop(), "floating");
-    } else {
-      win.setAlwaysOnTop(false);
-      win.setResizable(true);
-      win.setMaximizable(true);
-      win.setMinimumSize(FULL_SIZE.minWidth, FULL_SIZE.minHeight);
-      const area = screen.getDisplayMatching(win.getBounds()).workArea;
-      const target = this.fullBounds ?? {
-        x: area.x + Math.round((area.width - FULL_SIZE.width) / 2),
-        y: area.y + Math.round((area.height - FULL_SIZE.height) / 2),
-        width: FULL_SIZE.width,
-        height: FULL_SIZE.height,
-      };
-      win.setBounds(target);
+      const panel = this.compactWindow;
+      if (compact) {
+        if (!panel) {
+          full.webContents.send("window:compact", false);
+          return;
+        }
+        this.compact = true;
+        panel.setBounds(this.compactBounds(full.getBounds()));
+        panel.setAlwaysOnTop(this.options.compactAlwaysOnTop(), "floating");
+        panel.show();
+        panel.focus();
+        full.hide();
+      } else {
+        this.compact = false;
+        if (full.isMinimized()) full.restore();
+        full.show();
+        full.focus();
+        panel?.hide();
+      }
+      this.sendActive("window:compact", compact);
+    } finally {
+      this.switching = false;
     }
-    this.send("window:compact", compact);
   }
 
   refreshAlwaysOnTop(): void {
-    if (this.win && !this.win.isDestroyed() && this.compact) {
-      this.win.setAlwaysOnTop(this.options.compactAlwaysOnTop(), "floating");
-    }
+    if (this.compact) this.compactWindow?.setAlwaysOnTop(this.options.compactAlwaysOnTop(), "floating");
   }
 
   create(showOnReady = true): void {
@@ -135,14 +168,92 @@ export class ControlWindow {
       }
     });
     win.on("closed", () => {
-      if (this.win === win) this.win = null;
+      if (this.win !== win) return;
+      this.win = null;
+      // Reopening starts in the full layout, as before.
+      this.compact = false;
+      this.compactWindow?.destroy();
     });
 
+    this.denyWindowOpen(win);
+    void this.options.load(win);
+  }
+
+  private ensureCompactWindow(): void {
+    if (this.compactWindow) return;
+    const win = new BrowserWindow({
+      title: "PotSubOverlay",
+      icon: this.options.icon,
+      width: COMPACT_SIZE.width + COMPACT_SHADOW_MARGIN * 2,
+      height: COMPACT_SIZE.height + COMPACT_SHADOW_MARGIN * 2,
+      show: false,
+      frame: false,
+      transparent: true,
+      backgroundColor: "#00000000",
+      hasShadow: false,
+      resizable: false,
+      maximizable: false,
+      fullscreenable: false,
+      webPreferences: {
+        preload: this.options.preload,
+      },
+    });
+    // The page fades itself in; the shell's own show animation would fight it.
+    disableWindowTransitions(handleFromBuffer(win.getNativeWindowHandle()));
+    this.compactWin = win;
+    // The page says when its listeners are in place, so the fade-in message is not lost.
+    this.compactReady = new Promise<void>((resolve) => {
+      const timer = setTimeout(resolve, COMPACT_READY_TIMEOUT_MS);
+      win.webContents.ipc.once("window:compact-ready", () => {
+        clearTimeout(timer);
+        resolve();
+      });
+      win.once("closed", () => {
+        clearTimeout(timer);
+        resolve();
+      });
+    });
+
+    win.on("close", (event) => {
+      if (this.quitting) return;
+      event.preventDefault();
+      win.hide();
+      if (this.options.shouldHideOnClose()) {
+        this.options.onHiddenToTray?.();
+        return;
+      }
+      // Like closing the full window: it goes away and the next open starts full.
+      this.compact = false;
+      this.win?.close();
+    });
+    win.on("closed", () => {
+      if (this.compactWin !== win) return;
+      this.compactWin = null;
+      this.compactReady = null;
+    });
+
+    this.denyWindowOpen(win);
+    void this.options.loadCompact(win);
+  }
+
+  /** Put the panel's top-right corner where the full window's was, inside the work area. */
+  private compactBounds(anchor: Rectangle): Rectangle {
+    const area = screen.getDisplayMatching(anchor).workArea;
+    const { width, height } = COMPACT_SIZE;
+    const x = Math.max(area.x, Math.min(anchor.x + anchor.width - width, area.x + area.width - width));
+    const y = Math.max(area.y, Math.min(anchor.y, area.y + area.height - height));
+    return {
+      x: x - COMPACT_SHADOW_MARGIN,
+      y: y - COMPACT_SHADOW_MARGIN,
+      width: width + COMPACT_SHADOW_MARGIN * 2,
+      height: height + COMPACT_SHADOW_MARGIN * 2,
+    };
+  }
+
+  private denyWindowOpen(win: BrowserWindow): void {
     win.webContents.setWindowOpenHandler(({ url }) => {
       if (/^https?:\/\//i.test(url) || /^mailto:/i.test(url)) void shell.openExternal(url);
       return { action: "deny" };
     });
-
-    void this.options.load(win);
   }
 }

@@ -48,7 +48,7 @@ export function SubtitleStage({
     <div
       ref={ref}
       className={cn(
-        "relative isolate overflow-hidden rounded-2xl bg-[#0b0d12] text-white",
+        "relative isolate overflow-hidden rounded-smooth-2xl bg-[#0b0d12] text-white",
         "shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]",
         className
       )}

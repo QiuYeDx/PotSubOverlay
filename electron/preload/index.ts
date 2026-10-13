@@ -629,11 +629,14 @@ function useLoading() {
 
 // ----------------------------------------------------------------------
 
-const { appendLoading, removeLoading } = useLoading()
-domReady().then(appendLoading)
+// The compact panel (a transparent window) fades itself in; no loading screen there.
+if (new URLSearchParams(window.location.search).get('view') !== 'compact') {
+  const { appendLoading, removeLoading } = useLoading()
+  domReady().then(appendLoading)
 
-window.onmessage = (ev) => {
-  ev.data.payload === 'removeLoading' && removeLoading()
+  window.onmessage = (ev) => {
+    ev.data.payload === 'removeLoading' && removeLoading()
+  }
+
+  setTimeout(removeLoading, 4999)
 }
-
-setTimeout(removeLoading, 4999)

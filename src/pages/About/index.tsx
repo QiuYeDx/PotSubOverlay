@@ -67,13 +67,13 @@ function About() {
         </div>
       </div>
 
-      <div className="mb-3 overflow-hidden rounded-xl border bg-card">
+      <div className="mb-3 overflow-hidden rounded-smooth-xl border bg-card">
         <div className="relative p-6">
           <div className="flex items-start gap-5">
             <img
               src={AppLogo}
               alt={APP_NAME}
-              className="h-16 w-16 shrink-0 rounded-2xl shadow-sm"
+              className="h-16 w-16 shrink-0 rounded-smooth-2xl shadow-sm"
             />
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
@@ -195,7 +195,7 @@ function About() {
             ))}
           </div>
 
-          <div className="flex items-start gap-2 rounded-lg border border-dashed bg-muted/40 px-3 py-2.5 text-xs text-muted-foreground">
+          <div className="flex items-start gap-2 rounded-smooth-lg border border-dashed bg-muted/40 px-3 py-2.5 text-xs text-muted-foreground">
             <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
             <span className="leading-relaxed">{t("about:license_note")}</span>
           </div>
@@ -247,10 +247,10 @@ function LinkCard({
     <button
       type="button"
       onClick={() => void openExternal(href)}
-      className="group rounded-xl border bg-card p-4 text-left shadow-sm transition-colors hover:bg-accent/50"
+      className="group rounded-smooth-xl border bg-card p-4 text-left shadow-sm transition-colors hover:bg-accent/50"
     >
       <div className="flex items-start gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border bg-muted">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-smooth-lg border bg-muted">
           {icon}
         </div>
         <div className="min-w-0 flex-1">

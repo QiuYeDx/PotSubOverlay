@@ -206,7 +206,7 @@ function EditStage({
         style={{ left, bottom, width: widthPx }}
       >
         <div
-          className="relative rounded-2xl px-3 py-2 transition-[background-color,box-shadow] duration-150"
+          className="relative rounded-smooth-2xl px-3 py-2 transition-[background-color,box-shadow] duration-150"
           style={{
             cursor: drag ? "grabbing" : "grab",
             background: drag ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.06)",
@@ -251,20 +251,20 @@ function ScopeBar({
       onPointerDown={(event) => event.stopPropagation()}
     >
       <div
-        className="flex items-center gap-2 rounded-xl py-1 pr-1 pl-3 text-white"
+        className="flex items-center gap-2 rounded-smooth-xl py-1 pr-1 pl-3 text-white"
         style={{
           background: "rgba(28,28,30,0.9)",
           boxShadow: "0 0 0 1px rgba(255,255,255,0.10), 0 8px 28px rgba(0,0,0,0.40)",
         }}
       >
         <span className="text-[12px] text-white/60">{strings.scope}</span>
-        <div className="flex items-center gap-0.5 rounded-lg bg-white/8 p-0.5">
+        <div className="flex items-center gap-0.5 rounded-smooth-lg bg-white/8 p-0.5">
           {options.map((option) => (
             <button
               key={String(option.value)}
               type="button"
               title={option.label}
-              className="h-7 max-w-[220px] truncate rounded-md px-2.5 text-xs transition-colors"
+              className="h-7 max-w-[220px] truncate rounded-smooth-md px-2.5 text-xs transition-colors"
               style={{
                 background: appScope === option.value ? "rgba(255,255,255,0.22)" : "transparent",
                 color: appScope === option.value ? "#fff" : "rgba(255,255,255,0.72)",
@@ -321,7 +321,7 @@ function Toolbar(props: {
 
   return (
     <motion.div
-      className="absolute top-8 left-1/2 flex -translate-x-1/2 items-center gap-4 rounded-2xl py-2.5 pr-2.5 pl-5 text-white"
+      className="absolute top-8 left-1/2 flex -translate-x-1/2 items-center gap-4 rounded-smooth-2xl py-2.5 pr-2.5 pl-5 text-white"
       style={{
         background: "rgba(28,28,30,0.9)",
         boxShadow: "0 0 0 1px rgba(255,255,255,0.10), 0 12px 40px rgba(0,0,0,0.45)",
@@ -335,17 +335,17 @@ function Toolbar(props: {
         <span className="text-[13px] font-semibold leading-5">{props.title}</span>
         <span className="text-[11px] leading-4 text-white/60">{props.hint}</span>
       </div>
-      <span className="rounded-md bg-white/10 px-2 py-1 font-mono text-[11px] tabular-nums text-white/80">
+      <span className="rounded-smooth-sm bg-white/10 px-2 py-1 font-mono text-[11px] tabular-nums text-white/80">
         {props.widthLabel}
       </span>
       {props.displays.length > 1 ? (
-        <div className="flex items-center gap-1 rounded-lg bg-white/8 p-0.5">
+        <div className="flex items-center gap-1 rounded-smooth-lg bg-white/8 p-0.5">
           {props.displays.map((display, index) => (
             <button
               key={display.id}
               type="button"
               title={`${props.displayLabel} ${index + 1}${display.primary ? ` · ${props.primaryLabel}` : ""}`}
-              className="h-7 min-w-7 rounded-md px-2 text-xs tabular-nums transition-colors"
+              className="h-7 min-w-7 rounded-smooth-md px-2 text-xs tabular-nums transition-colors"
               style={{
                 background: activeDisplay?.id === display.id ? "rgba(255,255,255,0.22)" : "transparent",
               }}
@@ -359,14 +359,14 @@ function Toolbar(props: {
       <div className="flex items-center gap-1.5">
         <button
           type="button"
-          className="h-8 rounded-lg px-3 text-[13px] text-white/85 transition-colors hover:bg-white/10"
+          className="h-8 rounded-smooth-lg px-3 text-[13px] text-white/85 transition-colors hover:bg-white/10"
           onClick={props.onReset}
         >
           {props.resetLabel}
         </button>
         <button
           type="button"
-          className="h-8 rounded-lg bg-white px-4 text-[13px] font-semibold text-black transition-transform active:scale-[0.97]"
+          className="h-8 rounded-smooth-lg bg-white px-4 text-[13px] font-semibold text-black transition-transform active:scale-[0.97]"
           onClick={props.onDone}
         >
           {props.doneLabel}

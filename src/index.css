@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./smooth-corners.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -133,4 +134,9 @@
   ::-webkit-scrollbar-thumb {
     @apply rounded-full bg-border hover:bg-muted-foreground/30;
   }
+}
+
+/* The compact panel has its own transparent window: only the panel paints. */
+html[data-view="compact"] body {
+  background: transparent;
 }

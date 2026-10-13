@@ -42,13 +42,15 @@ if (!app.requestSingleInstanceLock()) {
 }
 
 /** Load a renderer page from the dev server or the built files. */
-function pageLoader(page: "index" | "overlay" | "tray-menu") {
+function pageLoader(page: "index" | "overlay" | "tray-menu", query?: Record<string, string>) {
   return async (win: BrowserWindow) => {
     if (VITE_DEV_SERVER_URL) {
-      await win.loadURL(page === "index" ? VITE_DEV_SERVER_URL : `${VITE_DEV_SERVER_URL}${page}.html`);
+      const url = new URL(page === "index" ? VITE_DEV_SERVER_URL : `${VITE_DEV_SERVER_URL}${page}.html`);
+      for (const [key, value] of Object.entries(query ?? {})) url.searchParams.set(key, value);
+      await win.loadURL(url.toString());
       return;
     }
-    await win.loadFile(path.join(RENDERER_DIST, `${page}.html`));
+    await win.loadFile(path.join(RENDERER_DIST, `${page}.html`), { query });
   };
 }
 
@@ -90,6 +92,10 @@ app.whenReady().then(() => {
       lockDownShortcuts(win);
       await pageLoader("index")(win);
     },
+    loadCompact: async (win) => {
+      lockDownShortcuts(win);
+      await pageLoader("index", { view: "compact" })(win);
+    },
     shouldHideOnClose: () => !quitting && settings.get().closeToTray,
     compactAlwaysOnTop: () => settings.get().compactAlwaysOnTop,
     onHiddenToTray: () => {
@@ -101,7 +107,7 @@ app.whenReady().then(() => {
 
   controller = new Controller(settings, overlay, control);
   controller.onSnapshot((snapshot) => {
-    if (control.isVisible) control.send("app:snapshot", snapshot);
+    if (control.isVisible) control.sendActive("app:snapshot", snapshot);
   });
 
   const quit = () => {

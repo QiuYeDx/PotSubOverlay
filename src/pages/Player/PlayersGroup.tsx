@@ -13,7 +13,7 @@ function StateIcon({ state }: { state: PlayerInstance["state"] }) {
   return (
     <span
       className={cn(
-        "flex size-7 shrink-0 items-center justify-center rounded-lg",
+        "flex size-7 shrink-0 items-center justify-center rounded-smooth-md",
         state === "playing"
           ? "bg-emerald-500/12 text-emerald-600 dark:text-emerald-400"
           : "bg-muted text-muted-foreground"
@@ -74,7 +74,7 @@ function PlayersGroup() {
             onClick={() => selectInstance(null)}
           >
             <Radio checked={auto} />
-            <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-smooth-md bg-muted text-muted-foreground">
               <Sparkles className="size-3.5" />
             </span>
             <span className="min-w-0 flex-1">

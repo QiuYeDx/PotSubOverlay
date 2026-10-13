@@ -60,7 +60,7 @@ export function FontPicker({
         setOpen(false);
       }}
       className={cn(
-        "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-accent",
+        "flex w-full items-center gap-2 rounded-smooth-md px-2 py-1.5 text-left transition-colors hover:bg-accent",
         name === value && "bg-accent/60"
       )}
     >
@@ -89,7 +89,7 @@ export function FontPicker({
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="flex h-8 w-[220px] items-center gap-2 rounded-md border bg-background px-2.5 text-left text-[13px] shadow-xs transition-colors hover:bg-accent dark:bg-input/30"
+          className="flex h-8 w-[220px] items-center gap-2 rounded-smooth-md border bg-background px-2.5 text-left text-[13px] shadow-xs transition-colors hover:bg-accent dark:bg-input/30"
         >
           <span
             className="min-w-0 flex-1 truncate"

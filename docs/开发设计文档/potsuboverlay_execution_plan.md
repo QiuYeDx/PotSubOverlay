@@ -29,6 +29,7 @@
 | PSO-015 字幕窗口过渡稳定（隐藏状态下改窗口、底对齐换句、编辑进出一步到位） | 已完成 | 2026-10-13 | `electron/main/windows/overlay.ts`; `src/overlay/OverlayApp.tsx`; `src/components/subtitle/SubtitleView.tsx` | QA 逐帧采样：换句底边恒定；进出编辑、改位置时可见帧中字幕屏幕位置恒定，改尺寸只发生在不透明度 0 | [v1.3.0](potsuboverlay_implementation_records/2026-10-13_PSO-015-017_v1.3.0.md) | 真实游戏与 PotPlayer 下的观感由用户实机确认 |
 | PSO-016 可选字幕动效与参数 | 已完成 | 2026-10-13 | `src/shared/motion.ts`; `src/components/subtitle/line-motion.ts`; `src/pages/Appearance/MotionGroup.tsx` | vitest 31 项（迁移 v4、参数校验）；QA 采样 wipe / spring slide / sequential zoom / blur；外观页截图 | [v1.3.0](potsuboverlay_implementation_records/2026-10-13_PSO-015-017_v1.3.0.md) | - |
 | PSO-017 进度条拖动跳转 | 已完成 | 2026-10-13 | `src/components/app/SeekBar.tsx`; `electron/main/controller.ts` | 模拟播放器 seek 落点 20.1s；悬停截图 | [v1.3.0](potsuboverlay_implementation_records/2026-10-13_PSO-015-017_v1.3.0.md) | 真实 PotPlayer 拖动跳转由用户确认 |
+| PSO-018 平滑圆角与简洁模式独立透明窗口 | 已完成 | 2026-10-13 | `src/smooth-corners.css`; `electron/main/windows/control.ts`; `src/pages/Compact/index.tsx` | QA 截图：简洁模式（进入 / 返回 / 再进入）、播放 / 设置 / 关于页、托盘菜单、调整位置；构建产物 CSS 检查 | [v1.3.0 圆角](potsuboverlay_implementation_records/2026-10-13_PSO-018_v1.3.0.md) | 实机拖动、关闭到托盘、多显示器下的简洁窗口由用户确认 |
 
 ## 不得违反的约束
 

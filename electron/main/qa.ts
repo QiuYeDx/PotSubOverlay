@@ -66,7 +66,7 @@ export async function runQaScript(deps: {
             ? deps.overlay.win
             : step.capture === "menu"
               ? deps.trayMenu.win
-              : deps.control.win;
+              : deps.control.activeWin;
         await capture(win, path.join(outDir, step.file));
       } else if ("snapshot" in step) {
         fs.writeFileSync(
@@ -76,9 +76,9 @@ export async function runQaScript(deps: {
       } else if ("edit" in step) await deps.controller.setEditing(step.edit);
       else if ("compact" in step) await deps.control.setCompact(step.compact);
       else if ("eval" in step) {
-        const result = await deps.control.win?.webContents.executeJavaScript(step.eval);
+        const result = await deps.control.activeWin?.webContents.executeJavaScript(step.eval);
         fs.writeFileSync(path.join(outDir, step.file), JSON.stringify(result, null, 2));
-      } else if ("js" in step) await deps.control.win?.webContents.executeJavaScript(step.js);
+      } else if ("js" in step) await deps.control.activeWin?.webContents.executeJavaScript(step.js);
       else if ("size" in step) deps.control.win?.setSize(step.size[0], step.size[1]);
       else if ("trayMenu" in step) deps.trayMenu.open(deps.tray.menuState());
       else if ("follow" in step) {
@@ -97,7 +97,7 @@ export async function runQaScript(deps: {
         const result = await deps.overlay.win.webContents.executeJavaScript(step.overlayEval);
         fs.writeFileSync(path.join(outDir, step.file), JSON.stringify(result, null, 2));
       } else if ("quiet" in step) {
-        for (const win of [deps.overlay.win, deps.control.win]) {
+        for (const win of [deps.overlay.win, deps.control.win, deps.control.compactWindow]) {
           win?.setOpacity(step.quiet ? 0 : 1);
           // A transparent window counts as hidden; keep it rendering so captures stay current.
           win?.webContents.setBackgroundThrottling(!step.quiet && win !== deps.overlay.win);

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../smooth-corners.css";
 
 /* The overlay window is transparent; nothing here may paint a background. */
 html,

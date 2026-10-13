@@ -44,7 +44,7 @@ function RecentLines() {
                     title={t("player:recent.play_from")}
                     onClick={() => playLine(line.startMs)}
                     className={cn(
-                      "group flex w-full items-start gap-3 rounded-lg px-3 py-1.5 text-left transition-colors",
+                      "group flex w-full items-start gap-3 rounded-smooth-lg px-3 py-1.5 text-left transition-colors",
                       line.current ? "bg-accent" : "hover:bg-accent/60"
                     )}
                   >

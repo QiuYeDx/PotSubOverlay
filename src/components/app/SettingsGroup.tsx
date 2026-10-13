@@ -32,7 +32,7 @@ export function SettingsGroup({
           {action ? <div className="shrink-0">{action}</div> : null}
         </div>
       ) : null}
-      <div className="divide-y divide-border/70 overflow-hidden rounded-xl border bg-card shadow-xs">
+      <div className="divide-y divide-border/70 overflow-hidden rounded-smooth-xl border bg-card shadow-xs">
         {children}
       </div>
     </section>

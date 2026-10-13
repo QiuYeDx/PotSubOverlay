@@ -137,7 +137,7 @@ function Setting() {
                 key={item.key}
                 onClick={() => handleTabChange(item.key)}
                 className={cn(
-                  "group relative flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-left transition-colors",
+                  "group relative flex items-center gap-2.5 rounded-smooth-lg px-3 py-2.5 text-left transition-colors",
                   "max-md:min-w-[160px] max-md:shrink-0",
                   active
                     ? "z-0 text-foreground"
@@ -147,7 +147,7 @@ function Setting() {
                 {active ? (
                   <motion.div
                     layoutId="setting-nav-indicator"
-                    className="absolute inset-0 rounded-lg border border-foreground/15 bg-accent"
+                    className="absolute inset-0 rounded-smooth-lg border border-foreground/15 bg-accent"
                     transition={{
                       type: "spring",
                       duration: 0.35,

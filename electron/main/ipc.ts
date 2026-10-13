@@ -100,7 +100,6 @@ export function registerIpc(deps: {
   });
 
   ipcMain.handle("window:set-compact", (_event, compact: boolean) => control.setCompact(compact));
-  ipcMain.handle("window:is-compact", () => control.isCompact);
   ipcMain.handle("window-control", (event, action: "close" | "minimize" | "toggle-maximize") => {
     const target = BrowserWindow.fromWebContents(event.sender);
     if (!target) return { success: false };
