@@ -171,7 +171,7 @@ export function OffsetControl({ dense = false }: { dense?: boolean }) {
             disabled={!hasMedia || offsetMs === 0}
             onClick={() => setOffset(0)}
             className={cn(
-              "flex h-full min-w-16 flex-1 items-center justify-center rounded-md font-mono text-[13px] tabular-nums transition-colors",
+              "flex h-full min-w-16 flex-1 items-center justify-center rounded-smooth-md font-mono text-[13px] tabular-nums transition-colors",
               offsetMs === 0 ? "text-muted-foreground" : "text-foreground hover:bg-accent"
             )}
           >
