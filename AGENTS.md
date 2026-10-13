@@ -18,7 +18,7 @@ PotSubOverlay：读取 PotPlayer 正在播放的文件与进度，把同名外�
 - `src/shared/` 是主进程与渲染进程共享的类型和默认值，不得引入 Node 或 DOM API。
 - 双语按“主语言 / 第二语言”角色工作，语言表（名称、字体栈、示例文本）集中在 `src/shared/languages.ts`；业务逻辑与文案里不要写死具体语言组合。
 - 字幕窗口创建后始终保持显示，“隐藏字幕”是页面内淡出（`overlay:visible`）；不要改回 `win.hide()/show()`，系统窗口动画会造成闪烁。
-- 托盘菜单是自绘的透明窗口（`windows/tray-menu.ts` + `tray-menu.html`），因为 Windows 原生菜单无法主题化；新增菜单项在 `tray.ts` 的 `menuState()` 与 `src/tray-menu/TrayMenu.tsx` 同步修改。
+- 托盘菜单是自绘的透明窗口（`windows/tray-menu.ts` + `tray-menu.html`），因为 Windows 原生菜单无法主题化；新增菜单项在 `tray.ts` 的 `menuState()` 与 `src/tray-menu/TrayMenu.tsx` 同步修改。Windows 重新显示窗口时会先放出它隐藏前的最后一帧，所以菜单关闭走 `tray-menu:hide` → 页面淡出并画出空帧 → `tray-menu:hidden` → `win.hide()`，不要直接 `win.hide()`；阴影必须落在 `TRAY_MENU_SHADOW_MARGIN` 以内。
 - 简洁模式是独立的无边框透明窗口（`index.html?view=compact`，`COMPACT_VIEW`），由 `ControlWindow` 管理：切换时隐藏一个、显示另一个，不要改回调整同一个窗口的尺寸（Windows 的 8px 窗口圆角无法放大）。主进程推送用 `send()`（两个页面都收）或 `sendActive()`（只发当前页面，如快照）。
 - 平滑圆角用 `rounded-smooth-*`（`src/smooth-corners.css`）；`cn()` 已让它与 `rounded-*` 互相覆盖。嵌套圆角按“外半径 = 内半径 + 间距”取值；胶囊和圆形保持 `rounded-full`。
 - 绝对定位的装饰层（如预览舞台里的字幕和占位文字）必须 `pointer-events-none`，避免挡住其上的按钮。

@@ -1,6 +1,9 @@
 import { DEFAULT_MOTION } from "./motion";
 import type { HotkeyAction, OverlayPlacement, OverlayStyle, Settings } from "./types";
 
+/** Transparent margin around the tray menu surface, sized to hold its whole shadow. */
+export const TRAY_MENU_SHADOW_MARGIN = 24;
+
 export const DEFAULT_STYLE: OverlayStyle = {
   primary: {
     fontFamily: "",

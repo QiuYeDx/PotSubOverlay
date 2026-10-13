@@ -2,6 +2,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { AppWindow, Captions, Check, Move, Power } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { TRAY_MENU_SHADOW_MARGIN } from "@/shared/defaults";
 import type { TrayMenuAction, TrayMenuState } from "@/shared/types";
 
 declare global {
@@ -30,6 +31,13 @@ function applyTheme() {
 }
 
 const send = (action: TrayMenuAction) => window.trayMenuApi.send("tray-menu:action", action);
+
+const SHOWN = { opacity: 1, scale: 1, y: 0 };
+const HIDDEN = { opacity: 0, scale: 0.97, y: 4 };
+
+/** Resolve after the current DOM has been painted (the frame after next is on screen). */
+const afterPaint = () =>
+  new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
 
 function Item({
   icon,
@@ -95,7 +103,12 @@ const Separator = () => <div role="separator" className="-mx-1 my-1 h-px bg-bord
 
 function TrayMenu() {
   const [state, setState] = useState<TrayMenuState | null>(null);
-  const [openKey, setOpenKey] = useState(0);
+  /**
+   * The surface is shown only between `tray-menu:open` and `tray-menu:hide`,
+   * so the window is always hidden (and later reappears) with nothing drawn.
+   */
+  const [open, setOpen] = useState(false);
+  const closingRef = useRef(false);
   const surfaceRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
@@ -108,9 +121,14 @@ function TrayMenu() {
         setState(next);
       }),
       api.on("tray-menu:open", () => {
-        setOpenKey((key) => key + 1);
+        closingRef.current = false;
+        setOpen(true);
         // Focus the menu (not an item) so keyboard users can start with ↓.
         surfaceRef.current?.focus({ preventScroll: true });
+      }),
+      api.on("tray-menu:hide", () => {
+        closingRef.current = true;
+        setOpen(false);
       }),
     ];
     return () => offs.forEach((off) => off());
@@ -141,22 +159,43 @@ function TrayMenu() {
     next.focus();
   };
 
+  // Once the faded-out menu is on screen, the window may be hidden.
+  const onAnimationComplete = () => {
+    if (!closingRef.current) return;
+    closingRef.current = false;
+    void afterPaint().then(() => window.trayMenuApi.send("tray-menu:hidden"));
+  };
+
   if (!state) return null;
   const { labels } = state;
 
   return (
-    <div ref={rootRef} className="inline-block p-[10px]">
+    // The margin holds the shadow; a click there counts as a click outside the menu.
+    <div
+      ref={rootRef}
+      className="inline-block"
+      style={{ padding: TRAY_MENU_SHADOW_MARGIN }}
+      onPointerDown={(event) => {
+        if (event.target === event.currentTarget) window.trayMenuApi.send("tray-menu:close");
+      }}
+    >
       <motion.div
-        key={openKey}
         ref={surfaceRef}
         role="menu"
         tabIndex={-1}
         onKeyDown={onKeyDown}
-        initial={reduceMotion ? false : { opacity: 0, scale: 0.97, y: 4 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ type: "spring", duration: 0.22, bounce: 0 }}
+        initial={HIDDEN}
+        animate={open ? SHOWN : HIDDEN}
+        transition={
+          reduceMotion || !open
+            ? { duration: reduceMotion ? 0 : 0.1, ease: "easeOut" }
+            : { type: "spring", duration: 0.22, bounce: 0 }
+        }
+        onAnimationComplete={onAnimationComplete}
         style={{ transformOrigin: "bottom right" }}
-        className="w-[236px] rounded-smooth-[12px] border bg-popover p-1 text-popover-foreground shadow-[0_8px_30px_rgba(0,0,0,0.18)] outline-none dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)]"
+        // Both shadows end inside the margin: the soft one reaches 8px above, 16px to
+        // the sides and 24px below the surface.
+        className="w-[236px] rounded-smooth-[12px] border bg-popover p-1 text-popover-foreground shadow-[0_1px_2px_rgba(0,0,0,0.06),0_8px_20px_-4px_rgba(0,0,0,0.16)] outline-none dark:shadow-[0_1px_2px_rgba(0,0,0,0.3),0_8px_20px_-4px_rgba(0,0,0,0.5)]"
       >
         <Item icon={<AppWindow />} onSelect={() => send({ type: "open" })}>
           {labels.open}

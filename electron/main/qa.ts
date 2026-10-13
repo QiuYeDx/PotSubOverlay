@@ -22,7 +22,9 @@ type Step =
   | { js: string }
   | { eval: string; file: string }
   | { size: [number, number] }
-  | { trayMenu: true }
+  /** Open (true) or close (false) the tray menu. */
+  | { trayMenu: boolean }
+  | { menuEval: string; file: string }
   | { hotkey: HotkeyAction }
   | { foreground: string | null }
   | { overlayJs: string }
@@ -80,7 +82,16 @@ export async function runQaScript(deps: {
         fs.writeFileSync(path.join(outDir, step.file), JSON.stringify(result, null, 2));
       } else if ("js" in step) await deps.control.activeWin?.webContents.executeJavaScript(step.js);
       else if ("size" in step) deps.control.win?.setSize(step.size[0], step.size[1]);
-      else if ("trayMenu" in step) deps.trayMenu.open(deps.tray.menuState());
+      else if ("trayMenu" in step) {
+        if (step.trayMenu) deps.trayMenu.open(deps.tray.menuState());
+        else deps.trayMenu.hide();
+      } else if ("menuEval" in step) {
+        const result = await deps.trayMenu.win.webContents.executeJavaScript(step.menuEval);
+        fs.writeFileSync(
+          path.join(outDir, step.file),
+          JSON.stringify({ visible: deps.trayMenu.win.isVisible(), result }, null, 2)
+        );
+      }
       else if ("follow" in step) {
         // Playback steps must never reach a player the tester did not open.
         const target = deps.controller.monitor.list().find((i) => i.title.includes(step.follow));
@@ -97,7 +108,7 @@ export async function runQaScript(deps: {
         const result = await deps.overlay.win.webContents.executeJavaScript(step.overlayEval);
         fs.writeFileSync(path.join(outDir, step.file), JSON.stringify(result, null, 2));
       } else if ("quiet" in step) {
-        for (const win of [deps.overlay.win, deps.control.win, deps.control.compactWindow]) {
+        for (const win of [deps.overlay.win, deps.control.win, deps.control.compactWindow, deps.trayMenu.win]) {
           win?.setOpacity(step.quiet ? 0 : 1);
           // A transparent window counts as hidden; keep it rendering so captures stay current.
           win?.webContents.setBackgroundThrottling(!step.quiet && win !== deps.overlay.win);

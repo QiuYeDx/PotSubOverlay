@@ -1,11 +1,12 @@
 import { BrowserWindow, ipcMain, screen, type IpcMainEvent } from "electron";
+import { TRAY_MENU_SHADOW_MARGIN as SHADOW_MARGIN } from "@/shared/defaults";
 import type { TrayMenuAction, TrayMenuState } from "@/shared/types";
 import { disableWindowTransitions } from "../win32/dwmapi";
 import { handleFromBuffer } from "../win32/user32";
 
-/** Transparent margin the renderer leaves around the menu for its shadow. */
-const SHADOW_MARGIN = 10;
 const READY_TIMEOUT_MS = 150;
+/** Longest wait for the page to clear the menu before the window is hidden anyway. */
+const HIDE_TIMEOUT_MS = 250;
 
 export interface TrayMenuWindowOptions {
   preload: string;
@@ -17,12 +18,18 @@ export interface TrayMenuWindowOptions {
  * A styled replacement for the native tray context menu (which Windows does
  * not let us theme). It is a small transparent window, preloaded once and
  * re-positioned next to the cursor each time it opens.
+ *
+ * Windows shows a hidden window's last frame again the moment it reappears,
+ * so the page clears the menu (and paints that) before the window is
+ * hidden: otherwise every open flashed the previous menu before its
+ * entrance animation, as if it opened twice.
  */
 export class TrayMenuWindow {
   readonly win: BrowserWindow;
   private size = { width: 260, height: 300 };
   private anchor = { x: 0, y: 0 };
   private pending: NodeJS.Timeout | null = null;
+  private closing: NodeJS.Timeout | null = null;
 
   constructor(private readonly options: TrayMenuWindowOptions) {
     this.win = new BrowserWindow({
@@ -50,6 +57,7 @@ export class TrayMenuWindow {
     ipcMain.on("tray-menu:ready", this.handleReady);
     ipcMain.on("tray-menu:action", this.handleAction);
     ipcMain.on("tray-menu:close", this.handleClose);
+    ipcMain.on("tray-menu:hidden", this.handleHidden);
   }
 
   /** Render `state`, then show the menu at the cursor once the renderer has measured it. */
@@ -62,24 +70,34 @@ export class TrayMenuWindow {
     this.pending = setTimeout(() => this.present(), READY_TIMEOUT_MS);
   }
 
+  /** Fade the menu out, then hide the window once the empty frame is on screen. */
   hide(): void {
     if (this.pending) {
       clearTimeout(this.pending);
       this.pending = null;
     }
-    if (!this.win.isDestroyed() && this.win.isVisible()) this.win.hide();
+    if (this.win.isDestroyed() || !this.win.isVisible() || this.closing) return;
+    this.win.webContents.send("tray-menu:hide");
+    this.closing = setTimeout(this.finishHide, HIDE_TIMEOUT_MS);
   }
 
   destroy(): void {
     ipcMain.off("tray-menu:ready", this.handleReady);
     ipcMain.off("tray-menu:action", this.handleAction);
     ipcMain.off("tray-menu:close", this.handleClose);
+    ipcMain.off("tray-menu:hidden", this.handleHidden);
+    if (this.closing) clearTimeout(this.closing);
     if (!this.win.isDestroyed()) this.win.destroy();
   }
 
   private present(): void {
     this.pending = null;
     if (this.win.isDestroyed()) return;
+    // Reopened while fading out: keep the window.
+    if (this.closing) {
+      clearTimeout(this.closing);
+      this.closing = null;
+    }
     const { width, height } = this.size;
     const area = screen.getDisplayNearestPoint(this.anchor).workArea;
     // Like the native menu: open up and to the left of the cursor (taskbar
@@ -95,6 +113,12 @@ export class TrayMenuWindow {
     this.win.focus();
     this.win.webContents.send("tray-menu:open");
   }
+
+  private finishHide = (): void => {
+    if (this.closing) clearTimeout(this.closing);
+    this.closing = null;
+    if (!this.win.isDestroyed() && this.win.isVisible()) this.win.hide();
+  };
 
   private fromMenu(event: IpcMainEvent): boolean {
     return !this.win.isDestroyed() && event.sender === this.win.webContents;
@@ -119,5 +143,9 @@ export class TrayMenuWindow {
 
   private handleClose = (event: IpcMainEvent) => {
     if (this.fromMenu(event)) this.hide();
+  };
+
+  private handleHidden = (event: IpcMainEvent) => {
+    if (this.fromMenu(event) && this.closing) this.finishHide();
   };
 }
