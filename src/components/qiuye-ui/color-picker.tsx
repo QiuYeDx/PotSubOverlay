@@ -632,6 +632,7 @@ interface ColorPickerPanelProps {
   panelHeight: number;
   smoothCorners: boolean;
   smoothCornerSmoothing: number;
+  labels: ColorPickerLabels;
 }
 
 function ColorPickerPanel({
@@ -650,6 +651,7 @@ function ColorPickerPanel({
   panelHeight,
   smoothCorners,
   smoothCornerSmoothing,
+  labels,
 }: ColorPickerPanelProps) {
   const [hexInput, setHexInput] = useState(color);
   const [alphaInput, setAlphaInput] = useState(String(alpha));
@@ -785,7 +787,9 @@ function ColorPickerPanel({
       {/* 预设色卡 */}
       {presetColors !== false && presetColors.length > 0 && (
         <div className="space-y-1.5">
-          <p className="text-[11px] font-medium text-muted-foreground">预设</p>
+          <p className="text-[11px] font-medium text-muted-foreground">
+            {labels.presets}
+          </p>
           <div className="grid grid-cols-8 gap-1">
             {presetColors.map((c) => (
               <Swatch
@@ -806,7 +810,7 @@ function ColorPickerPanel({
       {showRecent && recentColors.length > 0 && (
         <div className="space-y-1.5">
           <p className="text-[11px] font-medium text-muted-foreground">
-            最近使用
+            {labels.recent}
           </p>
           <div className="grid grid-cols-8 gap-1">
             {recentColors.map((c) => (
@@ -833,8 +837,8 @@ function ColorPickerPanel({
 
 const TRIGGER_SIZES = {
   sm: "size-7",
-  md: "size-9",
-  lg: "size-11",
+  md: "size-8",
+  lg: "size-9",
 } as const;
 
 /** ColorPicker 组件的属性 */
@@ -930,10 +934,31 @@ export interface ColorPickerProps {
    */
   contentClassName?: string;
   /**
+   * 界面文案（用于国际化），未传入的字段使用 `DEFAULT_COLOR_PICKER_LABELS`
+   */
+  labels?: Partial<ColorPickerLabels>;
+  /**
    * 根容器额外类名
    */
   className?: string;
 }
+
+/** ColorPicker 的界面文案 */
+export interface ColorPickerLabels {
+  /** 预设色卡分组标题 */
+  presets: string;
+  /** 最近使用分组标题 */
+  recent: string;
+  /** popover 触发器的无障碍标签，参数为当前输出的颜色值 */
+  trigger: (color: string) => string;
+}
+
+/** ColorPicker 默认界面文案 */
+export const DEFAULT_COLOR_PICKER_LABELS: ColorPickerLabels = {
+  presets: "预设",
+  recent: "最近使用",
+  trigger: (color) => `当前颜色 ${color}`,
+};
 
 /**
  * ColorPicker — 通用取色器组件
@@ -980,8 +1005,10 @@ export function ColorPicker({
   smoothCornerSmoothing = 0.7,
   triggerClassName,
   contentClassName,
+  labels: labelsProp,
   className,
 }: ColorPickerProps) {
+  const labels = { ...DEFAULT_COLOR_PICKER_LABELS, ...labelsProp };
   const isControlled = controlledValue !== undefined;
 
   const initialParsed = useMemo(
@@ -1086,6 +1113,7 @@ export function ColorPicker({
       panelHeight={panelHeight}
       smoothCorners={smoothCorners}
       smoothCornerSmoothing={smoothCornerSmoothing}
+      labels={labels}
     />
   );
 
@@ -1126,7 +1154,7 @@ export function ColorPicker({
             )}
             style={showAlpha ? undefined : { backgroundColor: color }}
             disabled={disabled}
-            aria-label={`当前颜色 ${outputColor}`}
+            aria-label={labels.trigger(outputColor)}
           >
             {showAlpha && (
               <>

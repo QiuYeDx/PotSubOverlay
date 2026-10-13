@@ -111,5 +111,10 @@
     "toggle_hint": "字幕のオン・オフや PotPlayer が前面に来たときのフェード",
     "off": "オフ"
   },
-  "reset": "外観をデフォルトに戻す"
+  "reset": "外観をデフォルトに戻す",
+  "color_picker": {
+    "presets": "プリセット",
+    "recent": "最近使用した色",
+    "trigger": "現在の色 {{color}}"
+  }
 }

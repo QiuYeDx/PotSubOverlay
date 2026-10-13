@@ -91,7 +91,7 @@ function BottomNavigation() {
             <Button
               key={path}
               variant="ghost"
-              size="sm"
+              size="default"
               onClick={() => navigate(path)}
               className={cn(
                 "relative gap-2 rounded-full text-muted-foreground/70 transition-colors hover:bg-transparent hover:text-foreground dark:hover:bg-transparent",

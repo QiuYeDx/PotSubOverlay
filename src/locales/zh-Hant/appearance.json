@@ -111,5 +111,10 @@
     "toggle_hint": "開關字幕、PotPlayer 切到前景時的淡入淡出",
     "off": "關閉"
   },
-  "reset": "恢復預設外觀"
+  "reset": "恢復預設外觀",
+  "color_picker": {
+    "presets": "預設",
+    "recent": "最近使用",
+    "trigger": "目前顏色 {{color}}"
+  }
 }

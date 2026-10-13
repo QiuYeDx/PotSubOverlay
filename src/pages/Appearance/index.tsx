@@ -60,6 +60,11 @@ function useMotionDemo(lines: DisplayPayload[], trigger: string) {
 
 function Appearance() {
   const { t } = useTranslation();
+  const colorPickerLabels = {
+    presets: t("appearance:color_picker.presets"),
+    recent: t("appearance:color_picker.recent"),
+    trigger: (color: string) => t("appearance:color_picker.trigger", { color }),
+  };
   const settings = useAppStore((s) => s.settings);
   const liveDisplay = useAppStore((s) => s.snapshot.display);
   const roles = useAppStore((s) => s.snapshot.roles);
@@ -187,6 +192,7 @@ function Appearance() {
             </SettingsRow>
             <SettingsRow label={t("appearance:text.color")}>
               <ColorPicker
+                labels={colorPickerLabels}
                 value={text.color}
                 onChange={(color) => updateStyle({ [role]: { color } })}
                 triggerSize="sm"
@@ -266,6 +272,7 @@ function Appearance() {
             </SettingsRow>
             <SettingsRow label={t("appearance:effects.outline_color")}>
               <ColorPicker
+                labels={colorPickerLabels}
                 value={style.outlineColor}
                 onChange={(outlineColor) => updateStyle({ outlineColor })}
                 triggerSize="sm"
@@ -322,6 +329,7 @@ function Appearance() {
               <>
                 <SettingsRow label={t("appearance:background.color")}>
                   <ColorPicker
+                    labels={colorPickerLabels}
                     value={style.backgroundColor}
                     onChange={(backgroundColor) => updateStyle({ backgroundColor })}
                     triggerSize="sm"

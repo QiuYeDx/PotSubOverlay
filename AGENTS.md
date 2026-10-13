@@ -28,6 +28,13 @@ PotSubOverlay：读取 PotPlayer 正在播放的文件与进度，把同名外�
 - QA 中凡是会操作真实 PotPlayer 的脚本，先用 `follow` 步骤锁定自己用 `/new` 打开的测试实例；不要向用户正在使用的播放器发送播放控制。
 - 模板文件在 Windows 上以 CRLF 检出（`core.autocrlf=true`），脚本化的多行替换要考虑行尾。
 
+## UI 组件
+
+- shadcn/ui 使用 `radix-nova` 风格（`radix-ui` 单包），通过 `pnpm dlx shadcn@latest add <name>` 安装；CLI 生成的 `from "cn"` 要改回 `@/lib/utils`（它扩展了 `rounded-smooth` 的合并规则）。
+- 重装组件后要还原的定制：`rounded-*` 改为 `rounded-smooth-*`（`rounded-full`、单侧圆角、`rounded-[inherit]` 与箭头的小圆角除外），ScrollArea 视口加 `[corner-shape:inherit]`，Button 与 Switch 带 `cursor-pointer`，TooltipTrigger 只在 `:focus-visible` 时因聚焦弹出，`sonner.tsx` 从 `@/store/useThemeStore` 取主题（不用 next-themes）。
+- nova 默认值与旧版不同：Popover / Tooltip 内容已改回块级布局；Select 的 `p-1` 在 Viewport 上；SelectTrigger、Switch 等用 `data-[size=sm]:*` 变体设置尺寸，覆盖时要写同一变体；Card 描边是外侧 `ring-1`，紧贴滚动区或 `overflow-hidden` 边缘时要留出 1px。
+- `--radius-2xl` 及以上沿用 Tailwind 默认值，字幕舞台和字幕窗口的 `rounded-smooth-2xl` 依赖它。
+
 ## 前端服务进程
 
 - 如果本次工作启动了 `corepack pnpm dev`、`vite preview`、Electron 进程或其他调试服务，回答结束前必须停止这些进程。

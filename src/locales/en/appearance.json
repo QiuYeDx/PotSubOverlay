@@ -111,5 +111,10 @@
     "toggle_hint": "When subtitles are switched on or off, or PotPlayer comes to the front",
     "off": "Off"
   },
-  "reset": "Restore Default Appearance"
+  "reset": "Restore Default Appearance",
+  "color_picker": {
+    "presets": "Presets",
+    "recent": "Recent",
+    "trigger": "Current color {{color}}"
+  }
 }

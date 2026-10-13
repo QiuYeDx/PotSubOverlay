@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
+import { Slot } from "radix-ui";
 import { smoothCorners, smoothCornersCSS } from "@qiuyedx/smooth-corners";
 import { observe, unobserve } from "@qiuyedx/smooth-corners/observer";
 
@@ -183,7 +183,7 @@ export const SmoothCorners = React.forwardRef<HTMLElement, SmoothCornersProps>(
       };
     }, [disabled, normalizedRadius, normalizedSmoothing, observeSize]);
 
-    const Comp = asChild ? Slot : "div";
+    const Comp = asChild ? Slot.Root : "div";
     const mergedRef = composeRefs<HTMLElement>(localRef, forwardedRef);
 
     return (
