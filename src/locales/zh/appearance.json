@@ -61,8 +61,55 @@
   },
   "motion": {
     "title": "动效",
-    "animation": "切换动画",
-    "animation_hint": "字幕切换时轻微淡入淡出"
+    "description": "字幕切换、出现与消失时的过渡",
+    "preview": "预览",
+    "effect": "切换效果",
+    "effects": {
+      "none": "无",
+      "fade": "淡入淡出",
+      "blur": "模糊",
+      "slide": "滑动",
+      "zoom": "缩放",
+      "wipe": "擦除"
+    },
+    "effect_hints": {
+      "none": "直接换成下一句，没有过渡",
+      "fade": "上一句淡出，下一句淡入",
+      "blur": "下一句从模糊中清晰起来",
+      "slide": "字幕沿所选方向滑入、滑出",
+      "zoom": "下一句由小到大浮现",
+      "wipe": "下一句从左到右逐渐显现"
+    },
+    "enter": "出现时长",
+    "exit": "消失时长",
+    "easing": "缓动",
+    "easings": {
+      "out": "柔和减速",
+      "inOut": "平缓",
+      "linear": "匀速",
+      "spring": "弹性"
+    },
+    "blur": "模糊程度",
+    "direction": "方向",
+    "directions": {
+      "up": "向上",
+      "down": "向下",
+      "left": "向左",
+      "right": "向右"
+    },
+    "distance": "滑动距离",
+    "zoom": "起始大小",
+    "overlap": "切换方式",
+    "overlaps": {
+      "cross": "交叉",
+      "sequential": "先出后入"
+    },
+    "overlap_hint": "先出后入：上一句消失后下一句才出现，会晚一点",
+    "bridge": "合并短暂停顿",
+    "bridge_hint": "两句之间的空白短于这个时长时，上一句保留到下一句出现，不会一闪而过",
+    "toggle": "显示 / 隐藏过渡",
+    "toggle_hint": "开关字幕、PotPlayer 切到前台时的淡入淡出",
+    "off": "关闭"
   },
   "reset": "恢复默认外观"
 }

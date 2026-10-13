@@ -19,13 +19,14 @@ const TOAST_MS = 1300;
 const RECALL_SCALE = 0.82;
 
 /**
- * Chrome drawn over arbitrary game frames: a dark, blurred pill keeps the
- * label readable on both bright and dark scenes.
+ * Chrome drawn over arbitrary game frames: a dark pill keeps the label
+ * readable on both bright and dark scenes. No backdrop blur: the game is in
+ * another window, so there is nothing to blur, and a blur snaps in when an
+ * ancestor's opacity finishes animating.
  */
 const PILL_STYLE = {
-  background: "rgba(22,22,24,0.66)",
+  background: "rgba(22,22,24,0.74)",
   boxShadow: "0 0 0 1px rgba(255,255,255,0.10), 0 4px 16px rgba(0,0,0,0.30)",
-  backdropFilter: "blur(14px) saturate(150%)",
 } as const;
 
 const TOAST_ICONS: Record<OverlayToast["kind"], LucideIcon> = {

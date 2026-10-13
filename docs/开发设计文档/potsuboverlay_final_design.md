@@ -174,3 +174,64 @@ v1.0 把双语写死为“中文 + 日文”。v1.1 改为按“角色”工作�
 - `style.primary.opacity` / `style.secondary.opacity`（默认 1）与 `style.outlineOpacity`（默认 1），旧设置由 `mergeKnown` 补上默认值，无需迁移。
 - 描边是居中的 `-webkit-text-stroke`、画在文字下面，有一半在字形内部：文字不透明时被盖住，半透明时会透出来。只有“描边 > 0 且文字半透明”时改走 `SubtitleView` 的 `SplitFilter`：文字画成纯红、描边画成纯绿，SVG 滤镜按 `通道 + alpha − 1` 拆出文字与描边两层，各自上色和设置不透明度；阴影改用作用于结果的 `drop-shadow`（模糊取一半，与 text-shadow 观感接近）。其余情况沿用原来的 rgba 颜色，默认外观不变。
 - 底板与文字分成两个元素，滤镜不会读到底板颜色。
+
+## v1.3：稳定的过渡与可选动效
+
+目标：字幕显示 / 隐藏、换句、进入 / 退出调整位置时不再闪烁或跳位；字幕切换动效可选择并调参；控制面板的进度条可拖动跳转。
+
+### 闪烁与跳位的根因（1.2.1）
+
+| 现象 | 原因 |
+|---|---|
+| 字幕结束（下一句未开始）时淡出的字幕向下跳一截；一行换两行时交叉过渡底边对不齐 | `SubtitleView` 用 `AnimatePresence mode="popLayout"`：离场元素被改成按 `top` 绝对定位，而容器靠底对齐、高度随新内容变化，离场元素随之移动 |
+| 进入调整位置时字幕在屏幕底部闪现 | 页面在 `overlay:prepare` 后硬切到 0，固定 60ms 后改窗口尺寸；收到新模式时立即恢复不透明度，而 `AnimatePresence mode="wait"` 还在播放旧的字幕层离场——此时窗口已是整屏，字幕层排在屏幕底部 |
+| 退出调整位置时调整界面被压进小窗口闪现、字幕先在旧位置出现再跳到新位置 | 同上的离场动画；且退出时窗口先按进入编辑前的位置恢复，控制器随后才 `applyPlacement` 到刚调整好的位置 |
+| 字幕关闭时进出调整位置，字幕先显示再淡出 | 可见性 = `editing || …`，退出编辑后 `overlay:visible=false` 晚于新模式到达 |
+| 切换到有单独位置的游戏时字幕直接跳位；调整外观时窗口频繁改尺寸 | 位置变化直接 `setBounds`；每次样式变化都重算高度 |
+
+### 隐藏状态下改变窗口（runHidden）
+
+主进程 `OverlayWindow.runHidden(change)`，串行执行：
+
+1. 发送 `overlay:prepare(id)`；页面把根节点淡出（130ms），再等两帧保证全透明的一帧已提交，`invoke("overlay:prepared", id)` 应答（主进程 450ms 超时兜底）。
+2. 主进程执行 `change()`（`setBounds`、鼠标穿透、焦点等）。
+3. 发送带 `reveal: id` 的 `overlay:mode`；页面确认 `innerWidth/innerHeight` 与 `viewport` 一致（最多等 300ms）并再等两帧，才把根节点淡入（220ms）。新的 prepare 会作废尚在等待的 reveal。
+
+使用场景：进入 / 退出调整位置、编辑中换显示器、字幕可见时位置改变（底边或宽度变化）。样式导致的纯高度变化保持底边不动，直接改尺寸；窗口高度按 40px 档位取整，且边界不变时不调用 `setBounds`。
+
+- `OverlayWindow.editing`（请求的模式，供 `isEditing`）与 `shownEditing`（窗口实际所处模式，供 `overlay:mode`）分开，切换过程中连续请求不会错乱。
+- `setEditing(false, placement)`：控制器把退出后的生效位置（`effectivePlacement()`）一并传入，窗口一步到位。
+- `overlay:visible` 只表示实时字幕层是否可见，不再包含编辑状态；编辑界面不受它影响。实时字幕层在编辑模式下保持挂载（`visibility: hidden`），退出时不重播它自己的淡入。
+- 字幕窗口内不使用 `backdrop-filter`：透明窗口取不到后面的游戏画面，且祖先 opacity 动画结束时模糊会突变。
+
+### 换句的结构
+
+`SubtitleView` 根节点为单格 grid（`items-end`），每句占同一格、底对齐、`justify-self: center`：进出的两句互不影响布局，视图底边始终不动。`AnimatePresence` 为 `sync`（交叉）或 `wait`（先出后入）。行元素常驻 `will-change: opacity, transform`，避免过渡结束时文字亚像素跳动。
+
+### 动效设置
+
+`style.motion: SubtitleMotion`（`src/shared/motion.ts` 提供默认值、取值范围、校验与 `motionBleed`）：
+
+| 字段 | 说明 | 默认 |
+|---|---|---|
+| `effect` | `none` / `fade` / `blur` / `slide` / `zoom` / `wipe` | `blur` |
+| `enterMs` / `exitMs` | 0–1000 | 200 / 140 |
+| `easing` | `out` / `inOut` / `linear` / `spring`（弹性只作用于位移与缩放，不透明度、模糊、擦除仍用曲线，避免越界） | `out` |
+| `blur` | 模糊效果的起始半径 1–16px | 4 |
+| `direction` / `distance` | 滑动方向（字幕移动的方向）与距离 2–48px | `up` / 10 |
+| `zoom` | 缩放效果的起始大小 0.6–0.98（离场放大到 `1 + (1 − zoom) / 2`，以底边中点为原点） | 0.92 |
+| `overlap` | `cross` / `sequential` | `cross` |
+| `bridgeMs` | 两句间空白短于此值时保留上一句（渲染层实现，按文本 key 计时），0–500 | 120 |
+| `toggleMs` | 整个字幕层显示 / 隐藏的淡入淡出，0–800（隐藏取 0.8 倍） | 200 |
+
+- 擦除：遮罩为带 18% 柔边的线性渐变，动画驱动 CSS 变量 `--wipe`，结束后移除遮罩；行元素加内边距（并以负外边距抵消）让描边与阴影落在遮罩范围内。
+- 模糊：结束后 `filter` 置为 `none`，文字渲染与无动效时一致。
+- 上 / 下滑动与模糊会画到字幕底边以下：主进程按 `motionBleed` 在窗口底部多留空间（`bottomInset`，受屏幕下沿限制），页面相应增加底部内边距，字幕位置不变。
+- 系统「减少动态效果」不再覆盖换句动效：它是应用内的显式选择（「无」即关闭），而很多游戏电脑为了性能关闭了 Windows 动画效果，开发机即如此，1.2.1 的切换动画因此一直未生效。
+- 设置版本升到 4：`style.animation === false` 迁移为 `style.motion = { effect: "none" }`，其余字段由 `mergeKnown` 补默认值并经 `sanitizeMotion` 校验。
+
+### 进度条跳转
+
+- `SeekBar`（`src/components/app/SeekBar.tsx`）：点击 / 拖动，松开时 `player:seek` → `Controller.seekToTime`（复用 `seekTo` 的落点检查，限制在 `时长 − 1s` 内）。拖动期间不发送跳转。
+- 跳转后进度条停在目标处，直到播放器报告的位置与目标相差 < 1.5s 或 2.5s 超时，避免 PotPlayer 跳转期间的旧读数让进度条弹回。
+- 播放页放在预览与信息栏的分界线上；简洁模式放在预览底部（`app-region-no-drag`）。焦点下 ← / → 按 `seekStepMs` 调整。

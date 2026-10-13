@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useTranslation } from "react-i18next";
 import { Eye, EyeOff, FilePlus2, FolderOpen, Move, RefreshCw, Upload } from "lucide-react";
 import { MiddleTruncate } from "@/components/app/MiddleTruncate";
+import { SeekBar } from "@/components/app/SeekBar";
 import { SubtitleStage } from "@/components/app/SubtitleStage";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -21,6 +22,7 @@ function Player() {
   const settings = useAppStore((s) => s.settings);
   const updateSettings = useAppStore((s) => s.updateSettings);
   const setEditing = useAppStore((s) => s.setEditing);
+  const seek = useAppStore((s) => s.seek);
   const addFile = useAppStore((s) => s.addFile);
   const [dragging, setDragging] = useState(false);
   const stage = useStageState();
@@ -28,7 +30,6 @@ function Player() {
   const active = snapshot.instances.find((instance) => instance.id === snapshot.activeId) ?? null;
   const mediaName = active?.mediaPath ? baseName(active.mediaPath) : null;
   const folder = active?.mediaPath ? baseName(dirName(active.mediaPath)) : null;
-  const progress = active && active.durationMs > 0 ? active.positionMs / active.durationMs : 0;
   const canDrop = Boolean(active?.mediaPath);
 
   const onDrop = (event: DragEvent) => {
@@ -100,6 +101,17 @@ function Player() {
           </AnimatePresence>
         </SubtitleStage>
 
+        {/* On the edge between the preview and the details, like a video player's scrubber. */}
+        <SeekBar
+          className="z-10 -my-2"
+          positionMs={active?.positionMs ?? 0}
+          durationMs={active?.durationMs ?? 0}
+          stepMs={settings.seekStepMs}
+          disabled={!active}
+          label={t("player:seek")}
+          onSeek={seek}
+        />
+
         <div className="flex items-center gap-4 px-5 py-3.5">
           <div className="min-w-0 flex-1">
             {mediaName ? (
@@ -121,12 +133,6 @@ function Player() {
               {formatTime(active.durationMs)}
             </div>
           ) : null}
-        </div>
-        <div className="h-[3px] bg-muted">
-          <div
-            className="h-full bg-foreground/70 transition-[width] duration-200 ease-linear"
-            style={{ width: `${Math.min(100, progress * 100)}%` }}
-          />
         </div>
       </section>
 

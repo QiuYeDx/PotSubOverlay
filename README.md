@@ -24,8 +24,9 @@
   - 按“主语言 / 第二语言”工作：主语言可在设置中选择（默认中文），默认在上方，可切换顺序；可选择 **双语 / 仅主语言 / 仅第二语言**，界面上直接显示语言名；
   - 主语言与第二语言分别设置字体（默认按语言自动选择）、字号、字重、颜色。
 - **不打扰游戏**：字幕窗口透明、置顶、鼠标点击穿透、不抢焦点；PotPlayer 在前台时自动隐藏，避免和播放器自带字幕重复。
-- **游戏中控制播放**：不用切回 PotPlayer，用快捷键暂停 / 继续、后退 / 前进、**重听这一句**（按字幕时间轴跳回这句开头，连按继续往前）。
+- **游戏中控制播放**：不用切回 PotPlayer，用快捷键暂停 / 继续、后退 / 前进、**重听这一句**（按字幕时间轴跳回这句开头，连按继续往前）；在控制面板里也可以直接点击或拖动进度条跳转。
 - **回看错过的字幕**：按一下把上一句临时显示在当前字幕上方，连按继续往前；播放页还有可点击跳转的「最近字幕」列表。
+- **可选的切换动效**：淡入淡出、模糊、滑动（上 / 下 / 左 / 右）、缩放、擦除或无动画，时长、缓动、模糊程度、滑动距离等都可以调，改动时预览区会立即演示；两句之间的短暂停顿可以合并，字幕不会一闪而过。
 - **随手调整**：进入编辑模式直接拖动字幕位置、拉伸宽度，带居中吸附；位置按显示器比例保存，支持多显示器。
 - **每个游戏一个位置**：不同游戏的界面布局不同，调整位置时可以只为当前游戏保存，它在前台时自动使用，切到其他程序时恢复默认位置。
 - **为真实字幕而做**：过滤 ASS 中的定位特效与屏幕字；YouTube 机翻字幕的“滚动重复行”自动去重。
@@ -116,7 +117,7 @@ corepack pnpm icons:build
 
 发布或合入用户可见的改动时请更新 [CHANGELOG.md](CHANGELOG.md)（格式见 [docs/CHANGELOG_TEMPLATE.md](docs/CHANGELOG_TEMPLATE.md)），`check` 会检查当前版本是否有对应条目。
 
-开发调试时可以设置环境变量 `POTSUB_FAKE_PLAYER="<媒体路径>|<起始毫秒>|<时长毫秒>|<模式>"`（后两项可省略；模式 `hold` 让进度停在起始位置，便于截图，`keyframe` 模拟按关键帧跳转），用模拟播放器代替 PotPlayer；`POTSUB_QA_SCRIPT` 可以驱动窗口截图做视觉验收（见 `electron/main/qa.ts`）。
+开发调试时可以设置环境变量 `POTSUB_FAKE_PLAYER="<媒体路径>|<起始毫秒>|<时长毫秒>|<模式>"`（后两项可省略；模式 `hold` 让进度停在起始位置，便于截图，`keyframe` 模拟按关键帧跳转），用模拟播放器代替 PotPlayer；`POTSUB_QA_SCRIPT` 可以驱动窗口截图做视觉验收（见 `electron/main/qa.ts`）；`POTSUB_USER_DATA` 指定单独的设置目录，与已安装、正在使用的 PotSubOverlay 互不影响。
 
 技术栈：Electron 41 · React 19 · TypeScript · Vite · Tailwind CSS 4 · shadcn/ui · [qiuye-ui](https://ui.qiuyedx.com/) · Motion · Zustand · i18next · koffi，基于 [qiuye-electron-template](https://github.com/QiuYeDx/qiuye-electron-template)（`electron-modern`）。
 

@@ -266,8 +266,9 @@ export class Controller extends EventEmitter<{ roles: [] }> {
         Boolean(this.editApp && settings.placementProfiles[this.editApp])
       );
     }
-    await this.overlay.setEditing(editing);
-    if (!editing) this.applyPlacement();
+    // Leaving: hand over the position just edited (or the program's own), so
+    // the subtitles reappear there instead of jumping after they faded in.
+    await this.overlay.setEditing(editing, editing ? undefined : this.effectivePlacement());
     this.refreshVisibility();
     this.markDirty(true);
   }
@@ -307,6 +308,16 @@ export class Controller extends EventEmitter<{ roles: [] }> {
     if (action === "playPause") this.togglePlay();
     else if (action === "replayLine") this.replayLine();
     else this.seekBy(action === "seekForward" ? 1 : -1);
+  }
+
+  /** Jump to a time picked on the control panel's progress bar. */
+  seekToTime(positionMs: number): void {
+    const active = this.monitor.active();
+    if (!active) return;
+    const max = active.durationMs > 0 ? Math.max(0, active.durationMs - 1000) : Number.MAX_SAFE_INTEGER;
+    this.lastSeek = null;
+    this.lastReplay = null;
+    this.seekTo(clamp(positionMs, 0, max));
   }
 
   /** Play from a subtitle line, e.g. one picked from the recent-lines list. */
@@ -564,12 +575,16 @@ export class Controller extends EventEmitter<{ roles: [] }> {
     return settings.autoPlacement && app && settings.placementProfiles[app] ? app : null;
   }
 
+  private effectivePlacement(): OverlayPlacement {
+    const app = this.placementApp();
+    const settings = this.settings.get();
+    return app ? settings.placementProfiles[app].placement : settings.placement;
+  }
+
   private applyPlacement(): void {
     // While editing, the edit surface owns the position.
     if (this.overlay.isEditing) return;
-    const app = this.placementApp();
-    const settings = this.settings.get();
-    this.overlay.setPlacement(app ? settings.placementProfiles[app].placement : settings.placement);
+    this.overlay.setPlacement(this.effectivePlacement());
   }
 
   private refreshDisplay(): void {
@@ -590,10 +605,9 @@ export class Controller extends EventEmitter<{ roles: [] }> {
     return false;
   }
 
+  /** Whether the live subtitles are shown; the edit surface shows regardless. */
   private refreshVisibility(): void {
-    const visible =
-      this.overlay.isEditing || (this.settings.get().overlayVisible && !this.isSuppressed());
-    this.overlay.setVisible(visible);
+    this.overlay.setVisible(this.settings.get().overlayVisible && !this.isSuppressed());
   }
 
   private hotkeyHandlers(): Record<HotkeyAction, () => void> {

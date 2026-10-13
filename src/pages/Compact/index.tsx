@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Eye, EyeOff, Maximize2, Move, Pause, Play, X } from "lucide-react";
 import { MiddleTruncate } from "@/components/app/MiddleTruncate";
+import { SeekBar } from "@/components/app/SeekBar";
 import { SubtitleStage } from "@/components/app/SubtitleStage";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -55,7 +56,7 @@ function Compact() {
   const playback = useAppStore((s) => s.playback);
   const active = useActiveInstance();
   const stage = useStageState();
-  const progress = active && active.durationMs > 0 ? active.positionMs / active.durationMs : 0;
+  const seek = useAppStore((s) => s.seek);
   const playLabel = active?.state === "playing" ? t("player:transport.pause") : t("player:transport.play");
 
   return (
@@ -66,7 +67,7 @@ function Compact() {
         placement={settings.placement}
         minScale={0.34}
         maxScale={0.42}
-        className="min-h-0 flex-1 rounded-xl [--stage-pad:12px]"
+        className="min-h-0 flex-1 rounded-xl [--stage-pad:20px]"
         placeholder={stage.placeholder}
       >
         <div className="absolute inset-x-2 top-2 flex items-center gap-2">
@@ -109,12 +110,16 @@ function Compact() {
             </button>
           </div>
         </div>
-        <div className="absolute inset-x-0 bottom-0 h-[2px] bg-white/10">
-          <div
-            className="h-full bg-white/60 transition-[width] duration-200 ease-linear"
-            style={{ width: `${Math.min(100, progress * 100)}%` }}
-          />
-        </div>
+        <SeekBar
+          tone="stage"
+          className="app-region-no-drag absolute inset-x-3 bottom-0.5"
+          positionMs={active?.positionMs ?? 0}
+          durationMs={active?.durationMs ?? 0}
+          stepMs={settings.seekStepMs}
+          disabled={!active}
+          label={t("player:seek")}
+          onSeek={seek}
+        />
       </SubtitleStage>
 
       <div className="app-region-no-drag flex h-8 shrink-0 items-center gap-1.5">

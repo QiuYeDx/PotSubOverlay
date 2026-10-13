@@ -32,6 +32,10 @@ if (process.platform === "win32") {
   app.setAppUserModelId("com.qiuyedx.potsuboverlay");
 }
 
+// Development only: a separate profile (settings and single-instance lock),
+// so QA runs never touch, or yield to, an installed copy in use.
+if (process.env.POTSUB_USER_DATA) app.setPath("userData", process.env.POTSUB_USER_DATA);
+
 if (!app.requestSingleInstanceLock()) {
   app.quit();
   process.exit(0);

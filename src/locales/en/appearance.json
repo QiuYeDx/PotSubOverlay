@@ -61,8 +61,55 @@
   },
   "motion": {
     "title": "Motion",
-    "animation": "Transitions",
-    "animation_hint": "Gently fade between subtitle lines"
+    "description": "Transitions as lines change, appear and disappear",
+    "preview": "Preview",
+    "effect": "Transition",
+    "effects": {
+      "none": "None",
+      "fade": "Fade",
+      "blur": "Blur",
+      "slide": "Slide",
+      "zoom": "Zoom",
+      "wipe": "Wipe"
+    },
+    "effect_hints": {
+      "none": "Switch to the next line instantly",
+      "fade": "The old line fades out as the new one fades in",
+      "blur": "The new line comes into focus",
+      "slide": "Lines slide in and out in the chosen direction",
+      "zoom": "The new line grows into place",
+      "wipe": "The new line is revealed from left to right"
+    },
+    "enter": "In duration",
+    "exit": "Out duration",
+    "easing": "Easing",
+    "easings": {
+      "out": "Ease out",
+      "inOut": "Ease in-out",
+      "linear": "Linear",
+      "spring": "Spring"
+    },
+    "blur": "Blur amount",
+    "direction": "Direction",
+    "directions": {
+      "up": "Up",
+      "down": "Down",
+      "left": "Left",
+      "right": "Right"
+    },
+    "distance": "Distance",
+    "zoom": "Starting size",
+    "overlap": "Order",
+    "overlaps": {
+      "cross": "Overlap",
+      "sequential": "One by one"
+    },
+    "overlap_hint": "One by one: the new line waits until the old one is gone, so it shows a little later",
+    "bridge": "Bridge short pauses",
+    "bridge_hint": "When the gap between two lines is shorter than this, the old line stays until the next one arrives instead of blinking out",
+    "toggle": "Show / hide fade",
+    "toggle_hint": "When subtitles are switched on or off, or PotPlayer comes to the front",
+    "off": "Off"
   },
   "reset": "Restore Default Appearance"
 }

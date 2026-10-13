@@ -4,6 +4,7 @@ import path from "node:path";
 import { app } from "electron";
 import { DEFAULT_SETTINGS } from "@/shared/defaults";
 import { isSubtitleLang } from "@/shared/languages";
+import { sanitizeMotion } from "@/shared/motion";
 import { isPlainObject, migrateSettings, SETTINGS_VERSION } from "./settings-migrate";
 import type { MediaPrefs, OverlayPlacement, PlacementProfile, Settings } from "@/shared/types";
 
@@ -79,6 +80,7 @@ function sanitize(settings: Settings): Settings {
       primary: { ...settings.style.primary, opacity: finite(settings.style.primary.opacity, 0, 1) ?? 1 },
       secondary: { ...settings.style.secondary, opacity: finite(settings.style.secondary.opacity, 0, 1) ?? 1 },
       outlineOpacity: finite(settings.style.outlineOpacity, 0, 1) ?? 1,
+      motion: sanitizeMotion(settings.style.motion),
     },
   };
 }

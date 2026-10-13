@@ -130,6 +130,24 @@ export const SAMPLE_TEXT: Record<SubtitleLang, string> = {
   other: "Sample subtitle",
 };
 
+/** The line that follows SAMPLE_TEXT, for previewing transitions between lines. */
+export const SAMPLE_TEXT_NEXT: Record<SubtitleLang, string> = {
+  zh: "一个只讲一次的故事",
+  ja: "一度きりの物語です",
+  ko: "단 한 번뿐인 이야기입니다",
+  en: "a story told only once",
+  fr: "une histoire racontée une seule fois",
+  de: "eine Geschichte, die nur einmal erzählt wird",
+  es: "una historia que se cuenta una sola vez",
+  pt: "uma história contada uma única vez",
+  it: "una storia raccontata una volta sola",
+  ru: "история, которую расскажут лишь однажды",
+  th: "เรื่องราวที่จะเล่าเพียงครั้งเดียว",
+  vi: "một câu chuyện chỉ kể một lần",
+  ar: "قصة لا تُروى إلا مرة واحدة",
+  other: "Another sample subtitle",
+};
+
 export function isSubtitleLang(value: unknown): value is SubtitleLang {
   return value === "other" || (SUBTITLE_LANGS as readonly unknown[]).includes(value);
 }

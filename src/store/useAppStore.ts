@@ -69,6 +69,7 @@ interface AppStore {
   nudgeOffset: (direction: 1 | -1) => void;
   playback: (action: PlaybackAction) => void;
   playLine: (startMs: number) => void;
+  seek: (positionMs: number) => void;
   removePlacementProfile: (app: string) => void;
   setEditing: (editing: boolean) => void;
   commitPlacement: (placement: OverlayPlacement) => void;
@@ -140,6 +141,7 @@ const useAppStore = create<AppStore>((set, get) => ({
   nudgeOffset: (direction) => void invoke("subtitle:nudge", direction),
   playback: (action) => void invoke("player:control", action),
   playLine: (startMs) => void invoke("player:play-line", startMs),
+  seek: (positionMs) => void invoke("player:seek", positionMs),
   removePlacementProfile: (app) => void invoke("placement:remove-profile", app),
   setEditing: (editing) => void invoke("overlay:set-editing", editing),
   commitPlacement: (placement) => void invoke("overlay:commit-placement", placement),

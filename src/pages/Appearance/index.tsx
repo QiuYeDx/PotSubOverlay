@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RotateCcw } from "lucide-react";
 import { FontPicker } from "@/components/app/FontPicker";
@@ -8,13 +8,55 @@ import { ValueSlider } from "@/components/app/ValueSlider";
 import { ColorPicker } from "@/components/qiuye-ui/color-picker";
 import { SegmentedControl } from "@/components/qiuye-ui/segmented-control";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import useLanguageName from "@/hooks/useLanguageName";
-import { RECOMMENDED_FONTS, SAMPLE_TEXT, type SubtitleLang } from "@/shared/languages";
+import { RECOMMENDED_FONTS, SAMPLE_TEXT, SAMPLE_TEXT_NEXT, type SubtitleLang } from "@/shared/languages";
 import type { DisplayPayload, LangOrder, LangRole } from "@/shared/types";
 import useAppStore from "@/store/useAppStore";
+import { MotionGroup } from "./MotionGroup";
 
 const WEIGHTS = [400, 500, 600, 700, 900];
+const EMPTY_DISPLAY: DisplayPayload = { key: "", blocks: [] };
+
+/**
+ * Plays a short sequence in the preview (line, next line, a pause, line
+ * again) so a transition can be seen without anything playing. Runs on
+ * demand and, debounced, whenever a transition setting changes.
+ */
+function useMotionDemo(lines: DisplayPayload[], trigger: string) {
+  const [frame, setFrame] = useState<DisplayPayload | null>(null);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const lastTrigger = useRef(trigger);
+
+  const stop = () => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+  };
+
+  const play = (delay = 0) => {
+    stop();
+    const [first, second] = lines;
+    // Pauses are longer than the longest gap bridging, so every step is seen.
+    const steps: [DisplayPayload | null, number][] = [
+      [EMPTY_DISPLAY, delay],
+      [first, delay + 650],
+      [second, delay + 2050],
+      [EMPTY_DISPLAY, delay + 3450],
+      [first, delay + 4200],
+      [null, delay + 5600],
+    ];
+    timers.current = steps.map(([display, at]) => setTimeout(() => setFrame(display), at));
+  };
+
+  useEffect(() => {
+    if (lastTrigger.current === trigger) return;
+    lastTrigger.current = trigger;
+    play(300);
+  }, [trigger]);
+
+  useEffect(() => stop, []);
+
+  return { frame, play: () => play() };
+}
 
 function Appearance() {
   const { t } = useTranslation();
@@ -44,8 +86,18 @@ function Appearance() {
     };
   }, [settings.langOrder, primaryLang, secondaryLang]);
 
+  const nextSample: DisplayPayload = useMemo(() => {
+    const primary = { lang: primaryLang, role: "primary" as const, lines: [SAMPLE_TEXT_NEXT[primaryLang]] };
+    const secondary = { lang: secondaryLang, role: "secondary" as const, lines: [SAMPLE_TEXT_NEXT[secondaryLang]] };
+    return {
+      key: `${sample.key}-next`,
+      blocks: settings.langOrder === "primary-first" ? [primary, secondary] : [secondary, primary],
+    };
+  }, [sample.key, settings.langOrder, primaryLang, secondaryLang]);
+  const demo = useMotionDemo([sample, nextSample], JSON.stringify(style.motion));
+
   const hasLive = liveDisplay.blocks.length > 0;
-  const display = source === "live" && hasLive ? liveDisplay : sample;
+  const display = demo.frame ?? (source === "live" && hasLive ? liveDisplay : sample);
 
   return (
     <div className="mx-auto flex max-w-[940px] flex-col gap-5 px-6 pb-[92px] pt-1">
@@ -57,7 +109,7 @@ function Appearance() {
           minScale={0.62}
           maxScale={0.9}
           className="h-[176px]"
-          placeholder={t("appearance:preview.silent")}
+          placeholder={demo.frame ? null : t("appearance:preview.silent")}
         >
           <div className="absolute top-3 right-3">
             <SegmentedControl
@@ -289,17 +341,7 @@ function Appearance() {
             ) : null}
           </SettingsGroup>
 
-          <SettingsGroup title={t("appearance:motion.title")}>
-            <SettingsRow
-              label={t("appearance:motion.animation")}
-              description={t("appearance:motion.animation_hint")}
-            >
-              <Switch
-                checked={style.animation}
-                onCheckedChange={(animation) => updateStyle({ animation })}
-              />
-            </SettingsRow>
-          </SettingsGroup>
+          <MotionGroup onPreview={demo.play} />
 
           <div className="flex justify-end">
             <Button

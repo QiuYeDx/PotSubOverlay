@@ -26,6 +26,11 @@ type Step =
   | { hotkey: HotkeyAction }
   | { foreground: string | null }
   | { overlayJs: string }
+  | { overlayEval: string; file: string }
+  /** Make the app's windows fully transparent on screen (pages still render and can be captured). */
+  | { quiet: boolean }
+  /** Seek the followed player, as the progress bar does. */
+  | { seek: number }
   /** Follow the PotPlayer window whose title contains this text, or stop the script. */
   | { follow: string }
   | { quit: true };
@@ -88,6 +93,16 @@ export async function runQaScript(deps: {
       } else if ("hotkey" in step) deps.controller.runHotkey(step.hotkey);
       else if ("foreground" in step) deps.controller.simulateForeground(step.foreground);
       else if ("overlayJs" in step) await deps.overlay.win.webContents.executeJavaScript(step.overlayJs);
+      else if ("overlayEval" in step) {
+        const result = await deps.overlay.win.webContents.executeJavaScript(step.overlayEval);
+        fs.writeFileSync(path.join(outDir, step.file), JSON.stringify(result, null, 2));
+      } else if ("quiet" in step) {
+        for (const win of [deps.overlay.win, deps.control.win]) {
+          win?.setOpacity(step.quiet ? 0 : 1);
+          // A transparent window counts as hidden; keep it rendering so captures stay current.
+          win?.webContents.setBackgroundThrottling(!step.quiet && win !== deps.overlay.win);
+        }
+      } else if ("seek" in step) deps.controller.seekToTime(step.seek);
       else if ("quit" in step) app.quit();
     } catch (error) {
       log(`error: ${String(error)}`);

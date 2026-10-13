@@ -47,6 +47,9 @@ export function registerIpc(deps: {
   ipcMain.handle("player:control", (_event, action: PlaybackAction) => {
     if (PLAYBACK_ACTIONS.includes(action)) controller.playback(action);
   });
+  ipcMain.handle("player:seek", (_event, positionMs: number) => {
+    if (typeof positionMs === "number" && Number.isFinite(positionMs)) controller.seekToTime(positionMs);
+  });
   ipcMain.handle("player:play-line", (_event, startMs: number) => {
     if (typeof startMs === "number" && Number.isFinite(startMs)) controller.playFromLine(startMs);
   });

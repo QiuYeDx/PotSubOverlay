@@ -253,9 +253,8 @@ function ScopeBar({
       <div
         className="flex items-center gap-2 rounded-xl py-1 pr-1 pl-3 text-white"
         style={{
-          background: "rgba(28,28,30,0.82)",
+          background: "rgba(28,28,30,0.9)",
           boxShadow: "0 0 0 1px rgba(255,255,255,0.10), 0 8px 28px rgba(0,0,0,0.40)",
-          backdropFilter: "blur(20px) saturate(160%)",
         }}
       >
         <span className="text-[12px] text-white/60">{strings.scope}</span>
@@ -324,9 +323,8 @@ function Toolbar(props: {
     <motion.div
       className="absolute top-8 left-1/2 flex -translate-x-1/2 items-center gap-4 rounded-2xl py-2.5 pr-2.5 pl-5 text-white"
       style={{
-        background: "rgba(28,28,30,0.82)",
+        background: "rgba(28,28,30,0.9)",
         boxShadow: "0 0 0 1px rgba(255,255,255,0.10), 0 12px 40px rgba(0,0,0,0.45)",
-        backdropFilter: "blur(20px) saturate(160%)",
       }}
       initial={{ y: -12, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}

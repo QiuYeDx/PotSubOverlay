@@ -2,7 +2,7 @@ export function isPlainObject(value: unknown): value is Record<string, unknown> 
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-export const SETTINGS_VERSION = 3;
+export const SETTINGS_VERSION = 4;
 
 /**
  * Settings history:
@@ -10,6 +10,8 @@ export const SETTINGS_VERSION = 3;
  * - v2 (unreleased) styles the primary and secondary language instead.
  * - v3 (1.1.0) moves the text-size and outline defaults; values still at the
  *   1.0 defaults were never chosen by the user, so they follow the new ones.
+ * - v4 (1.3.0) replaces the on/off `style.animation` with `style.motion`;
+ *   transitions that were turned off stay off.
  */
 export function migrateSettings(raw: unknown): unknown {
   if (!isPlainObject(raw)) return raw;
@@ -40,7 +42,7 @@ export function migrateSettings(raw: unknown): unknown {
     }
   }
 
-  if (style) {
+  if (style && version < 3) {
     const primary = isPlainObject(style.primary) ? { ...style.primary } : null;
     const secondary = isPlainObject(style.secondary) ? { ...style.secondary } : null;
     if (primary && primary.fontSize === 34) primary.fontSize = 30;
@@ -48,7 +50,13 @@ export function migrateSettings(raw: unknown): unknown {
     if (style.outlineWidth === 3) style.outlineWidth = 1.5;
     if (primary) style.primary = primary;
     if (secondary) style.secondary = secondary;
-    next.style = style;
   }
+
+  if (style && version < 4) {
+    if (style.animation === false && !isPlainObject(style.motion)) style.motion = { effect: "none" };
+    delete style.animation;
+  }
+
+  if (style) next.style = style;
   return next;
 }

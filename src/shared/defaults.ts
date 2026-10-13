@@ -1,3 +1,4 @@
+import { DEFAULT_MOTION } from "./motion";
 import type { HotkeyAction, OverlayPlacement, OverlayStyle, Settings } from "./types";
 
 export const DEFAULT_STYLE: OverlayStyle = {
@@ -26,7 +27,7 @@ export const DEFAULT_STYLE: OverlayStyle = {
   lineGap: 2,
   blockGap: 6,
   letterSpacing: 0.5,
-  animation: true,
+  motion: DEFAULT_MOTION,
 };
 
 export const DEFAULT_PLACEMENT: OverlayPlacement = {
@@ -61,7 +62,7 @@ export const HOTKEY_GROUPS: { key: "subtitle" | "playback"; actions: HotkeyActio
 export const HOTKEY_ACTIONS: HotkeyAction[] = HOTKEY_GROUPS.flatMap((group) => group.actions);
 
 export const DEFAULT_SETTINGS: Settings = {
-  version: 3,
+  version: 4,
   primaryLang: "zh",
   langMode: "both",
   langOrder: "primary-first",

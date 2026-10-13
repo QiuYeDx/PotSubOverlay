@@ -1,8 +1,9 @@
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useId, type CSSProperties } from "react";
+import { AnimatePresence, motion as m } from "motion/react";
+import { useEffect, useId, useReducer, useRef, type CSSProperties } from "react";
 import { FONT_STACK, HTML_LANG } from "@/shared/languages";
 import type { DisplayPayload, LangRole, OverlayStyle, SubtitleLang } from "@/shared/types";
 import { cn } from "@/lib/utils";
+import { lineMotion } from "./line-motion";
 
 function hexToRgb(hex: string): [number, number, number] {
   const value = hex.replace("#", "");
@@ -114,17 +115,50 @@ export interface SubtitleViewProps {
   style: OverlayStyle;
   /** Scales every size, used by the control panel previews. */
   scale?: number;
+  /** false: switch lines without a transition (the edit surface's static sample). */
   animate?: boolean;
   className?: string;
 }
 
 /**
+ * Keeps the previous line up through a pause shorter than `holdMs`, so two
+ * lines with a tiny gap between them change in place instead of blinking out.
+ */
+function useBridgedDisplay(display: DisplayPayload, holdMs: number): DisplayPayload {
+  const lastLine = useRef<DisplayPayload | null>(null);
+  const [, rerender] = useReducer((n: number) => n + 1, 0);
+  const empty = display.blocks.length === 0;
+
+  // Keyed by the text, not the object: the control panel gets a new object with every snapshot.
+  useEffect(() => {
+    if (!empty) {
+      lastLine.current = display;
+      return;
+    }
+    if (!lastLine.current || holdMs <= 0) return;
+    const timer = setTimeout(() => {
+      lastLine.current = null;
+      rerender();
+    }, holdMs);
+    return () => clearTimeout(timer);
+  }, [display.key, empty, holdMs]);
+
+  if (!empty || holdMs <= 0) return display;
+  return lastLine.current ?? display;
+}
+
+/**
  * Renders subtitle blocks exactly like the overlay does; each block is styled
  * by its role (primary / secondary language).
+ *
+ * Lines are stacked in one grid cell aligned to the bottom, so a leaving
+ * line stays exactly where it was while the next one comes in, whatever
+ * their heights; the view's bottom edge never moves.
  */
-export function SubtitleView({ display, style, scale = 1, animate, className }: SubtitleViewProps) {
-  const reduceMotion = useReducedMotion();
-  const shouldAnimate = (animate ?? style.animation) && !reduceMotion;
+export function SubtitleView({ display, style, scale = 1, animate = true, className }: SubtitleViewProps) {
+  const motion = style.motion;
+  const shown = useBridgedDisplay(display, animate ? motion.bridgeMs : 0);
+  const line = lineMotion(animate ? motion : { ...motion, effect: "none" }, scale);
   const boxed = style.background === "box";
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const filterIds: Record<LangRole, string | undefined> = {
@@ -133,7 +167,7 @@ export function SubtitleView({ display, style, scale = 1, animate, className }: 
   };
 
   return (
-    <div className={cn("relative flex w-full flex-col items-center justify-end", className)}>
+    <div className={cn("relative grid w-full items-end justify-items-center", className)}>
       {filterIds.primary || filterIds.secondary ? (
         <svg aria-hidden width="0" height="0" className="pointer-events-none absolute">
           <defs>
@@ -144,22 +178,23 @@ export function SubtitleView({ display, style, scale = 1, animate, className }: 
           </defs>
         </svg>
       ) : null}
-      <AnimatePresence mode="popLayout" initial={false}>
-        {display.blocks.length > 0 ? (
-          <motion.div
-            key={display.key}
-            className="flex w-full flex-col items-center text-center"
-            style={{ gap: style.blockGap * scale }}
-            initial={shouldAnimate ? { opacity: 0, filter: "blur(3px)", y: 3 * scale } : false}
-            animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-            exit={
-              shouldAnimate
-                ? { opacity: 0, filter: "blur(2px)", transition: { duration: 0.12, ease: "easeOut" } }
-                : { opacity: 0, transition: { duration: 0 } }
-            }
-            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+      <AnimatePresence mode={motion.overlap === "sequential" ? "wait" : "sync"} initial={false}>
+        {shown.blocks.length > 0 ? (
+          <m.div
+            key={shown.key}
+            className="col-start-1 row-start-1 flex max-w-full flex-col items-center text-center"
+            style={{
+              gap: style.blockGap * scale,
+              // Stay on one compositor layer, so the text does not shift by a
+              // subpixel when a transition ends.
+              willChange: "opacity, transform",
+              ...line.style,
+            }}
+            initial={line.initial}
+            animate={line.animate}
+            exit={line.exit}
           >
-            {display.blocks.map((block, index) => (
+            {shown.blocks.map((block, index) => (
               <div
                 key={`${block.lang}-${index}`}
                 lang={HTML_LANG[block.lang]}
@@ -167,12 +202,12 @@ export function SubtitleView({ display, style, scale = 1, animate, className }: 
                 className="flex w-full flex-col items-center"
                 style={{ gap: style.lineGap * scale }}
               >
-                {block.lines.map((line, lineIndex) => {
+                {block.lines.map((text, lineIndex) => {
                   const css = lineCss(block.lang, block.role, style, scale, filterIds[block.role]);
                   if (!boxed) {
                     return (
                       <span key={lineIndex} className="max-w-full whitespace-pre-wrap break-words" style={css}>
-                        {line}
+                        {text}
                       </span>
                     );
                   }
@@ -188,14 +223,14 @@ export function SubtitleView({ display, style, scale = 1, animate, className }: 
                       }}
                     >
                       <span className="block whitespace-pre-wrap break-words" style={css}>
-                        {line}
+                        {text}
                       </span>
                     </span>
                   );
                 })}
               </div>
             ))}
-          </motion.div>
+          </m.div>
         ) : null}
       </AnimatePresence>
     </div>

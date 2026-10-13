@@ -1,6 +1,7 @@
 import iconv from "iconv-lite";
 import { describe, expect, it } from "vitest";
 import { composeDisplay, resolveRoles } from "./compose";
+import { DEFAULT_MOTION, MOTION_LIMITS, motionBleed, sanitizeMotion } from "@/shared/motion";
 import { migrateSettings } from "../settings-migrate";
 import { decodeSubtitle } from "./decode";
 import { matchSubtitleFiles, parseLangHint } from "./finder";
@@ -361,10 +362,40 @@ describe("other languages", () => {
         outlineWidth: 2,
       },
     }) as Record<string, any>;
-    expect(migrated.version).toBe(3);
+    expect(migrated.version).toBe(4);
     expect(migrated.style.primary.fontSize).toBe(30);
     expect(migrated.style.secondary.fontSize).toBe(28);
     expect(migrated.style.outlineWidth).toBe(2);
+  });
+
+  it("keeps 1.1 text sizes the user chose and carries transitions over to 1.3", () => {
+    const migrated = migrateSettings({
+      version: 3,
+      style: {
+        primary: { fontFamily: "", fontSize: 34, fontWeight: 600, color: "#FFFFFF" },
+        outlineWidth: 3,
+        animation: false,
+      },
+    }) as Record<string, any>;
+    expect(migrated.version).toBe(4);
+    expect(migrated.style.primary.fontSize).toBe(34);
+    expect(migrated.style.outlineWidth).toBe(3);
+    expect(migrated.style.motion).toEqual({ effect: "none" });
+    expect("animation" in migrated.style).toBe(false);
+
+    const animated = migrateSettings({ version: 3, style: { animation: true } }) as Record<string, any>;
+    expect(animated.style.motion).toBeUndefined();
+  });
+
+  it("clamps transition settings to what can be rendered", () => {
+    const motion = sanitizeMotion({ effect: "spin" as never, enterMs: 99999, blur: -3, zoom: 0.2, bridgeMs: Number.NaN });
+    expect(motion.effect).toBe(DEFAULT_MOTION.effect);
+    expect(motion.enterMs).toBe(MOTION_LIMITS.enterMs.max);
+    expect(motion.blur).toBe(MOTION_LIMITS.blur.min);
+    expect(motion.zoom).toBe(MOTION_LIMITS.zoom.min);
+    expect(motion.bridgeMs).toBe(DEFAULT_MOTION.bridgeMs);
+    expect(motionBleed({ ...DEFAULT_MOTION, effect: "slide", direction: "up", distance: 20 })).toBe(20);
+    expect(motionBleed({ ...DEFAULT_MOTION, effect: "slide", direction: "left", distance: 20 })).toBe(0);
   });
 
   it("moves untouched 1.0 defaults to the 1.1 defaults", () => {
@@ -394,7 +425,7 @@ describe("other languages", () => {
         secondaryScale: 0.5,
       },
     }) as Record<string, any>;
-    expect(migrated.version).toBe(3);
+    expect(migrated.version).toBe(4);
     expect(migrated.langMode).toBe("secondary");
     expect(migrated.langOrder).toBe("secondary-first");
     expect(migrated.style.primary).toEqual({

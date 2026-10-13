@@ -88,5 +88,6 @@
     "empty": "Lines shown recently appear here during playback",
     "play_from": "Play from this line",
     "current": "Now"
-  }
+  },
+  "seek": "Playback position"
 }

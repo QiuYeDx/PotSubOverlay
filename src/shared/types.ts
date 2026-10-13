@@ -134,7 +134,34 @@ export interface OverlayStyle {
   lineGap: number;
   blockGap: number;
   letterSpacing: number;
-  animation: boolean;
+  motion: SubtitleMotion;
+}
+
+/** How one subtitle line gives way to the next. */
+export type LineEffect = "none" | "fade" | "blur" | "slide" | "zoom" | "wipe";
+
+export type MotionEasing = "out" | "inOut" | "linear" | "spring";
+
+export type SlideDirection = "up" | "down" | "left" | "right";
+
+export interface SubtitleMotion {
+  effect: LineEffect;
+  enterMs: number;
+  exitMs: number;
+  easing: MotionEasing;
+  /** "blur": starting blur radius, px. */
+  blur: number;
+  /** "slide": where the new line comes from and how far it travels, px. */
+  direction: SlideDirection;
+  distance: number;
+  /** "zoom": starting scale, 0.5–1. */
+  zoom: number;
+  /** "cross": the new line enters while the old one leaves; "sequential": after it has left. */
+  overlap: "cross" | "sequential";
+  /** A pause shorter than this between two lines keeps the previous line up, ms (0 = off). */
+  bridgeMs: number;
+  /** Fade of the whole overlay when it is shown or hidden, ms. */
+  toggleMs: number;
 }
 
 export interface OverlayPlacement {
@@ -170,7 +197,7 @@ export interface PlacementProfile {
 }
 
 export interface Settings {
-  version: 3;
+  version: 4;
   /** Preferred first language of bilingual subtitles. */
   primaryLang: KnownLang;
   langMode: LangMode;
@@ -220,6 +247,13 @@ export interface OverlayModeMessage {
   editing: boolean;
   /** Size of the window content in DIP. */
   viewport: { width: number; height: number };
+  /** Room below the subtitle's bottom edge kept for line transitions that move downward, DIP. */
+  bottomInset: number;
+  /**
+   * Set when this message completes an `overlay:prepare` (the page faded out
+   * so the window could change); the page fades back in once it has the new size.
+   */
+  reveal: number | null;
   placement: OverlayPlacement;
   displays: DisplayInfo[];
   locale: string;
