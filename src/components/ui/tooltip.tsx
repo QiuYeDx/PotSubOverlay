@@ -22,9 +22,22 @@ function Tooltip({
 }
 
 function TooltipTrigger({
+  onFocus,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
-  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
+  return (
+    <TooltipPrimitive.Trigger
+      data-slot="tooltip-trigger"
+      // Radix opens on every focus. Switching back to the window re-focuses the
+      // last clicked button, which would pop its tooltip; only keyboard focus
+      // (:focus-visible) should. preventDefault skips Radix's own handler.
+      onFocus={(event) => {
+        onFocus?.(event)
+        if (!event.currentTarget.matches(":focus-visible")) event.preventDefault()
+      }}
+      {...props}
+    />
+  )
 }
 
 function TooltipContent({
