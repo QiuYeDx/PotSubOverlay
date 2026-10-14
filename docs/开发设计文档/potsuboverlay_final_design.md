@@ -138,7 +138,7 @@ v1.0 把双语写死为“中文 + 日文”。v1.1 改为按“角色”工作�
 
 ## v1.2：游戏中不切出去
 
-目标：游戏进行中不需要 Alt+Tab 回 PotPlayer 或控制面板，也能控制播放、找回漏看的字幕，并让字幕位置适配不同游戏的界面。调研过程见 `docs/TODO.md`。
+目标：游戏进行中不需要 Alt+Tab 回 PotPlayer 或控制面板，也能控制播放、找回漏看的字幕，并让字幕位置适配不同游戏的界面。调研过程见 `potsuboverlay_research/2026-10-08_potplayer_playback_control.md`。
 
 ### 播放控制
 
